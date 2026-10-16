@@ -465,9 +465,10 @@ function seedLists_(ss) {
   const rows = [
     ['Climber', 'Gary'], ['Climber', 'Cecilia'],
     ['Gym', HUB],
-    ['Boulder grade', 'VB', '#F5D02E'], ['Boulder grade', 'V0-1', '#F28DB5'], ['Boulder grade', 'V2-3', '#2F6FD6'],
-    ['Boulder grade', 'V4-5', '#1B7F45'], ['Boulder grade', 'V6-7', '#F08A24'], ['Boulder grade', 'V8-9', '#D0342C'],
-    ['Boulder grade', 'V10+', '#22262A'],
+    // The Hub's circuits: tag colour → grade range
+    ['Boulder grade', 'V0-1', '#F5D02E'], ['Boulder grade', 'V1-2', '#F28DB5'], ['Boulder grade', 'V2-3', '#2F6FD6'],
+    ['Boulder grade', 'V3-4', '#1B7F45'], ['Boulder grade', 'V4-5', '#F08A24'], ['Boulder grade', 'V5-6', '#D0342C'],
+    ['Boulder grade', 'V6+', '#22262A'],
   ];
   ['5.9', '5.10-', '5.10+', '5.11-', '5.11+', '5.12-', '5.12+', '5.13-', '5.13+']
     .forEach(function (g) { rows.push(['Rope grade', g]); });

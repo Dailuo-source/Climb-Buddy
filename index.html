@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F3F1EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121614" media="(prefers-color-scheme: dark)">
+<title>Climb Buddy</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon-64.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<style>
+/* Layout: single-column phone app — sticky header, scrolling view, fixed bottom tab bar, bottom sheets for details */
+:root{
+  --bg:#F3F1EA; --surface:#FFFFFF; --sunk:#E4E1D7; --ink:#1D2422; --muted:#5B6460; --line:#DCD8CD; --line2:#C9C4B8;
+  --sent:#1F4FB8; --sent-ink:#FFFFFF; --sent-soft:#E2E9FA;
+  --fell:#B44A14; --fell-soft:#FBEBDF; --fell-line:#E7B394; --fell-bar:#F2A36B;
+  --scrim:rgba(29,36,34,.5); --shadow:0 1px 2px rgba(20,30,25,.06),0 8px 24px rgba(20,30,25,.10);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"DM Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --tabh:64px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root{
+  --bg:#121614; --surface:#1C2220; --sunk:#2A312E; --ink:#EEF2EF; --muted:#A9B3AE; --line:#36403B; --line2:#4A5550;
+  --sent:#8AA8FF; --sent-ink:#0B1230; --sent-soft:#1F2A4A;
+  --fell:#F2A36B; --fell-soft:#3A2416; --fell-line:#6B3E22; --fell-bar:#C9733A;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.4); color-scheme:dark;
+}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+a{color:var(--sent)}
+:focus-visible{outline:2px solid var(--sent);outline-offset:2px}
+.wrap{max-width:600px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* header */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:12px}
+.brand{display:flex;align-items:center;gap:6px;min-width:0}
+.brand img{width:22px;height:22px;border-radius:6px;flex:none}
+.gymbtn{appearance:none;border:0;background:none;padding:6px 0;cursor:pointer;font:700 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:4px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1{font-family:var(--f-display);font-weight:700;font-size:27px;line-height:1.1;margin:2px 0 0;letter-spacing:-.01em}
+.sync{appearance:none;border:0;background:none;cursor:pointer;font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding:4px 0 3px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.sync.on::before{background:#2E9E58}
+.sync.bad::before{background:var(--fell)}
+
+main{padding-top:14px;padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px) + 40px);display:flex;flex-direction:column;gap:14px}
+
+/* tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .wrap{display:grid;grid-template-columns:repeat(3,1fr);height:var(--tabh)}
+.tab{appearance:none;border:0;background:none;color:var(--muted);font:600 12px var(--f-body);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative;cursor:pointer}
+.tab svg{width:24px;height:24px}
+.tab[aria-selected="true"]{color:var(--ink)}
+.tab[aria-selected="true"]::after{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--ink)}
+.badge{position:absolute;top:7px;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--fell);color:#fff;font-size:11px;font-weight:700;line-height:18px;font-variant-numeric:tabular-nums}
+
+/* controls */
+.btn{appearance:none;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font:600 15px var(--f-body);padding:9px 14px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;text-decoration:none;white-space:nowrap}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.send{background:var(--sent);border-color:var(--sent);color:var(--sent-ink)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted);padding-inline:8px}
+.btn.danger{color:var(--fell)}
+.btn.small{min-height:36px;padding:5px 12px;font-size:14px;border-radius:10px}
+.btn.wide{flex:1}
+.btn:disabled{opacity:.45;cursor:default}
+.btn svg{width:18px;height:18px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;width:100%}
+textarea{resize:vertical}
+label.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.flabel{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 8px}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;background:var(--sunk);padding:4px;border-radius:14px}
+.seg button{appearance:none;border:0;border-radius:10px;height:40px;background:transparent;color:var(--ink);font-weight:500;font-size:15px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.types{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);border-bottom:1px solid var(--line)}
+.types button{appearance:none;border:0;border-bottom:3px solid transparent;background:none;height:44px;color:var(--muted);font-weight:500;font-size:15px;cursor:pointer;white-space:nowrap}
+.types button[aria-pressed="true"]{border-bottom-color:var(--ink);color:var(--ink);font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:0 14px;height:38px;font:500 14px var(--f-body);white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.chip .n{opacity:.7;font-variant-numeric:tabular-nums}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.dayrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.daynav{display:flex;align-items:center;gap:2px}
+.iconbtn{appearance:none;width:40px;height:40px;border:0;border-radius:10px;background:none;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px}
+.iconbtn:disabled{opacity:.3;cursor:default}
+.backfill{background:var(--fell-soft);color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sum div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.sum b{font-family:var(--f-display);font-size:26px;line-height:1.15;font-weight:700;font-variant-numeric:tabular-nums}
+.sum b.s{color:var(--sent)} .sum b.f{color:var(--fell)}
+.sum b.tops{font-size:16px;line-height:1.2;min-height:30px;display:flex;align-items:center}
+.sum span{font-size:12px;color:var(--muted)}
+
+/* grade rows */
+.grows{display:flex;flex-direction:column}
+.grow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.gcount{flex:1;font-size:14px;color:var(--muted);min-width:0}
+.gcount b{font-weight:700}
+.gcount .s{color:var(--sent)} .gcount .f{color:var(--fell)}
+.gcount.zero{opacity:.7}
+.tbtn{appearance:none;height:44px;border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none}
+.tbtn svg{width:22px;height:22px}
+.tbtn.fell{width:48px;border:1.5px solid var(--fell-line);background:var(--fell-soft);color:var(--fell)}
+.tbtn.sent{width:58px;border:0;background:var(--sent);color:var(--sent-ink)}
+.tbtn:active{transform:scale(.96)}
+.tag{display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:700;white-space:nowrap;border-radius:10px;flex:none;font-variant-numeric:tabular-nums}
+.tag.lg{min-width:64px;height:40px;padding:0 10px;font-size:16px}
+.tag.md{height:30px;padding:0 10px;font-size:15px;border-radius:8px}
+.tag.sm{height:24px;padding:0 7px;font-size:13px;border-radius:7px;min-width:42px}
+.tag.plain{background:var(--surface);color:var(--ink);border:1px solid var(--line2)}
+@media (prefers-color-scheme: dark){.tag:not(.plain){box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}}
+.hint{font-size:13px;color:var(--muted);margin:0}
+
+/* projects */
+.cards{display:flex;flex-direction:column;gap:12px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.phead{display:flex;align-items:center;gap:12px;appearance:none;border:0;background:none;padding:0;text-align:left;cursor:pointer;width:100%}
+.hdot{width:44px;height:44px;flex:none;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line2)}
+.hdot.sm{width:22px;height:22px;border-width:2px}
+.hdot.none{background:repeating-linear-gradient(45deg,var(--sunk) 0 4px,transparent 4px 8px)}
+.ptitle{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.ptitle .l1{display:flex;align-items:center;gap:8px;min-width:0}
+.ptitle .name{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptitle .sub{font-size:13px;color:var(--muted)}
+.pmeta{font-size:14px;display:flex;flex-direction:column;gap:3px}
+.pmeta .m{color:var(--muted)}
+.pmeta .note{font-style:italic;color:var(--muted)}
+.sentmark{color:var(--sent);font-weight:700}
+.pbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.linkbtn{appearance:none;background:none;border:0;padding:6px 2px;color:var(--muted);font-weight:600;font-size:13px;text-decoration:underline;cursor:pointer;align-self:flex-start}
+.done{display:flex;flex-direction:column}
+.drow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.drow span.t{flex:1;min-width:0}
+.sech{font:700 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 0}
+
+/* progress */
+.monthrow{display:flex;align-items:center;justify-content:space-between}
+.month{display:flex;align-items:center;gap:2px;font-weight:600}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.kpi b{font-family:var(--f-display);font-size:28px;line-height:1.2;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi b.small{font-size:19px;line-height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi span{font-size:13px;color:var(--muted)}
+.ctable{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.ctable th,.ctable td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
+.ctable th:first-child,.ctable td:first-child{text-align:left}
+.ctable th{font-size:12px;color:var(--muted);font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.panel h2{margin:0;font-size:16px;font-weight:600}
+.phead2{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.chart{display:flex;gap:8px;align-items:flex-end;height:190px;overflow-x:auto;padding-bottom:2px}
+.bar{flex:1 0 24px;max-width:40px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}
+.bar .v{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.bar .stack{width:100%;display:flex;flex-direction:column;gap:2px}
+.bar .stack i{display:block;border-radius:4px}
+.bar .d{font-size:12px;color:var(--muted)}
+.gbars{display:flex;flex-direction:column;gap:8px}
+.gbar{display:flex;align-items:center;gap:10px}
+.gbar .track{flex:1;height:18px;background:var(--sunk);border-radius:5px;overflow:hidden}
+.gbar .track i{display:block;height:100%;border-radius:5px}
+.gbar .n{width:92px;text-align:right;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.gbar .n b{color:var(--ink)}
+.typeh{font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
+.slist{display:flex;flex-direction:column}
+.srow{appearance:none;border:0;border-bottom:1px solid var(--line);background:none;display:flex;align-items:center;gap:12px;padding:12px 0;text-align:left;cursor:pointer;width:100%}
+.srow .dd{width:48px;display:flex;flex-direction:column;align-items:center;flex:none}
+.srow .dd small{font-size:12px;color:var(--muted);text-transform:uppercase}
+.srow .dd b{font-family:var(--f-display);font-size:21px;line-height:1.1}
+.srow .tx{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.srow .tx b{font-size:15px;font-weight:600}
+.srow .tx span{font-size:13px;color:var(--muted)}
+.srow svg{width:18px;height:18px;color:var(--muted);flex:none}
+
+.empty{text-align:center;padding:28px 18px;color:var(--muted);border:1px dashed var(--line2);border-radius:16px;font-size:14px}
+.empty strong{display:block;color:var(--ink);font-family:var(--f-display);font-size:18px;margin-bottom:4px}
+.connect{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.connect h2{font-family:var(--f-display);margin:0;font-size:21px;line-height:1.2}
+.connect p{margin:0;color:var(--muted)}
+.err{color:var(--fell)!important}
+.sheetlink{text-align:center;font-size:13px;color:var(--muted)}
+
+/* bottom sheet */
+.sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet{position:relative;background:var(--surface);width:100%;max-width:600px;max-height:calc(100% - 28px - env(safe-area-inset-top,0px));overflow:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));animation:up .22s ease-out;box-shadow:var(--shadow)}
+@media (min-width:700px){.sheet-wrap{align-items:center}.sheet{border-radius:22px;max-height:88%}}
+@keyframes up{from{transform:translateY(28px);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}.tbtn:active{transform:none}}
+.sheet-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--surface);padding:18px 0 10px;z-index:1}
+.sheet-h h2{font-family:var(--f-display);font-size:25px;line-height:1.15;margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sheet-h .sub{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.close{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:20px;line-height:1;cursor:pointer;flex:none}
+.sheet form,.sheet .stack{display:flex;flex-direction:column;gap:18px}
+.foot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* radio pills + swatches */
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{position:relative}
+.pill input,.sw input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;margin:0;pointer-events:none}
+.pill span{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 15px;border-radius:21px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer;white-space:nowrap}
+.pill input:checked+span{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.pill input:focus-visible+span,.sw input:focus-visible+span{outline:2px solid var(--sent);outline-offset:2px}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.sw{position:relative}
+.sw span{display:block;width:38px;height:38px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line2);cursor:pointer}
+.sw input:checked+span{box-shadow:0 0 0 3px var(--ink)}
+.stepper{display:flex;align-items:center;gap:4px;background:var(--bg);border-radius:14px;padding:4px}
+.stepper button{width:44px;height:40px;border:0;border-radius:10px;background:var(--surface);font-size:20px;cursor:pointer}
+.stepper output{width:40px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:20px}
+.inrow{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.inrow input{width:120px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:19px}
+.check{display:flex;align-items:center;gap:12px;background:var(--sent-soft);border-radius:14px;padding:12px 14px;font-size:15px;font-weight:500;cursor:pointer}
+.check input{width:22px;height:22px;min-height:0;margin:0;accent-color:var(--sent);flex:none}
+.linkp{display:flex;flex-direction:column;gap:8px}
+.crow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.crow .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.crow .t b{font-weight:600;font-size:14px}
+.crow .t span{font-size:13px;color:var(--muted)}
+.res{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.res.s{color:var(--sent)} .res.f{color:var(--fell)}
+.x{min-width:40px;height:40px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;border-radius:10px;flex:none}
+.x[data-armed="1"]{font-size:13px;font-weight:700;color:var(--fell)}
+
+/* toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px) + 12px);z-index:30;background:var(--ink);color:var(--bg);padding:8px 8px 8px 16px;border-radius:14px;display:flex;gap:4px;align-items:center;width:max-content;max-width:calc(100% - 24px);font-size:14px;box-shadow:var(--shadow)}
+.toast span{min-width:0;margin-right:6px}
+.toast button{background:none;border:0;color:var(--bg);font-weight:700;cursor:pointer;padding:8px 8px;white-space:nowrap}
+.toast button.hi{text-decoration:underline;text-underline-offset:3px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div style="min-width:0">
+      <div class="brand"><img src="favicon-64.png" alt=""><button id="gymBtn" class="gymbtn" data-act="pickGym" aria-label="Change gym">Climb Buddy</button></div>
+      <h1 id="title">Climb Buddy</h1>
+    </div>
+    <button id="sync" class="sync" data-act="refreshNow" title="Sync with your sheet">Connecting…</button>
+  </div>
+</header>
+<main id="view" class="wrap"></main>
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" data-tab="session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Session</button>
+    <button class="tab" role="tab" data-tab="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Projects<span id="projBadge" class="badge" hidden></span></button>
+    <button class="tab" role="tab" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg>Progress</button>
+  </div>
+</nav>
+
+<div id="sheetWrap" class="sheet-wrap" hidden>
+  <div class="scrim" data-act="close"></div>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div id="sheetBody"></div></section>
+</div>
+<div id="toast" class="toast" role="status" hidden><span id="toastMsg"></span><span id="toastActs" style="display:flex;margin:0"></span></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =====================================================================
+   CONFIG — optional. Leave blank and connect each phone once with the
+   phone link from your sheet (Climb Buddy menu → Show app key and phone link).
+   ===================================================================== */
+const API_URL = "";
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eqi=(a,b)=>String(a==null?"":a).trim().toLowerCase()===String(b==null?"":b).trim().toLowerCase();
+const LS={get(k,d){try{const v=localStorage.getItem("cb."+k);return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem("cb."+k,v);}catch(e){}}};
+const ICON={
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
+  down:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
+};
+
+/* ---------- dates ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const dayKey=ms=>{const d=new Date(ms);return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());};
+const todayKey=()=>dayKey(Date.now());
+const keyDate=k=>{const p=k.split("-").map(Number);return new Date(p[0],p[1]-1,p[2]||1,12);};
+const shiftDay=(k,n)=>{const d=keyDate(k);d.setDate(d.getDate()+n);return dayKey(d.getTime());};
+const fmtLong=k=>keyDate(k).toLocaleDateString([],{weekday:"long",month:"short",day:"numeric"});
+const fmtShort=k=>keyDate(k).toLocaleDateString([],{month:"short",day:"numeric"});
+const fmtDow=k=>keyDate(k).toLocaleDateString([],{weekday:"short"});
+const relDay=k=>k===todayKey()?"today":k===shiftDay(todayKey(),-1)?"yesterday":fmtShort(k);
+let backfillN=0;
+function whenFor(k){if(k===todayKey())return Date.now();backfillN++;return keyDate(k).getTime()+backfillN*1000;}
+
+/* ---------- types, lists, grades ---------- */
+const TYPES=[
+  {k:"Bouldering",grades:"Boulder grade",areas:["Boulder area"],anchor:false},
+  {k:"Top rope",grades:"Rope grade",areas:["Rope area"],anchor:true},
+  {k:"Auto belay",grades:"Rope grade",areas:["Auto belay area","Rope area"],anchor:true}
+];
+const typeOf=k=>TYPES.find(t=>t.k===k)||TYPES[0];
+function normType(v){const s=String(v||"").toLowerCase();if(/^boulder/.test(s))return"Bouldering";if(/^top/.test(s))return"Top rope";if(/^auto/.test(s))return"Auto belay";return String(v||"").trim()||"Bouldering";}
+function listRows(name,anyGym){const rows=S.lists.filter(r=>eqi(r.list,name));if(anyGym)return rows;const g=rows.filter(r=>r.gym&&eqi(r.gym,GYM));return g.length?g:rows.filter(r=>!r.gym);}
+const climbers=()=>{const c=[...new Set(listRows("Climber",true).map(r=>r.value))];return c.length?c:["Me"];};
+const gyms=()=>{const g=[...new Set(listRows("Gym",true).map(r=>r.value))];if(GYM&&!g.some(x=>eqi(x,GYM)))g.unshift(GYM);return g;};
+const gkey=g=>String(g==null?"":g).toLowerCase().replace(/[–—]/g,"-").replace(/\s+/g,"");
+const gradeLabel=g=>String(g==null?"":g).replace(/(\d)\s*-\s*(\d)/g,"$1–$2");
+const gradeRows=type=>listRows(typeOf(type).grades);
+function areaRows(type){for(const n of typeOf(type).areas){const r=listRows(n);if(r.length)return r;}return[];}
+const holdRows=()=>listRows("Hold colour",true);
+function gradeIdx(type,g){const k=gkey(g);return gradeRows(type).findIndex(r=>gkey(r.value)===k);}
+function gradeColour(type,g){const k=gkey(g);const r=gradeRows(type).find(x=>gkey(x.value)===k);return r&&/^#[0-9a-f]{6}$/i.test(r.colour)?r.colour:"";}
+function inkOn(hex){const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;const f=c=>c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4);const L=.2126*f(r)+.7152*f(g)+.0722*f(b);return L>.3?"#1D2422":"#FFFFFF";}
+function tagHTML(type,g,size){const c=gradeColour(type,g);const lbl=esc(gradeLabel(g));return c?`<span class="tag ${size}" style="background:${c};color:${inkOn(c)}">${lbl}</span>`:`<span class="tag ${size} plain">${lbl}</span>`;}
+const CSSCOL={red:"#D83A34",orange:"#F08A24",yellow:"#F5D02E",green:"#3DA35D",teal:"#2BA5A0",blue:"#2F6FD6",purple:"#8150C8",pink:"#EE7FB0",black:"#22262A",white:"#F7F7F4",grey:"#9AA0A6",gray:"#9AA0A6",brown:"#8A5A3B"};
+function holdHex(name){if(!name)return"";const r=holdRows().find(x=>eqi(x.value,name));if(r&&/^#[0-9a-f]{6}$/i.test(r.colour))return r.colour;return CSSCOL[String(name).trim().toLowerCase()]||"";}
+function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${cls||""}" style="background:${h}" aria-hidden="true"></span>`:`<span class="hdot none ${cls||""}" aria-hidden="true"></span>`;}
+function hardest(list){const out=[];for(const t of TYPES){let best=-1,bg="";for(const c of list){if(c.type!==t.k||c.result!=="Sent")continue;const i=gradeIdx(t.k,c.grade);if(i>best){best=i;bg=c.grade;}else if(best<0&&!bg)bg=c.grade;}if(bg)out.push(gradeLabel(bg));}return out.join(" · ");}
+
+/* =====================================================================
+   SYNC — the Google Sheet is the source of truth.
+   Changes show on screen right away, then go to the sheet in batches.
+   ===================================================================== */
+const COLLS=["climbs","projects","lists"];
+let S={climbs:[],projects:[],lists:[]};
+let ready=false,auth="ok",KEY=LS.get("key",""),API=API_URL||LS.get("api",""),sheetUrl=LS.get("sheet",""),lastSync=0;
+let queue=[],inflight=false,flushT=null,retryT=null;
+let GYM=LS.get("gym",""),WHO=LS.get("who",""),DAY=todayKey(),TYPE=LS.get("type","Bouldering");
+let tab=LS.get("tab","session"),projFilter="All",pMonth=todayKey().slice(0,7),pWho=LS.get("pwho","");
+function readLinkParams(){
+  try{
+    const h=new URLSearchParams((location.hash||"").replace(/^#/,""));const q=new URLSearchParams(location.search);
+    const api=h.get("api")||q.get("api"),key=h.get("key")||q.get("key");
+    if(api&&/^https:\/\/script\.google\.com\//.test(api)){API=api;LS.set("api",api);}
+    if(key){KEY=key.trim();LS.set("key",KEY);}
+    if(api||key)history.replaceState(null,"",location.pathname);
+  }catch(e){}
+}
+function callApi(payload){return fetch(API,{method:"POST",body:JSON.stringify(payload),redirect:"follow"}).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json();});}
+const uid=()=>("x"+Date.now().toString(36)+Math.random().toString(36).slice(2,9));
+function applyLocal(o){const arr=S[o.coll];if(o.op==="add"){const rec=Object.assign({id:o.id},o.data);const i=arr.findIndex(d=>d.id===o.id);if(i>=0)arr[i]=rec;else arr.push(rec);}else if(o.op==="update"){const x=arr.find(d=>d.id===o.id);if(x)Object.assign(x,o.data);}else S[o.coll]=arr.filter(d=>d.id!==o.id);}
+function enqueue(o){queue.push(o);applyLocal(o);onData();clearTimeout(flushT);flushT=setTimeout(flush,350);}
+const store={
+  add(c,data){const id=uid();enqueue({op:"add",coll:c,id,data});return id;},
+  update(c,id,data){enqueue({op:"update",coll:c,id,data});},
+  del(c,id){enqueue({op:"del",coll:c,id});}
+};
+function normalize(st){
+  st=st||{};const str=v=>String(v==null?"":v).trim();
+  return{
+    lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),gym:str(r.gym)})),
+    climbs:(st.climbs||[]).map(r=>Object.assign({},r,{when:+r.when||0,tries:r.tries==null||r.tries===""?null:+r.tries,result:/^s/i.test(str(r.result))?"Sent":"Fell",type:normType(r.type),climber:str(r.climber),gym:str(r.gym),grade:str(r.grade)})),
+    projects:(st.projects||[]).map(r=>Object.assign({},r,{type:normType(r.type),sentBy:Array.isArray(r.sentBy)?r.sentBy:str(r.sentBy).split(",").map(s=>s.trim()).filter(Boolean),status:/^s/i.test(str(r.status))?"Sent":/^r/i.test(str(r.status))?"Reset":"Open",added:+r.added||0,updated:+r.updated||0}))
+  };
+}
+async function flush(){
+  if(auth!=="ok")return;
+  if(inflight){clearTimeout(flushT);flushT=setTimeout(flush,400);return;}
+  clearTimeout(retryT);
+  const ops=queue.slice();inflight=true;setSync(ops.length?"saving":ready?"loading":"connecting");
+  let res;
+  try{res=await callApi({key:KEY,ops});}catch(e){res={ok:false,error:"network"};}
+  inflight=false;
+  if(res&&res.ok){
+    queue=queue.slice(ops.length);
+    if(res.sheetUrl){sheetUrl=res.sheetUrl;LS.set("sheet",sheetUrl);}
+    S=normalize(res.state);queue.forEach(applyLocal);
+    settleDefaults();
+    const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
+    if(first)render();else onData();
+    if(queue.length){clearTimeout(flushT);flushT=setTimeout(flush,350);}
+    return;
+  }
+  if(res&&res.error==="bad_key"){auth="need";setSync("off");render("That key didn't work. Get a fresh phone link from your sheet: Climb Buddy menu → Show app key and phone link.");return;}
+  setSync("error");
+  if(res&&res.message&&res.error!=="network")toast(res.message);
+  else toast(ops.length?"Can't reach your sheet. Your climbs will save when you're back online.":"Can't reach your sheet. Tap the status to retry.");
+  retryT=setTimeout(flush,15000);
+}
+function setSync(s){const el=$("#sync");if(!el)return;
+  const t={connecting:"Connecting…",loading:"Refreshing…",saving:"Saving…",ok:"Synced "+new Date(lastSync).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}),error:"Offline · tap to retry",off:"Not connected"}[s];
+  el.textContent=t;el.className="sync"+(s==="ok"?" on":s==="error"||s==="off"?" bad":"");}
+let lastToday=todayKey();
+document.addEventListener("visibilitychange",()=>{if(document.hidden||auth!=="ok")return;
+  // Leave the app open overnight and it moves on to the new day (unless you were logging an older day)
+  if(todayKey()!==lastToday){if(DAY===lastToday)DAY=todayKey();lastToday=todayKey();if(ready)render();}
+  if(Date.now()-lastSync>15000)flush();});
+setInterval(()=>{if(!document.hidden&&auth==="ok"&&!queue.length&&!inflight&&Date.now()-lastSync>60000)flush();},20000);
+window.addEventListener("beforeunload",e=>{if(queue.length){e.preventDefault();e.returnValue="";}});
+
+function settleDefaults(){
+  const cs=climbers();if(!cs.includes(WHO)){WHO=cs[0];LS.set("who",WHO);}
+  if(!GYM){GYM=gyms()[0]||"My gym";LS.set("gym",GYM);}
+  if(!TYPES.some(t=>t.k===TYPE))TYPE="Bouldering";
+  if(pWho!=="*"&&!cs.includes(pWho))pWho=WHO;
+}
+
+/* ---------- derived ---------- */
+const atGym=c=>eqi(c.gym,GYM);
+const dayClimbs=(k,who)=>S.climbs.filter(c=>atGym(c)&&dayKey(c.when)===k&&(!who||c.climber===who));
+const isOpen=p=>p.status==="Open";
+const gymProjects=()=>S.projects.filter(p=>eqi(p.gym,GYM));
+function projInfo(p){
+  const cs=S.climbs.filter(c=>c.project===p.id);
+  const tries={};let last=p.added||0;
+  for(const c of cs){if(c.result==="Fell")tries[c.climber]=(tries[c.climber]||0)+(c.tries||1);last=Math.max(last,c.when);}
+  for(const w of p.sentBy)if(!(w in tries))tries[w]=0;
+  return{tries,last,climbs:cs};
+}
+function projName(p){return(p.hold?p.hold+" holds":"Route");}
+function projWhere(p){return[p.type,p.area,p.anchor?"Anchor "+p.anchor:""].filter(Boolean).join(" · ");}
+
+/* ---------- render ---------- */
+function setTab(t){hideToast();tab=t;LS.set("tab",t);render();window.scrollTo(0,0);}
+function render(msg){
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===tab)));
+  $("#gymBtn").innerHTML=esc(GYM||"Climb Buddy")+(ready?" "+ICON.down:"");
+  const v=$("#view");
+  if(auth!=="ok"){
+    $("#title").textContent="Connect";
+    v.innerHTML=`<div class="connect"><h2>Connect to your sheet</h2>
+      <p>In your Climb Buddy Google Sheet, open the <b>Climb Buddy</b> menu and choose <b>Show app key and phone link</b>. Open that link on this phone and you're done.</p>
+      <p>Or fill these in by hand:</p>
+      <form id="keyForm" class="stack" style="display:flex;flex-direction:column;gap:10px" autocomplete="off">
+        <label class="field">Web app link<input id="apiInput" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(API)}" ${API_URL?"disabled":""}></label>
+        <label class="field">App key<input id="keyInput" autocapitalize="off" spellcheck="false" value="${esc(KEY)}"></label>
+        <button class="btn primary" type="submit">Connect</button>
+      </form>${msg?`<p class="err">${esc(msg)}</p>`:""}</div>`;
+    return;
+  }
+  if(!ready){$("#title").textContent={session:"Today",projects:"Projects",progress:"Progress"}[tab];v.innerHTML=`<div class="empty"><strong>Loading your climbs…</strong>Reading your sheet.</div>`;return;}
+  if(tab==="session")renderSession();else if(tab==="projects")renderProjects();else renderProgress();
+  const n=gymProjects().filter(isOpen).length;const b=$("#projBadge");b.hidden=!n;b.textContent=n;
+}
+// Forms in a sheet are never redrawn under your fingers; only the read-only day view refreshes
+function onData(){if(auth!=="ok"||!ready)return;render();if(sheet&&sheet.type==="day")renderSheet();}
+
+/* Session */
+function renderSession(){
+  const today=todayKey();
+  $("#title").textContent=DAY===today?"Today":keyDate(DAY).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
+  const mine=dayClimbs(DAY,WHO);
+  const sent=mine.filter(c=>c.result==="Sent").length,fell=mine.length-sent;
+  const rows=gradeRows(TYPE).map(r=>r.value);
+  for(const c of mine)if(c.type===TYPE&&!rows.some(g=>gkey(g)===gkey(c.grade)))rows.push(c.grade);
+  const cnt={};for(const c of mine){if(c.type!==TYPE)continue;const k=gkey(c.grade);cnt[k]=cnt[k]||{s:0,f:0};cnt[k][c.result==="Sent"?"s":"f"]++;}
+  $("#view").innerHTML=`
+    <div class="seg" role="group" aria-label="Who's climbing">${climbers().map(c=>`<button data-act="who" data-v="${esc(c)}" aria-pressed="${c===WHO}">${esc(c)}</button>`).join("")}</div>
+    ${DAY!==today?`<div class="backfill"><span>Logging for <b>${esc(fmtLong(DAY))}</b></span><button class="btn small" data-act="goToday">Back to today</button></div>`:""}
+    <div class="card">
+      <div class="sum">
+        <div><b>${mine.length}</b><span>climbs</span></div>
+        <div><b class="s">${sent}</b><span>sent</span></div>
+        <div><b class="f">${fell}</b><span>fell</span></div>
+        <div><b class="tops">${esc(hardest(mine)||"—")}</b><span>top send</span></div>
+      </div>
+    </div>
+    <div class="dayrow">
+      <div class="types" role="group" aria-label="Climb type" style="flex:1">${TYPES.map(t=>`<button data-act="type" data-v="${t.k}" aria-pressed="${t.k===TYPE}">${t.k}</button>`).join("")}</div>
+    </div>
+    <div class="grows">${rows.length?rows.map(g=>{const k=gkey(g),c=cnt[k]||{s:0,f:0};const L=esc(gradeLabel(g));return`
+      <div class="grow">
+        ${tagHTML(TYPE,g,"lg")}
+        <div class="gcount${c.s+c.f?"":" zero"}"><b class="s">${c.s}</b> sent · <b class="f">${c.f}</b> fell</div>
+        <button class="tbtn fell" data-act="log" data-res="Fell" data-g="${esc(g)}" aria-label="Fell on ${L}">${ICON.x}</button>
+        <button class="tbtn sent" data-act="log" data-res="Sent" data-g="${esc(g)}" aria-label="Sent ${L}">${ICON.check}</button>
+      </div>`;}).join(""):`<div class="empty"><strong>No grades yet</strong>Add some to the Lists tab in your sheet (List: ${esc(typeOf(TYPE).grades)}).</div>`}</div>
+    <div class="dayrow">
+      <p class="hint">Tap ✓ for a send, ✕ for a fall.</p>
+      <div class="daynav"><button class="iconbtn" data-act="prevDay" aria-label="Log an earlier day">${ICON.left}</button><button class="iconbtn" data-act="nextDay" aria-label="Next day" ${DAY>=today?"disabled":""}>${ICON.right}</button></div>
+    </div>
+    ${mine.length?`<button class="btn wide" data-act="openDay" data-k="${DAY}">See ${DAY===today?"today's":"this day's"} climbs</button>`:""}
+    ${sheetLink()}`;
+}
+const sheetLink=()=>sheetUrl?`<div class="sheetlink"><a href="${esc(sheetUrl)}" target="_blank" rel="noopener">Edit in Google Sheets ↗</a></div>`:"";
+
+function logClimb(res,grade){
+  const id=store.add("climbs",{when:whenFor(DAY),climber:WHO,type:TYPE,grade,result:res,gym:GYM,tries:1});
+  const lbl=gradeLabel(grade);
+  const acts=[{label:"Undo",fn:()=>{store.del("climbs",id);toast("Removed");}}];
+  if(res==="Fell")acts.unshift({label:"Add details",hi:true,fn:()=>openSheet({type:"climb",id})});
+  toast(res==="Sent"?`${WHO} sent a ${lbl}`:`${WHO} fell on a ${lbl}`,acts);
+}
+
+/* Projects */
+function renderProjects(){
+  $("#title").textContent="Projects";
+  const all=gymProjects();
+  const open=all.filter(isOpen).sort((a,b)=>projInfo(b).last-projInfo(a).last);
+  const counts={All:open.length};for(const t of TYPES)counts[t.k]=open.filter(p=>p.type===t.k).length;
+  const list=projFilter==="All"?open:open.filter(p=>p.type===projFilter);
+  const cutoff=Date.now()-60*864e5;
+  const done=all.filter(p=>!isOpen(p)&&(p.updated||p.added)>=cutoff).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  $("#view").innerHTML=`
+    <p class="hint">Routes you fell on at ${esc(GYM)} and haven't sent yet.</p>
+    <div class="chips" role="group" aria-label="Filter projects">${["All",...TYPES.map(t=>t.k)].map(k=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${k} <span class="n">${counts[k]}</span></button>`).join("")}</div>
+    <div class="cards">${list.length?list.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":"No projects yet"}</strong>${open.length?"Try another filter.":"When you fall on a route, tap <b>Add details</b> and keep it here to come back to."}</div>`}</div>
+    ${done.length?`<h2 class="sech">Sent or reset recently</h2><div class="done">${done.map(p=>{const info=projInfo(p);const total=Object.values(info.tries).reduce((a,b)=>a+b,0);
+      const what=p.status==="Sent"?`${esc(p.sentBy.join(" & ")||"Sent")} sent it${total?` after ${total} ${total===1?"try":"tries"}`:""}`:"Route was reset";
+      return`<div class="drow">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(p.hold||"Route")} · ${what}</span><button class="btn small ghost" data-act="reopen" data-id="${p.id}">Reopen</button></div>`;}).join("")}</div>`:""}
+    ${sheetLink()}`;
+}
+function projCard(p){
+  const info=projInfo(p);
+  const who=Object.keys(info.tries).map(w=>`${esc(w)} ${info.tries[w]} ${info.tries[w]===1?"try":"tries"}${p.sentBy.includes(w)?` <span class="sentmark">✓ sent</span>`:""}`).join(" · ");
+  const iSent=p.sentBy.includes(WHO);
+  return`<article class="pcard">
+    <button class="phead" data-act="editProj" data-id="${p.id}" aria-label="Edit ${esc(gradeLabel(p.grade))} ${esc(projName(p))}">
+      ${holdDot(p.hold)}
+      <span class="ptitle"><span class="l1">${tagHTML(p.type,p.grade,"md")}<span class="name">${esc(projName(p))}</span></span><span class="sub">${esc(projWhere(p))}</span></span>
+    </button>
+    <div class="pmeta">
+      ${who?`<span>${who}</span>`:""}
+      <span class="m">Last tried ${esc(relDay(dayKey(info.last||Date.now())))}</span>
+      ${p.note?`<span class="note">“${esc(p.note)}”</span>`:""}
+    </div>
+    <div class="pbtns">
+      <button class="btn send" data-act="projSent" data-id="${p.id}" ${iSent?"disabled":""}>${ICON.check}${iSent?esc(WHO)+" sent it":"Sent it"}</button>
+      <button class="btn" data-act="projFell" data-id="${p.id}">Fell again</button>
+    </div>
+    <button class="linkbtn" data-act="projReset" data-id="${p.id}" data-confirm="Tap again: route was reset">Route was reset</button>
+  </article>`;
+}
+function projSent(p){
+  const prev={sentBy:p.sentBy.slice(),status:p.status};
+  const cid=store.add("climbs",{when:whenFor(DAY),climber:WHO,type:p.type,grade:p.grade,result:"Sent",gym:p.gym||GYM,area:p.area||"",anchor:p.anchor||"",hold:p.hold||"",tries:1,project:p.id});
+  const sentBy=[...new Set([...p.sentBy,WHO])];
+  const triers=Object.keys(projInfo(p).tries);
+  const all=triers.every(w=>sentBy.includes(w));
+  store.update("projects",p.id,{sentBy,status:all?"Sent":"Open"});
+  toast(`Sent! ${gradeLabel(p.grade)} logged for ${WHO}`,[{label:"Undo",fn:()=>{store.del("climbs",cid);store.update("projects",p.id,prev);}}]);
+}
+function projFell(p){
+  const cid=store.add("climbs",{when:whenFor(DAY),climber:WHO,type:p.type,grade:p.grade,result:"Fell",gym:p.gym||GYM,area:p.area||"",anchor:p.anchor||"",hold:p.hold||"",tries:1,project:p.id});
+  store.update("projects",p.id,{});
+  toast(`Logged a try for ${WHO}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);
+}
+
+/* Progress */
+function renderProgress(){
+  $("#title").textContent="Progress";
+  const cs=climbers();if(pWho!=="*"&&!cs.includes(pWho))pWho=WHO;
+  const inMonth=S.climbs.filter(c=>atGym(c)&&dayKey(c.when).slice(0,7)===pMonth);
+  const data=pWho==="*"?inMonth:inMonth.filter(c=>c.climber===pWho);
+  const days=[...new Set(data.map(c=>dayKey(c.when)))].sort();
+  const sent=data.filter(c=>c.result==="Sent").length,fell=data.length-sent;
+  const thisMonth=todayKey().slice(0,7);
+  const mLabel=keyDate(pMonth+"-01").toLocaleDateString([],{month:"long",year:pMonth.slice(0,4)===thisMonth.slice(0,4)?undefined:"numeric"});
+  const per=days.map(k=>{const d=data.filter(c=>dayKey(c.when)===k);const s=d.filter(c=>c.result==="Sent").length;return{k,s,f:d.length-s,t:d.length,top:hardest(d)};});
+  const max=Math.max(1,...per.map(x=>x.t));const H=140;
+  let html=`
+    <div class="monthrow">
+      <div class="month"><button class="iconbtn" data-act="month" data-d="-1" aria-label="Previous month">${ICON.left}</button><span>${esc(mLabel)}</span><button class="iconbtn" data-act="month" data-d="1" aria-label="Next month" ${pMonth>=thisMonth?"disabled":""}>${ICON.right}</button></div>
+    </div>
+    <div class="seg" role="group" aria-label="Whose progress">${cs.map(c=>`<button data-act="pwho" data-v="${esc(c)}" aria-pressed="${pWho===c}">${esc(c)}</button>`).join("")}${cs.length>1?`<button data-act="pwho" data-v="*" aria-pressed="${pWho==="*"}">Both</button>`:""}</div>`;
+  if(!data.length){$("#view").innerHTML=html+`<div class="empty"><strong>No climbs in ${esc(mLabel)}</strong>Log a session and it shows up here.</div>`+sheetLink();return;}
+  if(pWho==="*"&&cs.length>1){
+    html+=`<div class="panel"><table class="ctable"><thead><tr><th scope="col">${esc(mLabel)}</th><th scope="col">Sessions</th><th scope="col">Climbs</th><th scope="col">Sent</th><th scope="col">Hardest</th></tr></thead><tbody>${cs.map(w=>{const d=inMonth.filter(c=>c.climber===w);const s=d.filter(c=>c.result==="Sent").length;return`<tr><td><b>${esc(w)}</b></td><td>${new Set(d.map(c=>dayKey(c.when))).size}</td><td>${d.length}</td><td>${d.length?Math.round(s/d.length*100)+"%":"—"}</td><td>${esc(hardest(d)||"—")}</td></tr>`;}).join("")}</tbody></table></div>`;
+  }else{
+    html+=`<div class="kpis">
+      <div class="kpi"><b>${days.length}</b><span>${days.length===1?"session":"sessions"}</span></div>
+      <div class="kpi"><b>${data.length}</b><span>climbs · ${sent} sent, ${fell} fell</span></div>
+      <div class="kpi"><b>${Math.round(sent/data.length*100)}%</b><span>send rate</span></div>
+      <div class="kpi"><b class="small">${esc(hardest(data)||"—")}</b><span>hardest sends</span></div>
+    </div>`;
+  }
+  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--sent)"></i>Sent</span><span><i style="background:var(--fell-bar)"></i>Fell</span></div></div>
+    <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--sent)"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
+  // sends by grade, per type
+  let gb="";const bmax=Math.max(1,...TYPES.flatMap(t=>gradeCounts(t.k,data).map(r=>r.s)));
+  for(const t of TYPES){const rows=gradeCounts(t.k,data);if(!rows.length)continue;
+    gb+=`<div class="typeh">${t.k}</div>`+rows.map(r=>{const col=gradeColour(t.k,r.g)||"var(--ink)";return`<div class="gbar">${tagHTML(t.k,r.g,"sm")}<span class="track"><i style="width:${Math.round(r.s/bmax*100)}%;background:${col}"></i></span><span class="n"><b>${r.s}</b> sent${r.f?` · ${r.f}✕`:""}</span></div>`;}).join("");}
+  html+=`<section class="panel"><h2>Sends by grade</h2><div class="gbars">${gb}</div></section>`;
+  html+=`<section><h2 class="sech">Sessions</h2><div class="slist">${per.slice().reverse().map(x=>`<button class="srow" data-act="openDay" data-k="${x.k}"><span class="dd"><small>${esc(fmtDow(x.k))}</small><b>${keyDate(x.k).getDate()}</b></span><span class="tx"><b>${x.t} ${x.t===1?"climb":"climbs"} · ${x.s} sent</b><span>${x.top?"Top "+esc(x.top):"No sends yet"}</span></span>${ICON.right}</button>`).join("")}</div></section>`+sheetLink();
+  $("#view").innerHTML=html;
+}
+function gradeCounts(type,data){
+  const d=data.filter(c=>c.type===type);if(!d.length)return[];
+  const order=gradeRows(type).map(r=>r.value);
+  for(const c of d)if(!order.some(g=>gkey(g)===gkey(c.grade)))order.push(c.grade);
+  return order.map(g=>{const k=gkey(g);const x=d.filter(c=>gkey(c.grade)===k);return{g,s:x.filter(c=>c.result==="Sent").length,f:x.filter(c=>c.result==="Fell").length};}).filter(r=>r.s+r.f);
+}
+
+/* =====================================================================
+   SHEETS (bottom panels)
+   ===================================================================== */
+let sheet=null,lastFocus=null;
+function openSheet(s){hideToast();if(!sheet)lastFocus=document.activeElement;sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow="hidden";setTimeout(()=>{const f=$("#sheetBody .close");if(f)f.focus();},30);}
+function closeSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style.overflow="";if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
+const head=(title,sub)=>`<div class="sheet-h"><div><h2 id="sheetTitle">${title}</h2>${sub?`<p class="sub">${sub}</p>`:""}</div><button class="close" data-act="close" aria-label="Close">×</button></div>`;
+function renderSheet(){
+  if(!sheet)return;const b=$("#sheetBody");
+  if(sheet.type==="climb"){const c=S.climbs.find(x=>x.id===sheet.id);if(!c){closeSheet();return;}b.innerHTML=climbSheet(c);}
+  else if(sheet.type==="project"){const p=S.projects.find(x=>x.id===sheet.id);if(!p){closeSheet();return;}b.innerHTML=projSheet(p);}
+  else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
+  else if(sheet.type==="gym")b.innerHTML=gymSheet();
+}
+function areaField(type,val){
+  const rows=areaRows(type);
+  if(!rows.length)return`<label class="field">Where<input name="area" value="${esc(val||"")}" placeholder="Wall or area"></label>`;
+  const has=rows.some(r=>eqi(r.value,val));
+  return`<fieldset><legend class="flabel">Where</legend><div class="pills">${rows.map(r=>`<label class="pill"><input type="radio" name="area" value="${esc(r.value)}" ${eqi(r.value,val)?"checked":""}><span>${esc(r.value)}</span></label>`).join("")}${val&&!has?`<label class="pill"><input type="radio" name="area" value="${esc(val)}" checked><span>${esc(val)}</span></label>`:""}</div></fieldset>`;
+}
+function holdField(val){
+  const rows=holdRows();
+  return`<fieldset><legend class="flabel">Hold colour</legend><div class="swatches">${rows.map(r=>{const h=/^#[0-9a-f]{6}$/i.test(r.colour)?r.colour:(CSSCOL[r.value.toLowerCase()]||"#ccc");return`<label class="sw" title="${esc(r.value)}"><input type="radio" name="hold" value="${esc(r.value)}" ${eqi(r.value,val)?"checked":""} aria-label="${esc(r.value)}"><span style="background:${h}"></span></label>`;}).join("")}</div></fieldset>`;
+}
+const anchorField=(type,val)=>typeOf(type).anchor?`<div class="inrow"><label for="fAnchor" class="flabel" style="margin:0">Anchor #</label><input id="fAnchor" name="anchor" inputmode="numeric" value="${esc(val||"")}" placeholder="—"></div>`:"";
+function climbSheet(c){
+  const fell=c.result==="Fell";
+  const matches=fell&&!c.project?gymProjects().filter(p=>isOpen(p)&&p.type===c.type&&gkey(p.grade)===gkey(c.grade)):[];
+  if(sheet.link==null)sheet.link="new";
+  const linked=c.project?S.projects.find(p=>p.id===c.project):null;
+  const sub=[c.type,c.climber,c.gym,relDay(dayKey(c.when))].filter(Boolean).map(esc).join(" · ");
+  return head(`${fell?"Fell on a":"Sent a"} ${tagHTML(c.type,c.grade,"md")}`,sub)+`
+  <form id="climbForm" data-id="${c.id}" autocomplete="off">
+    ${matches.length?`<fieldset><legend class="flabel">Is it one of your projects?</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}" ${sheet.link===p.id?"checked":""}><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="new" ${sheet.link==="new"?"checked":""}><span>A new route</span></label></div></fieldset>`:""}
+    <div id="newFields" class="stack" ${sheet.link!=="new"?"hidden":""}>
+      ${areaField(c.type,c.area)}
+      ${anchorField(c.type,c.anchor)}
+      ${holdField(c.hold)}
+    </div>
+    <div class="inrow"><span class="flabel" style="margin:0" id="triesL">Tries on it ${dayKey(c.when)===todayKey()?"today":"that day"}</span>
+      <div class="stepper" role="group" aria-labelledby="triesL"><button type="button" data-act="tries" data-d="-1" aria-label="One fewer try">−</button><output id="triesOut">${c.tries||1}</output><button type="button" data-act="tries" data-d="1" aria-label="One more try">+</button></div></div>
+    <label class="field">Note<input name="note" value="${esc(c.note||"")}" placeholder="${fell?"What stopped you?":"Anything to remember?"}"></label>
+    ${linked?`<p class="hint">Part of your project: ${esc(projName(linked))}${linked.area?" · "+esc(linked.area):""}.</p>`:fell?`<label class="check" id="projCheck" ${sheet.link!=="new"?"hidden":""}><input type="checkbox" name="addProj" checked>Add to Projects to come back to</label>`:""}
+    <div class="foot"><button type="button" class="btn" data-act="close">${c.area||c.hold||c.note?"Cancel":"Skip"}</button><button type="submit" class="btn primary">Save</button></div>
+    <button type="button" class="linkbtn" data-act="delClimb" data-id="${c.id}" data-confirm="Tap again to delete">Delete this climb</button>
+  </form>`;
+}
+function saveClimb(form){
+  const c=S.climbs.find(x=>x.id===form.dataset.id);if(!c)return closeSheet();
+  const f=new FormData(form);const tries=Math.max(1,+$("#triesOut").textContent||1);const note=String(f.get("note")||"").trim();
+  const link=f.get("link")||"new";
+  if(link!=="new"){
+    const p=S.projects.find(x=>x.id===link)||{};
+    store.update("climbs",c.id,{project:link,tries,note,area:p.area||"",anchor:p.anchor||"",hold:p.hold||""});
+    store.update("projects",link,{});
+    closeSheet();toast("Added to your project");return;
+  }
+  const d={area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||""),note,tries};
+  if(c.project){store.update("projects",c.project,{area:d.area,anchor:d.anchor,hold:d.hold});}
+  else if(c.result==="Fell"&&f.get("addProj")){
+    d.project=store.add("projects",{type:c.type,grade:c.grade,hold:d.hold,area:d.area,anchor:d.anchor,gym:c.gym||GYM,note,status:"Open",sentBy:[],added:Date.now()});
+  }
+  store.update("climbs",c.id,d);
+  closeSheet();toast(d.project?"Saved to Projects":"Saved");
+}
+function projSheet(p){
+  const grades=gradeRows(p.type);const has=grades.some(r=>gkey(r.value)===gkey(p.grade));
+  return head(`Edit project`,esc(p.type)+" · "+esc(p.gym||GYM))+`
+  <form id="projForm" data-id="${p.id}" autocomplete="off">
+    <label class="field">Grade<select name="grade">${grades.map(r=>`<option value="${esc(r.value)}" ${gkey(r.value)===gkey(p.grade)?"selected":""}>${esc(gradeLabel(r.value))}</option>`).join("")}${has?"":`<option selected>${esc(p.grade)}</option>`}</select></label>
+    ${areaField(p.type,p.area)}
+    ${anchorField(p.type,p.anchor)}
+    ${holdField(p.hold)}
+    <label class="field">Note<input name="note" value="${esc(p.note||"")}"></label>
+    <div class="foot"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">Save</button></div>
+    <button type="button" class="linkbtn" data-act="delProj" data-id="${p.id}" data-confirm="Tap again to delete (your logged climbs stay)">Delete project</button>
+  </form>`;
+}
+function daySheet(k){
+  const list=dayClimbs(k).sort((a,b)=>a.when-b.when);
+  const cs=[...new Set(list.map(c=>c.climber))];
+  let body="";
+  for(const w of cs){const mine=list.filter(c=>c.climber===w);const s=mine.filter(c=>c.result==="Sent").length;
+    body+=`<h3 class="sech">${esc(w)} · ${mine.length} climbs · ${s} sent</h3>`+mine.map(c=>{const det=[c.hold?c.hold+" holds":"",c.area,c.anchor?"Anchor "+c.anchor:"",c.note?"“"+c.note+"”":""].filter(Boolean).join(" · ");
+      return`<div class="crow">${tagHTML(c.type,c.grade,"sm")}<button class="t" data-act="openClimb" data-id="${c.id}" style="appearance:none;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:inherit"><b><span class="res ${c.result==="Sent"?"s":"f"}">${c.result}</span> · ${esc(c.type)}</b><span>${esc(det||"Tap to add details")}</span></button><button class="x" data-act="delClimb" data-id="${c.id}" data-confirm="Delete?" aria-label="Delete this climb">×</button></div>`;}).join("");}
+  return head(esc(fmtLong(k)),esc(GYM))+`<div class="stack">${body||`<div class="empty">No climbs on this day.</div>`}
+    <button class="btn primary" data-act="logOnDay" data-k="${k}">${k===todayKey()?"Log more today":"Log more for this day"}</button></div>`;
+}
+function gymSheet(){
+  return head("Gym","Climbs, projects and progress are kept per gym.")+`<div class="stack">
+    <div class="pills" role="group" aria-label="Choose gym">${gyms().map(g=>`<button class="chip" data-act="setGym" data-v="${esc(g)}" aria-pressed="${eqi(g,GYM)}">${esc(g)}</button>`).join("")}</div>
+    <form id="gymForm" style="display:flex;gap:8px;flex-direction:row" autocomplete="off"><label class="vh" for="gymInput">New gym</label><input id="gymInput" placeholder="Add a gym" style="flex:1"><button class="btn" type="submit">Add</button></form>
+    <p class="hint">Grades and wall areas for each gym live in the Lists tab of your sheet.</p></div>`;
+}
+
+/* ---------- toast ---------- */
+let tT=null,tActs=[];
+function hideToast(){$("#toast").hidden=true;tActs=[];clearTimeout(tT);}
+function toast(msg,acts){
+  acts=acts||[];tActs=acts;$("#toastMsg").textContent=msg;
+  $("#toastActs").innerHTML=acts.map((a,i)=>`<button data-i="${i}" class="${a.hi?"hi":""}">${esc(a.label)}</button>`).join("");
+  $("#toast").hidden=false;clearTimeout(tT);tT=setTimeout(()=>{$("#toast").hidden=true;tActs=[];},acts.length?7000:2600);
+}
+$("#toastActs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const a=tActs[+b.dataset.i];$("#toast").hidden=true;tActs=[];if(a)a.fn();});
+
+/* ---------- events ---------- */
+function armed(btn){if(btn.dataset.armed==="1")return true;const orig=btn.innerHTML;btn.dataset.armed="1";btn.textContent=btn.dataset.confirm;setTimeout(()=>{if(btn.isConnected){btn.dataset.armed="";btn.innerHTML=orig;}},3200);return false;}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-act],[data-tab]");if(!t)return;
+  if(t.dataset.tab&&!t.dataset.act){setTab(t.dataset.tab);return;}
+  const a=t.dataset.act,id=t.dataset.id;
+  if(t.dataset.confirm&&!armed(t))return;
+  const P=id?S.projects.find(p=>p.id===id):null;
+  switch(a){
+    case"refreshNow":if(auth==="ok")flush();break;
+    case"close":closeSheet();break;
+    case"who":WHO=t.dataset.v;LS.set("who",WHO);render();break;
+    case"type":TYPE=t.dataset.v;LS.set("type",TYPE);render();break;
+    case"log":logClimb(t.dataset.res,t.dataset.g);break;
+    case"prevDay":DAY=shiftDay(DAY,-1);render();break;
+    case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();break;
+    case"goToday":DAY=todayKey();render();break;
+    case"openDay":openSheet({type:"day",k:t.dataset.k});break;
+    case"openClimb":openSheet({type:"climb",id});break;
+    case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
+    case"delClimb":{const c=S.climbs.find(x=>x.id===id);if(!c)break;const keep=Object.assign({},c);delete keep.id;store.del("climbs",id);if(sheet&&sheet.type==="climb")closeSheet();toast("Climb deleted",[{label:"Undo",fn:()=>enqueue({op:"add",coll:"climbs",id,data:keep})}]);break;}
+    case"tries":{const o=$("#triesOut");if(o)o.textContent=Math.max(1,(+o.textContent||1)+ +t.dataset.d);break;}
+    case"pf":projFilter=t.dataset.v;render();break;
+    case"editProj":openSheet({type:"project",id});break;
+    case"projSent":if(P)projSent(P);break;
+    case"projFell":if(P)projFell(P);break;
+    case"projReset":if(P){store.update("projects",P.id,{status:"Reset"});toast("Moved to Reset",[{label:"Undo",fn:()=>store.update("projects",P.id,{status:"Open"})}]);}break;
+    case"reopen":if(P){store.update("projects",P.id,{status:"Open"});toast("Back in your projects");}break;
+    case"delProj":if(P){for(const c of S.climbs.filter(c=>c.project===P.id))store.update("climbs",c.id,{project:""});store.del("projects",P.id);closeSheet();toast("Project deleted");}break;
+    case"month":{const d=keyDate(pMonth+"-01");d.setMonth(d.getMonth()+ +t.dataset.d);pMonth=dayKey(d.getTime()).slice(0,7);render();break;}
+    case"pwho":pWho=t.dataset.v;LS.set("pwho",pWho);render();break;
+    case"pickGym":if(ready)openSheet({type:"gym"});break;
+    case"setGym":GYM=t.dataset.v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+GYM);break;
+  }
+});
+document.addEventListener("change",e=>{
+  if(e.target.name==="link"&&sheet&&sheet.type==="climb"){sheet.link=e.target.value;const nf=$("#newFields");if(nf)nf.hidden=sheet.link!=="new";const pc=$("#projCheck");if(pc)pc.hidden=sheet.link!=="new";}
+});
+document.addEventListener("submit",e=>{
+  const id=e.target.id;e.preventDefault();
+  if(id==="keyForm"){const k=$("#keyInput").value.trim();const u=API_URL||$("#apiInput").value.trim();
+    if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u.split(/[?#]/)[0])){render("That web app link doesn't look right. It starts with https://script.google.com and ends with /exec.");return;}
+    if(!k)return;API=u.split(/[?#]/)[0];LS.set("api",API);KEY=k;LS.set("key",KEY);auth="ok";ready=false;render();flush();return;}
+  if(id==="climbForm")saveClimb(e.target);
+  if(id==="projForm"){const f=new FormData(e.target);store.update("projects",e.target.dataset.id,{grade:String(f.get("grade")||""),area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||""),note:String(f.get("note")||"").trim()});closeSheet();toast("Project saved");}
+  if(id==="gymForm"){const v=$("#gymInput").value.trim();if(!v)return;if(!gyms().some(g=>eqi(g,v)))store.add("lists",{list:"Gym",value:v,colour:"",gym:""});GYM=v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+v);}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheet)closeSheet();});
+
+async function boot(){
+  readLinkParams();
+  if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+  if(!API||!KEY)auth="need";
+  render();
+  if(auth==="ok")flush();else setSync("off");
+}
+boot();
+})();
+</script>
+</body>
+</html>

@@ -466,7 +466,7 @@ function seedLists_(ss) {
     ['Boulder grade', 'V4-5', '#1B7F45'], ['Boulder grade', 'V6-7', '#F08A24'], ['Boulder grade', 'V8-9', '#D0342C'],
     ['Boulder grade', 'V10+', '#22262A'],
   ];
-  ['5.5', '5.6', '5.7', '5.8', '5.9', '5.10-', '5.10', '5.10+', '5.11-', '5.11', '5.11+', '5.12-', '5.12', '5.12+', '5.13-', '5.13']
+  ['5.9', '5.10-', '5.10+', '5.11-', '5.11+', '5.12-', '5.12+', '5.13-', '5.13+']
     .forEach(function (g) { rows.push(['Rope grade', g]); });
   ['Cave Left', 'Cave Right', 'Comp Wall Left', 'Comp Wall Right', 'Learners', 'Corner', 'Stage 3']
     .forEach(function (a) { rows.push(['Boulder area', a, '', HUB]); });

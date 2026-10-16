@@ -470,7 +470,7 @@ function renderSession(){
         <button class="tbtn sent" data-act="log" data-res="Sent" data-g="${esc(g)}" aria-label="Sent ${L}">${ICON.check}</button>
       </div>`;}).join(""):`<div class="empty"><strong>No grades yet</strong>Add some to the Lists tab in your sheet (List: ${esc(typeOf(TYPE).grades)}).</div>`}</div>
     <div class="dayrow">
-      <p class="hint">Tap ✓ for a send, ✕ for a fall.</p>
+      <p class="hint">Tap ✓ for a send. Tap ✕ for a fall to add its details.</p>
       <div class="daynav"><button class="iconbtn" data-act="prevDay" aria-label="Log an earlier day">${ICON.left}</button><button class="iconbtn" data-act="nextDay" aria-label="Next day" ${DAY>=today?"disabled":""}>${ICON.right}</button></div>
     </div>
     ${mine.length?`<button class="btn wide" data-act="openDay" data-k="${DAY}">See ${DAY===today?"today's":"this day's"} climbs</button>`:""}
@@ -480,10 +480,9 @@ const sheetLink=()=>sheetUrl?`<div class="sheetlink"><a href="${esc(sheetUrl)}" 
 
 function logClimb(res,grade){
   const id=store.add("climbs",{when:whenFor(DAY),climber:WHO,type:TYPE,grade,result:res,gym:GYM,tries:1});
-  const lbl=gradeLabel(grade);
-  const acts=[{label:"Undo",fn:()=>{store.del("climbs",id);toast("Removed");}}];
-  if(res==="Fell")acts.unshift({label:"Add details",hi:true,fn:()=>openSheet({type:"climb",id})});
-  toast(res==="Sent"?`${WHO} sent a ${lbl}`:`${WHO} fell on a ${lbl}`,acts);
+  // A fall opens its details right away; a send just confirms with an undo
+  if(res==="Fell"){openSheet({type:"climb",id,fresh:true});return;}
+  toast(`${WHO} sent a ${gradeLabel(grade)}`,[{label:"Undo",fn:()=>{store.del("climbs",id);toast("Removed");}}]);
 }
 
 /* Projects */
@@ -628,7 +627,7 @@ function climbSheet(c){
       <div class="stepper" role="group" aria-labelledby="triesL"><button type="button" data-act="tries" data-d="-1" aria-label="One fewer try">−</button><output id="triesOut">${c.tries||1}</output><button type="button" data-act="tries" data-d="1" aria-label="One more try">+</button></div></div>
     <label class="field">Note<input name="note" value="${esc(c.note||"")}" placeholder="${fell?"What stopped you?":"Anything to remember?"}"></label>
     ${linked?`<p class="hint">Part of your project: ${esc(projName(linked))}${linked.area?" · "+esc(linked.area):""}.</p>`:fell?`<label class="check" id="projCheck" ${sheet.link!=="new"?"hidden":""}><input type="checkbox" name="addProj" checked>Add to Projects to come back to</label>`:""}
-    <div class="foot"><button type="button" class="btn" data-act="close">${c.area||c.hold||c.note?"Cancel":"Skip"}</button><button type="submit" class="btn primary">Save</button></div>
+    <div class="foot"><button type="button" class="btn" data-act="${sheet.fresh?"skipDetails":"close"}">${sheet.fresh?"Skip details":"Cancel"}</button><button type="submit" class="btn primary">Save</button></div>
     <button type="button" class="linkbtn" data-act="delClimb" data-id="${c.id}" data-confirm="Tap again to delete">Delete this climb</button>
   </form>`;
 }
@@ -701,6 +700,7 @@ document.addEventListener("click",e=>{
   switch(a){
     case"refreshNow":if(auth==="ok")flush();break;
     case"close":closeSheet();break;
+    case"skipDetails":{const cid=sheet&&sheet.id;const c=S.climbs.find(x=>x.id===cid);closeSheet();if(c)toast(`${c.climber} fell on a ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);break;}
     case"who":WHO=t.dataset.v;LS.set("who",WHO);render();break;
     case"type":TYPE=t.dataset.v;LS.set("type",TYPE);render();break;
     case"log":logClimb(t.dataset.res,t.dataset.g);break;

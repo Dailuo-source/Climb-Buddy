@@ -18,7 +18,7 @@ const APP_SITE = 'https://climbbuddy.pages.dev/';
 const TYPES = ['Bouldering', 'Top rope', 'Auto belay'];
 const RESULTS = ['Sent', 'Rested', 'Fell'];
 const STATUSES = ['Open', 'Sent', 'Reset'];
-const LIST_NAMES = ['Climber', 'Gym', 'Boulder grade', 'Rope grade', 'Boulder area', 'Rope area', 'Auto belay area', 'Hold colour'];
+const LIST_NAMES = ['Climber', 'Gym', 'Boulder grade', 'Rope grade', 'Boulder area', 'Rope area', 'Auto belay area', 'Anchors', 'Hold colour'];
 
 // [field, header label, type, column width]. `key` is the field a row must have to count.
 const SCHEMA = {
@@ -471,9 +471,12 @@ function seedLists_(ss) {
   ];
   ['5.9', '5.10-', '5.10+', '5.11-', '5.11+', '5.12-', '5.12+', '5.13-', '5.13+']
     .forEach(function (g) { rows.push(['Rope grade', g]); });
-  ['Cave Left', 'Cave Right', 'Comp Wall Left', 'Comp Wall Right', 'Learners', 'Corner', 'Stage 3']
+  ['Cave Left', 'Cave Right', 'Comp Wall Left', 'Comp Wall Right', 'Learners', 'Corner North', 'Corner East', 'Stage 3']
     .forEach(function (a) { rows.push(['Boulder area', a, '', HUB]); });
-  ['Pit', 'Upper'].forEach(function (a) { rows.push(['Rope area', a, '', HUB]); });
+  ['Upper', 'Upper Back', 'Upper Entrance', 'Pit', 'Pit Small Wall'].forEach(function (a) { rows.push(['Rope area', a, '', HUB]); });
+  ['Upper Back', 'Upper Learners', 'Upper Entrance'].forEach(function (a) { rows.push(['Auto belay area', a, '', HUB]); });
+  // Anchor numbers per wall, as "Wall: from-to" (several ranges can be comma-separated)
+  ['Upper: 1-43', 'Pit: 87-109'].forEach(function (a) { rows.push(['Anchors', a, '', HUB]); });
   [['Red', '#D83A34'], ['Orange', '#F08A24'], ['Yellow', '#F5D02E'], ['Green', '#3DA35D'], ['Teal', '#2BA5A0'],
     ['Blue', '#2F6FD6'], ['Purple', '#8150C8'], ['Pink', '#EE7FB0'], ['Black', '#22262A'], ['White', '#F7F7F4'], ['Grey', '#9AA0A6']]
     .forEach(function (h) { rows.push(['Hold colour', h[0], h[1]]); });

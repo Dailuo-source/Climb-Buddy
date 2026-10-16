@@ -50,7 +50,7 @@ main{padding-top:14px;padding-bottom:calc(var(--tabh) + env(safe-area-inset-bott
 
 /* tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabs .wrap{display:grid;grid-template-columns:repeat(3,1fr);height:var(--tabh)}
+.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr);height:var(--tabh)}
 .tab{appearance:none;border:0;background:none;color:var(--muted);font:600 12px var(--f-body);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative;cursor:pointer}
 .tab svg{width:24px;height:24px}
 .tab[aria-selected="true"]{color:var(--ink)}
@@ -235,6 +235,25 @@ legend{padding:0}
 .x{min-width:40px;height:40px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;border-radius:10px;flex:none}
 .x[data-armed="1"]{font-size:13px;font-weight:700;color:var(--fell)}
 
+/* map */
+.mapwrap{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:6px;position:relative}
+.mapbox{overflow:auto;border-radius:13px;max-height:74vh;-webkit-overflow-scrolling:touch}
+.mapbox svg{display:block;width:calc(var(--mz,1) * 100%);height:auto}
+.maprow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.zoombtns{display:flex;gap:6px;flex:none}
+.zoombtns button{width:44px;height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--surface);font-size:21px;line-height:1;cursor:pointer;color:var(--ink)}
+.zoombtns button:disabled{opacity:.4}
+.zone{cursor:pointer;outline:none}
+.zone polygon{transition:fill .15s}
+.zone.sel polygon{fill:#FFD98A;stroke-width:12px}
+.zone:focus-visible polygon{stroke:var(--sent);stroke-width:12px}
+.mlegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.mlegend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px;border:1px solid var(--line2)}
+.mlegend i.dot{border-radius:50%;background:#8150C8;border:2px solid #2D3A34}
+.ztype{font-size:12px;font-weight:700;padding:4px 8px;border-radius:6px;color:var(--ink)}
+.minimap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#FBF8F1}
+.minimap svg{display:block;width:100%;height:auto;max-height:320px}
+
 /* toast */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px) + 12px);z-index:30;background:var(--ink);color:var(--bg);padding:8px 8px 8px 16px;border-radius:14px;display:flex;gap:4px;align-items:center;width:max-content;max-width:calc(100% - 24px);font-size:14px;box-shadow:var(--shadow)}
 .toast span{min-width:0;margin-right:6px}
@@ -257,6 +276,7 @@ legend{padding:0}
   <div class="wrap" role="tablist">
     <button class="tab" role="tab" data-tab="session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Session</button>
     <button class="tab" role="tab" data-tab="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Projects<span id="projBadge" class="badge" hidden></span></button>
+    <button class="tab" role="tab" data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>Map</button>
     <button class="tab" role="tab" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg>Progress</button>
   </div>
 </nav>
@@ -438,8 +458,8 @@ function render(msg){
       </form>${msg?`<p class="err">${esc(msg)}</p>`:""}</div>`;
     return;
   }
-  if(!ready){$("#title").textContent={session:"Today",projects:"Projects",progress:"Progress"}[tab];v.innerHTML=`<div class="empty"><strong>Loading your climbs…</strong>Reading your sheet.</div>`;return;}
-  if(tab==="session")renderSession();else if(tab==="projects")renderProjects();else renderProgress();
+  if(!ready){$("#title").textContent={session:"Today",projects:"Projects",progress:"Progress",map:"Map"}[tab];v.innerHTML=`<div class="empty"><strong>Loading your climbs…</strong>Reading your sheet.</div>`;return;}
+  if(tab==="session")renderSession();else if(tab==="projects")renderProjects();else if(tab==="map")renderMap();else renderProgress();
   const n=gymProjects().filter(isOpen).length;const b=$("#projBadge");b.hidden=!n;b.textContent=n;
 }
 // Forms in a sheet are never redrawn under your fingers; only the read-only day view refreshes
@@ -549,6 +569,162 @@ function projFell(p){
   toast(`Logged a try for ${WHO}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);
 }
 
+/* =====================================================================
+   GYM MAP — The Hub Mississauga, traced from Gary's floor plan.
+   Each zone's `area` matches a Where value in the Lists tab.
+   ===================================================================== */
+const HUB_MAP={
+  gym:"The Hub Mississauga",w:1227,h:1402,
+  zones:[
+    {id:"caveL",area:"Cave Left",type:"Bouldering",pts:"852,18 1213,18 1032,198",lbl:[1040,80],pin:[1060,130],lines:["Cave Left"]},
+    {id:"caveR",area:"Cave Right",type:"Bouldering",pts:"1032,198 1213,18 1213,380",lbl:[1160,215],pin:[1160,280],lines:["Cave","Right"]},
+    {id:"compL",area:"Comp Wall Left",type:"Bouldering",pts:"1213,488 1170,488 1104,553 1104,630 1134,660 1134,772 1155,793 1155,829 1213,829",lbl:[1162,600],pin:[1178,720],lines:["Comp","Left"],fs:30},
+    {id:"compR",area:"Comp Wall Right",type:"Bouldering",pts:"1155,829 1155,868 1104,917 1104,1010 1134,1040 1134,1207 1213,1207 1213,829",lbl:[1160,965],pin:[1175,1100],lines:["Comp","Right"],fs:30},
+    {id:"learn",area:"Learners",type:"Bouldering",pts:"322,1332 518,1332 550,1365 1030,1365 1030,1395 322,1395",lbl:[700,1318],pin:[440,1366],lines:["Learners"]},
+    {id:"cornE",area:"Corner East",type:"Bouldering",pts:"12,1395 98,1307 322,1307 322,1395",lbl:[214,1340],pin:[190,1372],lines:["Corner East"],fs:26},
+    {id:"cornN",area:"Corner North",type:"Bouldering",alias:["Corner"],pts:"12,1082 98,1082 98,1307 12,1395",lbl:[55,1200],pin:[55,1310],lines:["Corner North"],rot:true,fs:26},
+    {id:"stage",area:"Stage 3",type:"Bouldering",pts:"12,732 98,732 98,815 125,815 125,957 98,957 98,1082 12,1082",lbl:[56,880],pin:[56,1010],lines:["Stage 3"],rot:true},
+    {id:"aUB",area:"Upper Back",type:"Auto belay",pts:"362,18 478,18 478,67 362,67",lbl:[420,100],pin:[420,43],lines:["Auto belay","Upper Back"],fs:22},
+    {id:"rUB",area:"Upper Back",type:"Top rope",pts:"478,18 807,18 807,64 775,97 720,97 690,68 582,68 540,107 503,107 492,67 478,67",lbl:[640,140],pin:[640,42],lines:["Upper Back"],fs:26},
+    {id:"aUL",area:"Upper Learners",type:"Auto belay",pts:"282,270 373,270 373,405 282,707 282,530 298,515 298,420 282,405",lbl:[190,470],pin:[322,330],lines:["Auto belay","Upper","Learners"],fs:22},
+    {id:"rPS",area:"Pit Small Wall",type:"Top rope",pts:"373,405 388,420 388,530 354,565 354,688 337,707 282,707",lbl:[440,600],pin:[345,600],lines:["Pit","Small Wall"],fs:24},
+    {id:"rPit",area:"Pit",type:"Top rope",pts:"595,270 706,380 706,1087 595,1207 595,1137 568,1110 568,1027 624,970 624,792 646,771 646,707 627,707 627,514 595,482",lbl:[515,690],pin:[660,620],lines:["The Pit"]},
+    {id:"rUp",area:"Upper",type:"Top rope",pts:"595,270 807,270 872,335 872,433 774,531 774,793 820,838 820,920 769,970 769,1008 706,1008 706,380",lbl:[790,400],pin:[740,640],lines:["Upper"]},
+    {id:"aUE",area:"Upper Entrance",type:"Auto belay",pts:"706,1008 769,1008 769,1087 706,1087",lbl:[860,1035],pin:[737,1047],lines:["Auto belay","Upper Entrance"],fs:22},
+    {id:"rUE",area:"Upper Entrance",type:"Top rope",pts:"706,1087 769,1087 769,1150 713,1207 595,1207",lbl:[870,1160],pin:[715,1160],lines:["Upper","Entrance"],fs:24}
+  ],
+  features:[
+    {name:"Boards & Training",pts:"12,18 282,18 282,132 98,132 98,618 12,618",lbl:[55,380],lines:["Boards & Training"],rot:true},
+    {name:"Stadium seating",pts:"285,775 463,775 463,1203 285,1203",lbl:[374,990],lines:["Stadium","seating"]},
+    {name:"Speed climb",lbl:[428,330],lines:["Speed","climb"],fs:20}
+  ]
+};
+const TYPE_TINT={"Bouldering":"#FBE0CF","Top rope":"#D9E5FB","Auto belay":"#E7DFFB"};
+const MAP_INK="#2D3A34";
+const gymMap=()=>eqi(GYM,HUB_MAP.gym)?HUB_MAP:null;
+const zoneById=id=>HUB_MAP.zones.find(z=>z.id===id);
+const inZone=(x,z)=>x.type===z.type&&(eqi(x.area,z.area)||(z.alias||[]).some(a=>eqi(x.area,a)));
+const zoneClimbs=z=>S.climbs.filter(c=>eqi(c.gym,HUB_MAP.gym)&&inZone(c,z));
+const zoneProjects=z=>S.projects.filter(p=>isOpen(p)&&eqi(p.gym,HUB_MAP.gym)&&inZone(p,z));
+
+/* Anchor ranges live in the Lists tab: List "Anchors", Value like "Upper: 1-43" or "Pit: 77-86, 87-109" */
+function anchorRanges(){
+  const out=[];
+  for(const r of listRows("Anchors")){
+    const m=String(r.value).match(/^(.+?)\s*:\s*(.+)$/);if(!m)continue;
+    for(const part of m[2].split(",")){const n=part.match(/(\d+)\s*[-–]\s*(\d+)/)||part.match(/(\d+)/);if(n)out.push({area:m[1].trim(),lo:+n[1],hi:+(n[2]||n[1])});}
+  }
+  return out;
+}
+const anchorText=area=>anchorRanges().filter(r=>eqi(r.area,area)).map(r=>r.lo===r.hi?String(r.lo):r.lo+"–"+r.hi).join(", ");
+function areaForAnchor(type,num){
+  const allowed=areaRows(type).map(r=>r.value);
+  const hit=anchorRanges().find(r=>num>=r.lo&&num<=r.hi&&allowed.some(a=>eqi(a,r.area)));
+  return hit?hit.area:"";
+}
+
+/* One SVG for both the Map tab and the small pickers.
+   o.type: only that type's walls are active (picker), o.sel: selected zone id or area, o.dots/o.heat: overlays */
+function mapSVG(o){
+  const M=HUB_MAP;o=o||{};
+  let vb=[0,0,M.w,M.h];
+  if(o.type){
+    const xs=[],ys=[];
+    for(const z of M.zones){if(z.type!==o.type)continue;for(const p of z.pts.split(" ")){const[a,b]=p.split(",").map(Number);xs.push(a);ys.push(b);}xs.push(z.lbl[0]);ys.push(z.lbl[1]);}
+    if(xs.length){const pad=70;const x0=Math.max(0,Math.min(...xs)-pad),y0=Math.max(0,Math.min(...ys)-pad),x1=Math.min(M.w,Math.max(...xs)+pad),y1=Math.min(M.h,Math.max(...ys)+pad);vb=[x0,y0,x1-x0,y1-y0];}
+  }
+  const label=(item,bold,dim)=>{
+    const fs=item.fs||34,lh=fs*1.15,[x,y]=item.lbl;const lines=item.lines.slice();
+    if(item.anchors)lines.push(item.anchors);
+    const y0=y-(lines.length-1)*lh/2;
+    const tf=item.rot?` transform="rotate(-90 ${x} ${y})"`:"";
+    return`<text x="${x}" y="${y0}" text-anchor="middle" dominant-baseline="middle" font-size="${fs}" font-weight="${bold?700:600}" fill="${MAP_INK}" opacity="${dim?.4:1}"${tf} pointer-events="none">${lines.map((l,i)=>`<tspan x="${x}" dy="${i?lh:0}"${item.anchors&&i===lines.length-1?` font-size="${fs*.8}" font-weight="500"`:""}>${esc(l)}</tspan>`).join("")}</text>`;
+  };
+  let s=`<svg viewBox="${vb.join(" ")}" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans, system-ui, sans-serif" role="group" aria-label="Map of ${esc(M.gym)}">`;
+  s+=`<rect x="12" y="18" width="1201" height="1377" fill="#FBF8F1"/>`;
+  for(const f of M.features)if(f.pts)s+=`<polygon points="${f.pts}" fill="#ECE8DE" stroke="${MAP_INK}" stroke-width="5" stroke-linejoin="round"/>`;
+  for(const z of M.zones){
+    const active=!o.type||z.type===o.type;
+    const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
+    let fill=TYPE_TINT[z.type];
+    if(o.heat){const n=o.heat[z.id]||0;fill=n?`rgba(31,79,184,${(.12+.42*n/o.heatMax).toFixed(2)})`:"#F1EEE6";}
+    const name=`${z.area} (${z.type})`;
+    s+=active?`<g class="zone${sel?" sel":""}" data-act="${o.type?"pickArea":"mapSel"}" data-z="${z.id}" data-area="${esc(z.area)}" tabindex="0" role="button" aria-label="${esc(name)}" aria-pressed="${!!sel}"><polygon points="${z.pts}" fill="${fill}" stroke="${MAP_INK}" stroke-width="5" stroke-linejoin="round"/></g>`
+      :`<polygon points="${z.pts}" fill="#F1EEE6" stroke="${MAP_INK}" stroke-width="4" stroke-linejoin="round" opacity=".45" aria-hidden="true"/>`;
+  }
+  s+=`<rect x="12" y="18" width="1201" height="1377" fill="none" stroke="${MAP_INK}" stroke-width="12"/>`;
+  for(const f of M.features)s+=label(f,false,!!o.type);
+  for(const z of M.zones){
+    const active=!o.type||z.type===o.type;
+    const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
+    const anchors=z.type!=="Bouldering"&&!o.type?anchorText(z.area):"";
+    s+=label(Object.assign({},z,{anchors:anchors?"#"+anchors:""}),sel,!active);
+  }
+  if(o.dots)for(const z of M.zones){
+    const list=o.dots[z.id];if(!list||!list.length)continue;
+    const show=list.slice(0,list.length>6?5:6),per=3,sp=44;
+    show.forEach((c,i)=>{const row=Math.floor(i/per),col=i%per,n=Math.min(per,show.length-row*per);
+      const x=z.pin[0]+(col-(n-1)/2)*sp,y=z.pin[1]+row*sp-((Math.ceil(show.length/per)-1)*sp)/2;
+      s+=`<circle cx="${x}" cy="${y}" r="17" fill="${c||"#C9C4B8"}" stroke="${MAP_INK}" stroke-width="5" pointer-events="none"/>`;});
+    if(list.length>6){const i=5,row=Math.floor(i/per),col=i%per;const x=z.pin[0]+(col-1)*sp,y=z.pin[1]+row*sp-sp/2;
+      s+=`<circle cx="${x}" cy="${y}" r="21" fill="${MAP_INK}" pointer-events="none"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="700" fill="#fff" pointer-events="none">+${list.length-5}</text>`;}
+  }
+  if(o.heat)for(const z of M.zones){const n=o.heat[z.id];if(!n)continue;
+    s+=`<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="26" fill="#fff" stroke="${MAP_INK}" stroke-width="4" pointer-events="none"/><text x="${z.pin[0]}" y="${z.pin[1]}" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="700" fill="${MAP_INK}" pointer-events="none">${n}</text>`;}
+  return s+`</svg>`;
+}
+/* Small map shown in a details panel: tap a wall to fill in Where */
+function miniMap(type,gym,area){
+  if(!eqi(gym,HUB_MAP.gym)||!HUB_MAP.zones.some(z=>z.type===type))return"";
+  return`<div class="minimap" aria-label="Tap a wall to choose where">${mapSVG({type,sel:area||""})}</div><p class="hint" style="margin-top:-8px">Tap a wall on the map, or pick it below.</p>`;
+}
+function syncMini(){
+  const root=$("#sheetBody");if(!root)return;
+  const ch=root.querySelector('input[name=area]:checked')||root.querySelector('input[name=area]:not([type=radio])');
+  const v=ch?ch.value:"";
+  root.querySelectorAll(".minimap .zone").forEach(g=>{const on=!!v&&eqi(g.dataset.area,v);g.classList.toggle("sel",on);g.setAttribute("aria-pressed",String(on));});
+}
+
+/* Map tab */
+let mapSel=LS.get("mapsel",""),mapMode=LS.get("mapmode","projects"),mapWho=LS.get("mapwho","*"),mapZoom=+LS.get("mapz","1")||1;
+function renderMap(){
+  $("#title").textContent="Map";
+  const M=gymMap();
+  if(!M){$("#view").innerHTML=`<div class="empty"><strong>No map for ${esc(GYM)} yet</strong>The map is drawn for The Hub Mississauga. Switch gyms from the top of the screen.</div>`;return;}
+  const cs=climbers();if(mapWho!=="*"&&!cs.includes(mapWho))mapWho="*";
+  const o={};
+  if(mapMode==="projects"){o.dots={};for(const z of M.zones){const ps=zoneProjects(z);if(ps.length)o.dots[z.id]=ps.map(p=>holdHex(p.hold));}}
+  else{const since=Date.now()-30*864e5;o.heat={};let mx=1;for(const z of M.zones){const n=zoneClimbs(z).filter(c=>c.when>=since&&(mapWho==="*"||c.climber===mapWho)).length;if(n){o.heat[z.id]=n;mx=Math.max(mx,n);}}o.heatMax=mx;}
+  if(mapSel&&zoneById(mapSel))o.sel=mapSel;
+  const openN=M.zones.reduce((a,z)=>a+zoneProjects(z).length,0);
+  $("#view").innerHTML=`
+    <div class="seg" role="group" aria-label="Show on map"><button data-act="mapMode" data-v="projects" aria-pressed="${mapMode==="projects"}">Projects${openN?` (${openN})`:""}</button><button data-act="mapMode" data-v="activity" aria-pressed="${mapMode==="activity"}">Activity</button></div>
+    ${mapMode==="activity"?`<div class="chips" role="group" aria-label="Whose activity">${[...cs,"*"].map(w=>`<button class="chip" data-act="mapWho" data-v="${esc(w)}" aria-pressed="${mapWho===w}">${w==="*"?"Both":esc(w)}</button>`).join("")}<span class="hint" style="align-self:center">Climbs in the last 30 days</span></div>`:""}
+    <div class="mapwrap">
+      <div class="mapbox" id="mapbox" style="--mz:${mapZoom}">${mapSVG(o)}</div>
+    </div>
+    <div class="maprow"><div class="mlegend"><span><i style="background:${TYPE_TINT["Bouldering"]}"></i>Bouldering</span><span><i style="background:${TYPE_TINT["Top rope"]}"></i>Top rope</span><span><i style="background:${TYPE_TINT["Auto belay"]}"></i>Auto belay</span>${mapMode==="projects"?`<span><i class="dot"></i>Project (hold colour)</span>`:""}</div>
+      <div class="zoombtns"><button data-act="mapZoom" data-d="-1" aria-label="Zoom out" ${mapZoom<=1?"disabled":""}>−</button><button data-act="mapZoom" data-d="1" aria-label="Zoom in" ${mapZoom>=3?"disabled":""}>+</button></div></div>
+    ${mapSel&&zoneById(mapSel)?zonePanel(zoneById(mapSel)):`<p class="hint">Tap a wall to see its projects and stats.</p>`}
+    ${sheetLink()}`;
+}
+function zonePanel(z){
+  const cs=zoneClimbs(z),ps=zoneProjects(z),rope=z.type!=="Bouldering";
+  const since=Date.now()-30*864e5,recent=cs.filter(c=>c.when>=since).length;
+  const cnt=(a,r)=>a.filter(c=>c.result===r).length;
+  const anchors=rope?anchorText(z.area):"";
+  const people=climbers().filter(w=>cs.some(c=>c.climber===w));
+  return`<section class="panel" aria-labelledby="zoneTitle">
+    <div class="phead2"><h2 id="zoneTitle" style="font-family:var(--f-display);font-size:21px">${esc(z.area)}</h2><span class="ztype" style="background:${TYPE_TINT[z.type]}">${z.type}</span></div>
+    ${rope?`<p class="hint">${anchors?`Anchors #${esc(anchors)}`:`Anchor numbers not set yet. Add them in the Lists tab as <b>Anchors</b>, e.g. “${esc(z.area)}: 1-20”.`}</p>`:""}
+    ${people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Fell</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>
+    <p class="hint">${recent} ${recent===1?"climb":"climbs"} here in the last 30 days.</p>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
+    <h3 class="sech">Open projects (${ps.length})</h3>
+    ${ps.length?`<div class="cards">${ps.map(projCard).join("")}</div>`:`<p class="hint">None here right now.</p>`}
+    <button class="btn" data-act="zoneReset" data-z="${z.id}" ${ps.length?`data-confirm="Tap again: move ${ps.length} to Reset"`:"disabled"}>This wall was reset</button>
+  </section>`;
+}
+
 /* Progress */
 function renderProgress(){
   $("#title").textContent="Progress";
@@ -636,6 +812,7 @@ function climbSheet(c){
     <div class="inrow"><label for="fDay" class="flabel" style="margin:0">Date</label><input id="fDay" name="day" type="date" value="${dayKey(c.when)}" max="${todayKey()}" style="width:auto"></div>
     ${matches.length?`<fieldset><legend class="flabel">${res==="Sent"?"Did you send one of your projects?":"Is it one of your projects?"}</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}" ${sheet.link===p.id?"checked":""}><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="new" ${sheet.link==="new"?"checked":""}><span>${res==="Sent"?"No, another route":"A new route"}</span></label></div></fieldset>`:""}
     <div id="newFields" class="stack" ${sheet.link!=="new"?"hidden":""}>
+      ${miniMap(c.type,c.gym||GYM,c.area)}
       ${areaField(c.type,c.area)}
       ${anchorField(c.type,c.anchor)}
       ${holdField(c.hold)}
@@ -680,6 +857,7 @@ function projSheet(p){
   return head(`Edit project`,esc(p.type)+" · "+esc(p.gym||GYM))+`
   <form id="projForm" data-id="${p.id}" autocomplete="off">
     <label class="field">Grade<select name="grade">${grades.map(r=>`<option value="${esc(r.value)}" ${gkey(r.value)===gkey(p.grade)?"selected":""}>${esc(gradeLabel(r.value))}</option>`).join("")}${has?"":`<option selected>${esc(p.grade)}</option>`}</select></label>
+    ${miniMap(p.type,p.gym||GYM,p.area)}
     ${areaField(p.type,p.area)}
     ${anchorField(p.type,p.anchor)}
     ${holdField(p.hold)}
@@ -747,12 +925,27 @@ document.addEventListener("click",e=>{
     case"delProj":if(P){for(const c of S.climbs.filter(c=>c.project===P.id))store.update("climbs",c.id,{project:""});store.del("projects",P.id);closeSheet();toast("Project deleted");}break;
     case"month":{const d=keyDate(pMonth+"-01");d.setMonth(d.getMonth()+ +t.dataset.d);pMonth=dayKey(d.getTime()).slice(0,7);render();break;}
     case"pwho":pWho=t.dataset.v;LS.set("pwho",pWho);render();break;
+    case"mapMode":mapMode=t.dataset.v;LS.set("mapmode",mapMode);render();break;
+    case"mapWho":mapWho=t.dataset.v;LS.set("mapwho",mapWho);render();break;
+    case"mapZoom":mapZoom=Math.max(1,Math.min(3,mapZoom+ +t.dataset.d));LS.set("mapz",mapZoom);render();break;
+    case"mapSel":{mapSel=mapSel===t.dataset.z?"":t.dataset.z;LS.set("mapsel",mapSel);const box=$("#mapbox"),sx=box?box.scrollLeft:0,sy=box?box.scrollTop:0;render();const nb=$("#mapbox");if(nb){nb.scrollLeft=sx;nb.scrollTop=sy;}const h=$("#zoneTitle");if(h)h.scrollIntoView({behavior:"smooth",block:"nearest"});break;}
+    case"pickArea":{const root=$("#sheetBody");const radios=[...root.querySelectorAll('input[name=area][type=radio]')];const hit=radios.find(i=>eqi(i.value,t.dataset.area));
+      if(hit)hit.checked=true;else{const ti=root.querySelector('input[name=area]:not([type=radio])');if(ti)ti.value=t.dataset.area;}syncMini();break;}
+    case"zoneReset":{const z=zoneById(t.dataset.z);if(!z)break;const ps=zoneProjects(z);ps.forEach(p=>store.update("projects",p.id,{status:"Reset"}));
+      toast(`${ps.length} ${ps.length===1?"project":"projects"} moved to Reset`,[{label:"Undo",fn:()=>ps.forEach(p=>store.update("projects",p.id,{status:"Open"}))}]);break;}
     case"pickGym":if(ready)openSheet({type:"gym"});break;
     case"setGym":GYM=t.dataset.v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+GYM);break;
   }
 });
 document.addEventListener("click",e=>{if(e.target.id==="dayInput"&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
+document.addEventListener("input",e=>{
+  // Typing an anchor number picks the wall it belongs to
+  if(e.target.id==="fAnchor"){const n=parseInt(e.target.value,10);const form=e.target.form;if(!n||!form)return;
+    const c=form.id==="climbForm"?S.climbs.find(x=>x.id===form.dataset.id):S.projects.find(x=>x.id===form.dataset.id);if(!c)return;
+    const a=areaForAnchor(c.type,n);if(!a)return;const r=[...form.querySelectorAll('input[name=area][type=radio]')].find(i=>eqi(i.value,a));if(r){r.checked=true;syncMini();}}
+});
 document.addEventListener("change",e=>{
+  if(e.target.name==="area"){syncMini();}
   if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){DAY=v;render();}return;}
   if(e.target.name==="link"&&sheet&&sheet.type==="climb"){sheet.link=e.target.value;const nf=$("#newFields");if(nf)nf.hidden=sheet.link!=="new";const pc=$("#projCheck");if(pc)pc.hidden=sheet.link!=="new";}
 });
@@ -765,7 +958,11 @@ document.addEventListener("submit",e=>{
   if(id==="projForm"){const f=new FormData(e.target);store.update("projects",e.target.dataset.id,{grade:String(f.get("grade")||""),area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||""),note:String(f.get("note")||"").trim()});closeSheet();toast("Project saved");}
   if(id==="gymForm"){const v=$("#gymInput").value.trim();if(!v)return;if(!gyms().some(g=>eqi(g,v)))store.add("lists",{list:"Gym",value:v,colour:"",gym:""});GYM=v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+v);}
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheet)closeSheet();});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&sheet)closeSheet();
+  // Map walls are SVG groups: let Enter and Space press them like buttons
+  if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("zone")){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}));}
+});
 
 async function boot(){
   readLinkParams();

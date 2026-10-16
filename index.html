@@ -18,6 +18,7 @@
   --bg:#F3F1EA; --surface:#FFFFFF; --sunk:#E4E1D7; --ink:#1D2422; --muted:#5B6460; --line:#DCD8CD; --line2:#C9C4B8;
   --sent:#1F4FB8; --sent-ink:#FFFFFF; --sent-soft:#E2E9FA;
   --fell:#B44A14; --fell-soft:#FBEBDF; --fell-line:#E7B394; --fell-bar:#F2A36B;
+  --rest:#2C4A96; --rest-soft:#E8EEFB; --rest-line:#A9BDEB; --rest-bar:#8FA9E6;
   --scrim:rgba(29,36,34,.5); --shadow:0 1px 2px rgba(20,30,25,.06),0 8px 24px rgba(20,30,25,.10);
   --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
   --f-body:"DM Sans","Segoe UI",system-ui,-apple-system,sans-serif;
@@ -91,24 +92,29 @@ legend{padding:0}
 .iconbtn svg{width:20px;height:20px}
 .iconbtn:disabled{opacity:.3;cursor:default}
 .backfill{background:var(--fell-soft);color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sum{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
 .sum div{display:flex;flex-direction:column;gap:1px;min-width:0}
 .sum b{font-family:var(--f-display);font-size:26px;line-height:1.15;font-weight:700;font-variant-numeric:tabular-nums}
-.sum b.s{color:var(--sent)} .sum b.f{color:var(--fell)}
+.sum b.s{color:var(--sent)} .sum b.f{color:var(--fell)} .sum b.r{color:var(--rest)}
 .sum b.tops{font-size:16px;line-height:1.2;min-height:30px;display:flex;align-items:center}
 .sum span{font-size:12px;color:var(--muted)}
 
 /* grade rows */
 .grows{display:flex;flex-direction:column}
 .grow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
-.gcount{flex:1;font-size:14px;color:var(--muted);min-width:0}
+.gcount{flex:1;font-size:13.5px;line-height:1.35;color:var(--muted);min-width:0;display:flex;flex-wrap:wrap;column-gap:8px}
+.gcount span{white-space:nowrap}
 .gcount b{font-weight:700}
-.gcount .s{color:var(--sent)} .gcount .f{color:var(--fell)}
+.gcount .s{color:var(--sent)} .gcount .f{color:var(--fell)} .gcount .r{color:var(--rest)}
 .gcount.zero{opacity:.7}
 .tbtn{appearance:none;height:44px;border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none}
 .tbtn svg{width:22px;height:22px}
 .tbtn.fell{width:48px;border:1.5px solid var(--fell-line);background:var(--fell-soft);color:var(--fell)}
 .tbtn.sent{width:58px;border:0;background:var(--sent);color:var(--sent-ink)}
+.tbtn.rest{width:50px;border:1.5px solid var(--rest-line);background:var(--rest-soft);color:var(--rest);font:700 13px var(--f-body)}
+.datebar{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px}
+.datepick{position:relative;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:40px;font-weight:600;font-size:15px;cursor:pointer;border-radius:10px;white-space:nowrap}
+.datepick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:0;padding:0;border:0;cursor:pointer}
 .tbtn:active{transform:scale(.96)}
 .tag{display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:700;white-space:nowrap;border-radius:10px;flex:none;font-variant-numeric:tabular-nums}
 .tag.lg{min-width:64px;height:40px;padding:0 10px;font-size:16px}
@@ -166,7 +172,7 @@ legend{padding:0}
 .gbar{display:flex;align-items:center;gap:10px}
 .gbar .track{flex:1;height:18px;background:var(--sunk);border-radius:5px;overflow:hidden}
 .gbar .track i{display:block;height:100%;border-radius:5px}
-.gbar .n{width:92px;text-align:right;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.gbar .n{min-width:92px;text-align:right;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .gbar .n b{color:var(--ink)}
 .typeh{font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
 .slist{display:flex;flex-direction:column}
@@ -225,7 +231,7 @@ legend{padding:0}
 .crow .t b{font-weight:600;font-size:14px}
 .crow .t span{font-size:13px;color:var(--muted)}
 .res{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.res.s{color:var(--sent)} .res.f{color:var(--fell)}
+.res.s{color:var(--sent)} .res.f{color:var(--fell)} .res.r{color:var(--rest)}
 .x{min-width:40px;height:40px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;border-radius:10px;flex:none}
 .x[data-armed="1"]{font-size:13px;font-weight:700;color:var(--fell)}
 
@@ -353,7 +359,7 @@ function normalize(st){
   st=st||{};const str=v=>String(v==null?"":v).trim();
   return{
     lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),gym:str(r.gym)})),
-    climbs:(st.climbs||[]).map(r=>Object.assign({},r,{when:+r.when||0,tries:r.tries==null||r.tries===""?null:+r.tries,result:/^s/i.test(str(r.result))?"Sent":"Fell",type:normType(r.type),climber:str(r.climber),gym:str(r.gym),grade:str(r.grade)})),
+    climbs:(st.climbs||[]).map(r=>Object.assign({},r,{when:+r.when||0,tries:r.tries==null||r.tries===""?null:+r.tries,result:/^s/i.test(str(r.result))?"Sent":/^r/i.test(str(r.result))?"Rested":"Fell",rests:r.rests==null||r.rests===""?null:+r.rests,type:normType(r.type),climber:str(r.climber),gym:str(r.gym),grade:str(r.grade)})),
     projects:(st.projects||[]).map(r=>Object.assign({},r,{type:normType(r.type),sentBy:Array.isArray(r.sentBy)?r.sentBy:str(r.sentBy).split(",").map(s=>s.trim()).filter(Boolean),status:/^s/i.test(str(r.status))?"Sent":/^r/i.test(str(r.status))?"Reset":"Open",added:+r.added||0,updated:+r.updated||0}))
   };
 }
@@ -407,7 +413,7 @@ const gymProjects=()=>S.projects.filter(p=>eqi(p.gym,GYM));
 function projInfo(p){
   const cs=S.climbs.filter(c=>c.project===p.id);
   const tries={};let last=p.added||0;
-  for(const c of cs){if(c.result==="Fell")tries[c.climber]=(tries[c.climber]||0)+(c.tries||1);last=Math.max(last,c.when);}
+  for(const c of cs){if(c.result!=="Sent")tries[c.climber]=(tries[c.climber]||0)+(c.tries||1);last=Math.max(last,c.when);}
   for(const w of p.sentBy)if(!(w in tries))tries[w]=0;
   return{tries,last,climbs:cs};
 }
@@ -444,45 +450,49 @@ function renderSession(){
   const today=todayKey();
   $("#title").textContent=DAY===today?"Today":keyDate(DAY).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
   const mine=dayClimbs(DAY,WHO);
-  const sent=mine.filter(c=>c.result==="Sent").length,fell=mine.length-sent;
+  const n=r=>mine.filter(c=>c.result===r).length;
+  const sent=n("Sent"),fell=n("Fell"),rested=n("Rested");
+  const rope=TYPE!=="Bouldering";
   const rows=gradeRows(TYPE).map(r=>r.value);
   for(const c of mine)if(c.type===TYPE&&!rows.some(g=>gkey(g)===gkey(c.grade)))rows.push(c.grade);
-  const cnt={};for(const c of mine){if(c.type!==TYPE)continue;const k=gkey(c.grade);cnt[k]=cnt[k]||{s:0,f:0};cnt[k][c.result==="Sent"?"s":"f"]++;}
+  const cnt={};for(const c of mine){if(c.type!==TYPE)continue;const k=gkey(c.grade);cnt[k]=cnt[k]||{s:0,f:0,r:0};cnt[k][c.result==="Sent"?"s":c.result==="Rested"?"r":"f"]++;}
+  const dayLbl=keyDate(DAY).toLocaleDateString([],{weekday:"long",month:"short",day:"numeric"});
   $("#view").innerHTML=`
     <div class="seg" role="group" aria-label="Who's climbing">${climbers().map(c=>`<button data-act="who" data-v="${esc(c)}" aria-pressed="${c===WHO}">${esc(c)}</button>`).join("")}</div>
-    ${DAY!==today?`<div class="backfill"><span>Logging for <b>${esc(fmtLong(DAY))}</b></span><button class="btn small" data-act="goToday">Back to today</button></div>`:""}
+    <div class="datebar">
+      <button class="iconbtn" data-act="prevDay" aria-label="Previous day">${ICON.left}</button>
+      <label class="datepick"><span>${DAY===today?"Today · ":""}${esc(dayLbl)}</span>${ICON.down}<input type="date" id="dayInput" value="${DAY}" max="${today}" aria-label="Date you're logging for"></label>
+      <button class="iconbtn" data-act="nextDay" aria-label="Next day" ${DAY>=today?"disabled":""}>${ICON.right}</button>
+    </div>
+    ${DAY!==today?`<div class="backfill"><span>Logging for an earlier day</span><button class="btn small" data-act="goToday">Back to today</button></div>`:""}
     <div class="card">
       <div class="sum">
         <div><b>${mine.length}</b><span>climbs</span></div>
         <div><b class="s">${sent}</b><span>sent</span></div>
+        ${rested?`<div><b class="r">${rested}</b><span>rested</span></div>`:""}
         <div><b class="f">${fell}</b><span>fell</span></div>
         <div><b class="tops">${esc(hardest(mine)||"—")}</b><span>top send</span></div>
       </div>
     </div>
-    <div class="dayrow">
-      <div class="types" role="group" aria-label="Climb type" style="flex:1">${TYPES.map(t=>`<button data-act="type" data-v="${t.k}" aria-pressed="${t.k===TYPE}">${t.k}</button>`).join("")}</div>
-    </div>
-    <div class="grows">${rows.length?rows.map(g=>{const k=gkey(g),c=cnt[k]||{s:0,f:0};const L=esc(gradeLabel(g));return`
+    <div class="types" role="group" aria-label="Climb type">${TYPES.map(t=>`<button data-act="type" data-v="${t.k}" aria-pressed="${t.k===TYPE}">${t.k}</button>`).join("")}</div>
+    <div class="grows">${rows.length?rows.map(g=>{const k=gkey(g),c=cnt[k]||{s:0,f:0,r:0};const L=esc(gradeLabel(g));return`
       <div class="grow">
         ${tagHTML(TYPE,g,"lg")}
-        <div class="gcount${c.s+c.f?"":" zero"}"><b class="s">${c.s}</b> sent · <b class="f">${c.f}</b> fell</div>
+        <div class="gcount${c.s+c.f+c.r?"":" zero"}"><span><b class="s">${c.s}</b> sent</span>${rope?`<span><b class="r">${c.r}</b> rest</span>`:""}<span><b class="f">${c.f}</b> fell</span></div>
         <button class="tbtn fell" data-act="log" data-res="Fell" data-g="${esc(g)}" aria-label="Fell on ${L}">${ICON.x}</button>
+        ${rope?`<button class="tbtn rest" data-act="log" data-res="Rested" data-g="${esc(g)}" aria-label="Finished ${L} with rests">Rest</button>`:""}
         <button class="tbtn sent" data-act="log" data-res="Sent" data-g="${esc(g)}" aria-label="Sent ${L}">${ICON.check}</button>
       </div>`;}).join(""):`<div class="empty"><strong>No grades yet</strong>Add some to the Lists tab in your sheet (List: ${esc(typeOf(TYPE).grades)}).</div>`}</div>
-    <div class="dayrow">
-      <p class="hint">Tap ✓ for a send. Tap ✕ for a fall to add its details.</p>
-      <div class="daynav"><button class="iconbtn" data-act="prevDay" aria-label="Log an earlier day">${ICON.left}</button><button class="iconbtn" data-act="nextDay" aria-label="Next day" ${DAY>=today?"disabled":""}>${ICON.right}</button></div>
-    </div>
+    <p class="hint">${rope?"Tap ✓ for a clean send, Rest if you finished with rests, ✕ for a fall.":"Tap ✓ for a send, ✕ for a fall."} Each one asks for its details.</p>
     ${mine.length?`<button class="btn wide" data-act="openDay" data-k="${DAY}">See ${DAY===today?"today's":"this day's"} climbs</button>`:""}
     ${sheetLink()}`;
 }
 const sheetLink=()=>sheetUrl?`<div class="sheetlink"><a href="${esc(sheetUrl)}" target="_blank" rel="noopener">Edit in Google Sheets ↗</a></div>`:"";
 
 function logClimb(res,grade){
-  const id=store.add("climbs",{when:whenFor(DAY),climber:WHO,type:TYPE,grade,result:res,gym:GYM,tries:1});
-  // A fall opens its details right away; a send just confirms with an undo
-  if(res==="Fell"){openSheet({type:"climb",id,fresh:true});return;}
-  toast(`${WHO} sent a ${gradeLabel(grade)}`,[{label:"Undo",fn:()=>{store.del("climbs",id);toast("Removed");}}]);
+  const id=store.add("climbs",Object.assign({when:whenFor(DAY),climber:WHO,type:TYPE,grade,result:res,gym:GYM,tries:1},res==="Rested"?{rests:1}:{}));
+  // Every climb opens its details right away (Skip details keeps it as is)
+  openSheet({type:"climb",id,fresh:true});
 }
 
 /* Projects */
@@ -546,10 +556,10 @@ function renderProgress(){
   const inMonth=S.climbs.filter(c=>atGym(c)&&dayKey(c.when).slice(0,7)===pMonth);
   const data=pWho==="*"?inMonth:inMonth.filter(c=>c.climber===pWho);
   const days=[...new Set(data.map(c=>dayKey(c.when)))].sort();
-  const sent=data.filter(c=>c.result==="Sent").length,fell=data.length-sent;
+  const sent=data.filter(c=>c.result==="Sent").length,rested=data.filter(c=>c.result==="Rested").length,fell=data.length-sent-rested;
   const thisMonth=todayKey().slice(0,7);
   const mLabel=keyDate(pMonth+"-01").toLocaleDateString([],{month:"long",year:pMonth.slice(0,4)===thisMonth.slice(0,4)?undefined:"numeric"});
-  const per=days.map(k=>{const d=data.filter(c=>dayKey(c.when)===k);const s=d.filter(c=>c.result==="Sent").length;return{k,s,f:d.length-s,t:d.length,top:hardest(d)};});
+  const per=days.map(k=>{const d=data.filter(c=>dayKey(c.when)===k);const s=d.filter(c=>c.result==="Sent").length,r=d.filter(c=>c.result==="Rested").length;return{k,s,r,f:d.length-s-r,t:d.length,top:hardest(d)};});
   const max=Math.max(1,...per.map(x=>x.t));const H=140;
   let html=`
     <div class="monthrow">
@@ -562,17 +572,17 @@ function renderProgress(){
   }else{
     html+=`<div class="kpis">
       <div class="kpi"><b>${days.length}</b><span>${days.length===1?"session":"sessions"}</span></div>
-      <div class="kpi"><b>${data.length}</b><span>climbs · ${sent} sent, ${fell} fell</span></div>
+      <div class="kpi"><b>${data.length}</b><span>climbs · ${sent} sent, ${rested?rested+" rested, ":""}${fell} fell</span></div>
       <div class="kpi"><b>${Math.round(sent/data.length*100)}%</b><span>send rate</span></div>
       <div class="kpi"><b class="small">${esc(hardest(data)||"—")}</b><span>hardest sends</span></div>
     </div>`;
   }
-  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--sent)"></i>Sent</span><span><i style="background:var(--fell-bar)"></i>Fell</span></div></div>
-    <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--sent)"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
+  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--sent)"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rested</span>`:""}<span><i style="background:var(--fell-bar)"></i>Fell</span></div></div>
+    <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.r?`<i style="height:${Math.round(x.r/max*H)}px;background:var(--rest-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--sent)"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
   // sends by grade, per type
   let gb="";const bmax=Math.max(1,...TYPES.flatMap(t=>gradeCounts(t.k,data).map(r=>r.s)));
   for(const t of TYPES){const rows=gradeCounts(t.k,data);if(!rows.length)continue;
-    gb+=`<div class="typeh">${t.k}</div>`+rows.map(r=>{const col=gradeColour(t.k,r.g)||"var(--ink)";return`<div class="gbar">${tagHTML(t.k,r.g,"sm")}<span class="track"><i style="width:${Math.round(r.s/bmax*100)}%;background:${col}"></i></span><span class="n"><b>${r.s}</b> sent${r.f?` · ${r.f}✕`:""}</span></div>`;}).join("");}
+    gb+=`<div class="typeh">${t.k}</div>`+rows.map(r=>{const col=gradeColour(t.k,r.g)||"var(--ink)";return`<div class="gbar">${tagHTML(t.k,r.g,"sm")}<span class="track"><i style="width:${Math.round(r.s/bmax*100)}%;background:${col}"></i></span><span class="n"><b>${r.s}</b> sent${r.r?` · ${r.r} rest`:""}${r.f?` · ${r.f}✕`:""}</span></div>`;}).join("");}
   html+=`<section class="panel"><h2>Sends by grade</h2><div class="gbars">${gb}</div></section>`;
   html+=`<section><h2 class="sech">Sessions</h2><div class="slist">${per.slice().reverse().map(x=>`<button class="srow" data-act="openDay" data-k="${x.k}"><span class="dd"><small>${esc(fmtDow(x.k))}</small><b>${keyDate(x.k).getDate()}</b></span><span class="tx"><b>${x.t} ${x.t===1?"climb":"climbs"} · ${x.s} sent</b><span>${x.top?"Top "+esc(x.top):"No sends yet"}</span></span>${ICON.right}</button>`).join("")}</div></section>`+sheetLink();
   $("#view").innerHTML=html;
@@ -581,7 +591,7 @@ function gradeCounts(type,data){
   const d=data.filter(c=>c.type===type);if(!d.length)return[];
   const order=gradeRows(type).map(r=>r.value);
   for(const c of d)if(!order.some(g=>gkey(g)===gkey(c.grade)))order.push(c.grade);
-  return order.map(g=>{const k=gkey(g);const x=d.filter(c=>gkey(c.grade)===k);return{g,s:x.filter(c=>c.result==="Sent").length,f:x.filter(c=>c.result==="Fell").length};}).filter(r=>r.s+r.f);
+  return order.map(g=>{const k=gkey(g);const x=d.filter(c=>gkey(c.grade)===k);return{g,s:x.filter(c=>c.result==="Sent").length,r:x.filter(c=>c.result==="Rested").length,f:x.filter(c=>c.result==="Fell").length};}).filter(r=>r.s+r.r+r.f);
 }
 
 /* =====================================================================
@@ -609,42 +619,58 @@ function holdField(val){
   return`<fieldset><legend class="flabel">Hold colour</legend><div class="swatches">${rows.map(r=>{const h=/^#[0-9a-f]{6}$/i.test(r.colour)?r.colour:(CSSCOL[r.value.toLowerCase()]||"#ccc");return`<label class="sw" title="${esc(r.value)}"><input type="radio" name="hold" value="${esc(r.value)}" ${eqi(r.value,val)?"checked":""} aria-label="${esc(r.value)}"><span style="background:${h}"></span></label>`;}).join("")}</div></fieldset>`;
 }
 const anchorField=(type,val)=>typeOf(type).anchor?`<div class="inrow"><label for="fAnchor" class="flabel" style="margin:0">Anchor #</label><input id="fAnchor" name="anchor" inputmode="numeric" value="${esc(val||"")}" placeholder="—"></div>`:"";
+const RES_TITLE={Sent:"Sent a",Fell:"Fell on a",Rested:"Rested on a"};
+const resVerb=c=>c.result==="Sent"?"sent":c.result==="Rested"?"finished with rests on":"fell on";
+function stepField(id,label,val,min,what){
+  return`<div class="inrow"><span class="flabel" style="margin:0" id="${id}L">${label}</span><div class="stepper" role="group" aria-labelledby="${id}L"><button type="button" data-act="step" data-o="${id}" data-min="${min}" data-d="-1" aria-label="One fewer ${what}">−</button><output id="${id}">${val}</output><button type="button" data-act="step" data-o="${id}" data-min="${min}" data-d="1" aria-label="One more ${what}">+</button></div></div>`;
+}
 function climbSheet(c){
-  const fell=c.result==="Fell";
-  const matches=fell&&!c.project?gymProjects().filter(p=>isOpen(p)&&p.type===c.type&&gkey(p.grade)===gkey(c.grade)):[];
+  const res=c.result;
+  const matches=!c.project?gymProjects().filter(p=>isOpen(p)&&p.type===c.type&&gkey(p.grade)===gkey(c.grade)):[];
   if(sheet.link==null)sheet.link="new";
   const linked=c.project?S.projects.find(p=>p.id===c.project):null;
-  const sub=[c.type,c.climber,c.gym,relDay(dayKey(c.when))].filter(Boolean).map(esc).join(" · ");
-  return head(`${fell?"Fell on a":"Sent a"} ${tagHTML(c.type,c.grade,"md")}`,sub)+`
+  const sub=[c.type,c.climber,c.gym].filter(Boolean).map(esc).join(" · ");
+  const place={Fell:"What stopped you?",Rested:"Where did you rest?",Sent:"Anything to remember?"}[res];
+  return head(`${RES_TITLE[res]} ${tagHTML(c.type,c.grade,"md")}`,sub)+`
   <form id="climbForm" data-id="${c.id}" autocomplete="off">
-    ${matches.length?`<fieldset><legend class="flabel">Is it one of your projects?</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}" ${sheet.link===p.id?"checked":""}><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="new" ${sheet.link==="new"?"checked":""}><span>A new route</span></label></div></fieldset>`:""}
+    <div class="inrow"><label for="fDay" class="flabel" style="margin:0">Date</label><input id="fDay" name="day" type="date" value="${dayKey(c.when)}" max="${todayKey()}" style="width:auto"></div>
+    ${matches.length?`<fieldset><legend class="flabel">${res==="Sent"?"Did you send one of your projects?":"Is it one of your projects?"}</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}" ${sheet.link===p.id?"checked":""}><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="new" ${sheet.link==="new"?"checked":""}><span>${res==="Sent"?"No, another route":"A new route"}</span></label></div></fieldset>`:""}
     <div id="newFields" class="stack" ${sheet.link!=="new"?"hidden":""}>
       ${areaField(c.type,c.area)}
       ${anchorField(c.type,c.anchor)}
       ${holdField(c.hold)}
     </div>
-    <div class="inrow"><span class="flabel" style="margin:0" id="triesL">Tries on it ${dayKey(c.when)===todayKey()?"today":"that day"}</span>
-      <div class="stepper" role="group" aria-labelledby="triesL"><button type="button" data-act="tries" data-d="-1" aria-label="One fewer try">−</button><output id="triesOut">${c.tries||1}</output><button type="button" data-act="tries" data-d="1" aria-label="One more try">+</button></div></div>
-    <label class="field">Note<input name="note" value="${esc(c.note||"")}" placeholder="${fell?"What stopped you?":"Anything to remember?"}"></label>
-    ${linked?`<p class="hint">Part of your project: ${esc(projName(linked))}${linked.area?" · "+esc(linked.area):""}.</p>`:fell?`<label class="check" id="projCheck" ${sheet.link!=="new"?"hidden":""}><input type="checkbox" name="addProj" checked>Add to Projects to come back to</label>`:""}
+    ${res==="Rested"?stepField("restsOut","Rests needed",c.rests||1,1,"rest"):""}
+    ${stepField("triesOut",res==="Sent"?"Tries it took":"Tries on it",c.tries||1,1,"try")}
+    <label class="field">Note<input name="note" value="${esc(c.note||"")}" placeholder="${place}"></label>
+    ${linked?`<p class="hint">Part of your project: ${esc(projName(linked))}${linked.area?" · "+esc(linked.area):""}.</p>`:res!=="Sent"?`<label class="check" id="projCheck" ${sheet.link!=="new"?"hidden":""}><input type="checkbox" name="addProj" ${res==="Fell"?"checked":""}>${res==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
     <div class="foot"><button type="button" class="btn" data-act="${sheet.fresh?"skipDetails":"close"}">${sheet.fresh?"Skip details":"Cancel"}</button><button type="submit" class="btn primary">Save</button></div>
     <button type="button" class="linkbtn" data-act="delClimb" data-id="${c.id}" data-confirm="Tap again to delete">Delete this climb</button>
   </form>`;
 }
+function markProjectSent(p,who){
+  const sentBy=[...new Set([...p.sentBy,who])];
+  const all=Object.keys(projInfo(p).tries).every(w=>sentBy.includes(w));
+  store.update("projects",p.id,{sentBy,status:all?"Sent":"Open"});
+}
 function saveClimb(form){
   const c=S.climbs.find(x=>x.id===form.dataset.id);if(!c)return closeSheet();
-  const f=new FormData(form);const tries=Math.max(1,+$("#triesOut").textContent||1);const note=String(f.get("note")||"").trim();
+  const f=new FormData(form);
+  const base={tries:Math.max(1,+$("#triesOut").textContent||1),note:String(f.get("note")||"").trim()};
+  const ro=$("#restsOut");if(ro)base.rests=Math.max(1,+ro.textContent||1);
+  const day=String(f.get("day")||"");
+  if(day&&day!==dayKey(c.when)&&day<=todayKey())base.when=whenFor(day);
   const link=f.get("link")||"new";
   if(link!=="new"){
     const p=S.projects.find(x=>x.id===link)||{};
-    store.update("climbs",c.id,{project:link,tries,note,area:p.area||"",anchor:p.anchor||"",hold:p.hold||""});
-    store.update("projects",link,{});
-    closeSheet();toast("Added to your project");return;
+    store.update("climbs",c.id,Object.assign(base,{project:link,area:p.area||"",anchor:p.anchor||"",hold:p.hold||""}));
+    if(c.result==="Sent"&&p.id)markProjectSent(p,c.climber);else store.update("projects",link,{});
+    closeSheet();toast(c.result==="Sent"?"Project sent!":"Added to your project");return;
   }
-  const d={area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||""),note,tries};
+  const d=Object.assign(base,{area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||"")});
   if(c.project){store.update("projects",c.project,{area:d.area,anchor:d.anchor,hold:d.hold});}
-  else if(c.result==="Fell"&&f.get("addProj")){
-    d.project=store.add("projects",{type:c.type,grade:c.grade,hold:d.hold,area:d.area,anchor:d.anchor,gym:c.gym||GYM,note,status:"Open",sentBy:[],added:Date.now()});
+  else if(c.result!=="Sent"&&f.get("addProj")){
+    d.project=store.add("projects",{type:c.type,grade:c.grade,hold:d.hold,area:d.area,anchor:d.anchor,gym:c.gym||GYM,note:d.note,status:"Open",sentBy:[],added:Date.now()});
   }
   store.update("climbs",c.id,d);
   closeSheet();toast(d.project?"Saved to Projects":"Saved");
@@ -668,7 +694,7 @@ function daySheet(k){
   let body="";
   for(const w of cs){const mine=list.filter(c=>c.climber===w);const s=mine.filter(c=>c.result==="Sent").length;
     body+=`<h3 class="sech">${esc(w)} · ${mine.length} climbs · ${s} sent</h3>`+mine.map(c=>{const det=[c.hold?c.hold+" holds":"",c.area,c.anchor?"Anchor "+c.anchor:"",c.note?"“"+c.note+"”":""].filter(Boolean).join(" · ");
-      return`<div class="crow">${tagHTML(c.type,c.grade,"sm")}<button class="t" data-act="openClimb" data-id="${c.id}" style="appearance:none;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:inherit"><b><span class="res ${c.result==="Sent"?"s":"f"}">${c.result}</span> · ${esc(c.type)}</b><span>${esc(det||"Tap to add details")}</span></button><button class="x" data-act="delClimb" data-id="${c.id}" data-confirm="Delete?" aria-label="Delete this climb">×</button></div>`;}).join("");}
+      return`<div class="crow">${tagHTML(c.type,c.grade,"sm")}<button class="t" data-act="openClimb" data-id="${c.id}" style="appearance:none;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:inherit"><b><span class="res ${c.result==="Sent"?"s":c.result==="Rested"?"r":"f"}">${c.result}${c.result==="Rested"&&c.rests?" ×"+c.rests:""}</span> · ${esc(c.type)}</b><span>${esc(det||"Tap to add details")}</span></button><button class="x" data-act="delClimb" data-id="${c.id}" data-confirm="Delete?" aria-label="Delete this climb">×</button></div>`;}).join("");}
   return head(esc(fmtLong(k)),esc(GYM))+`<div class="stack">${body||`<div class="empty">No climbs on this day.</div>`}
     <button class="btn primary" data-act="logOnDay" data-k="${k}">${k===todayKey()?"Log more today":"Log more for this day"}</button></div>`;
 }
@@ -700,7 +726,7 @@ document.addEventListener("click",e=>{
   switch(a){
     case"refreshNow":if(auth==="ok")flush();break;
     case"close":closeSheet();break;
-    case"skipDetails":{const cid=sheet&&sheet.id;const c=S.climbs.find(x=>x.id===cid);closeSheet();if(c)toast(`${c.climber} fell on a ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);break;}
+    case"skipDetails":{const cid=sheet&&sheet.id;const c=S.climbs.find(x=>x.id===cid);closeSheet();if(c)toast(`${c.climber} ${resVerb(c)} a ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);break;}
     case"who":WHO=t.dataset.v;LS.set("who",WHO);render();break;
     case"type":TYPE=t.dataset.v;LS.set("type",TYPE);render();break;
     case"log":logClimb(t.dataset.res,t.dataset.g);break;
@@ -711,7 +737,7 @@ document.addEventListener("click",e=>{
     case"openClimb":openSheet({type:"climb",id});break;
     case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
     case"delClimb":{const c=S.climbs.find(x=>x.id===id);if(!c)break;const keep=Object.assign({},c);delete keep.id;store.del("climbs",id);if(sheet&&sheet.type==="climb")closeSheet();toast("Climb deleted",[{label:"Undo",fn:()=>enqueue({op:"add",coll:"climbs",id,data:keep})}]);break;}
-    case"tries":{const o=$("#triesOut");if(o)o.textContent=Math.max(1,(+o.textContent||1)+ +t.dataset.d);break;}
+    case"step":{const o=document.getElementById(t.dataset.o);if(o)o.textContent=Math.max(+t.dataset.min||0,(+o.textContent||0)+ +t.dataset.d);break;}
     case"pf":projFilter=t.dataset.v;render();break;
     case"editProj":openSheet({type:"project",id});break;
     case"projSent":if(P)projSent(P);break;
@@ -725,7 +751,9 @@ document.addEventListener("click",e=>{
     case"setGym":GYM=t.dataset.v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+GYM);break;
   }
 });
+document.addEventListener("click",e=>{if(e.target.id==="dayInput"&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
 document.addEventListener("change",e=>{
+  if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){DAY=v;render();}return;}
   if(e.target.name==="link"&&sheet&&sheet.type==="climb"){sheet.link=e.target.value;const nf=$("#newFields");if(nf)nf.hidden=sheet.link!=="new";const pc=$("#projCheck");if(pc)pc.hidden=sheet.link!=="new";}
 });
 document.addEventListener("submit",e=>{

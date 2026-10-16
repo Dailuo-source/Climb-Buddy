@@ -16,7 +16,7 @@ const APP_NAME = 'Climb Buddy';
 const APP_SITE = 'https://climbbuddy.pages.dev/';
 
 const TYPES = ['Bouldering', 'Top rope', 'Auto belay'];
-const RESULTS = ['Sent', 'Fell'];
+const RESULTS = ['Sent', 'Rested', 'Fell'];
 const STATUSES = ['Open', 'Sent', 'Reset'];
 const LIST_NAMES = ['Climber', 'Gym', 'Boulder grade', 'Rope grade', 'Boulder area', 'Rope area', 'Auto belay area', 'Hold colour'];
 
@@ -36,6 +36,7 @@ const SCHEMA = {
       ['anchor', 'Anchor #', 'text', 75],
       ['hold', 'Hold colour', 'text', 95],
       ['tries', 'Tries', 'num', 55],
+      ['rests', 'Rests', 'num', 55],
       ['note', 'Note', 'text', 240],
       ['project', 'Project ID', 'text', 95],
     ],
@@ -428,6 +429,8 @@ function buildTab_(ss, sch) {
       .setFontColor('#1F4FB8').setRanges([sh.getRange(2, cols.result + 1, body, 1)]).build());
     rules.push(SpreadsheetApp.newConditionalFormatRule().whenFormulaSatisfied('=$' + L('result') + '2="Fell"')
       .setFontColor('#B44A14').setRanges([sh.getRange(2, cols.result + 1, body, 1)]).build());
+    rules.push(SpreadsheetApp.newConditionalFormatRule().whenFormulaSatisfied('=$' + L('result') + '2="Rested"')
+      .setFontColor('#2C4A96').setRanges([sh.getRange(2, cols.result + 1, body, 1)]).build());
   }
   if (sch === SCHEMA.projects) {
     rules.push(SpreadsheetApp.newConditionalFormatRule().whenFormulaSatisfied('=OR($' + L('status') + '2="Sent",$' + L('status') + '2="Reset")')

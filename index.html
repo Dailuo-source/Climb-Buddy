@@ -114,23 +114,33 @@ legend{padding:0}
 .sum b.tops{font-size:16px;line-height:1.2;min-height:30px;display:flex;align-items:center}
 .sum span{font-size:12px;color:var(--muted)}
 
-/* session summary: a table with a Total row, then one row per climb type */
-.dsum{padding:6px 14px 4px}
-.dtab{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-.dtab th{font-size:11.5px;font-weight:600;color:var(--muted);text-align:center;padding:6px 2px 8px}
-.dtab th:first-child{text-align:left}
-.dtab th:last-child,.dtab td:last-child{text-align:right}
-.dtab td{padding:9px 2px;border-top:1px solid var(--line);text-align:center;font-size:15px}
-.dtab td:first-child{text-align:left;font-weight:600;font-size:14.5px;white-space:nowrap}
-.dtab .n{font-family:var(--f-display);font-weight:700;font-size:20px}
-.dtab .s{color:var(--sent)} .dtab .r{color:var(--rest)} .dtab .f{color:var(--fell)}
-.dtab tr.tot td{border-top:0}
-.dtab tr.tot .n{font-size:24px}
-.dtab tr.zero td{color:var(--muted);opacity:.6}
-.dtab tr.zero .n{color:var(--muted)}
-.dtab tr.typ{cursor:pointer}
-.dtab tr.typ.on td:first-child{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
-.dtab .rate{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+/* session summary: a ring for the whole day + a stacked bar per climb type (shared scale).
+   Chart colours are deeper than the UI's soft fills so they pass contrast and colour-blind checks. */
+.dsum{--c-sent:#1F4FB8;--c-rest:#6C8CEB;--c-fell:#DD6B26;padding:14px 16px;display:flex;flex-direction:column;gap:14px}
+.dhero{display:flex;align-items:center;gap:18px}
+.ring{position:relative;width:112px;height:112px;flex:none}
+.ring svg{display:block;width:100%;height:100%;transform:rotate(-90deg)}
+.ring .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.ring .mid b{font-family:var(--f-display);font-size:32px;font-weight:700;font-variant-numeric:tabular-nums}
+.ring .mid span{font-size:12px;color:var(--muted);margin-top:3px}
+.dleg{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0}
+.dleg div{display:flex;align-items:center;gap:8px;font-size:14px}
+.dleg i{width:12px;height:12px;border-radius:4px;flex:none}
+.dleg b{margin-left:auto;font-family:var(--f-display);font-size:17px;font-variant-numeric:tabular-nums}
+.dleg .rate{font-size:12.5px;color:var(--muted);padding-top:2px;border-top:1px solid var(--line);margin-top:2px}
+.dtypes{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:8px}
+.dtype{appearance:none;border:0;background:none;padding:6px 0;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;width:100%;color:inherit}
+.dtype .h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;min-height:24px}
+.dtype .h .k{flex:1}
+.dtype.on .h .k{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.dtype .h small{font-size:11.5px;font-weight:600;color:var(--muted)}
+.sbar{display:flex;gap:2px;height:22px}
+.sbar i{display:flex;align-items:center;justify-content:center;font:700 12.5px var(--f-body);font-style:normal;min-width:0;overflow:hidden;font-variant-numeric:tabular-nums}
+.sbar i:first-child{border-radius:6px 0 0 6px}
+.sbar i:last-child{border-radius:0 6px 6px 0}
+.sbar i:only-child{border-radius:6px}
+.sbar .none0{flex:1;height:6px;align-self:center;border-radius:3px;background:var(--sunk)}
+.dtype.zero .h{color:var(--muted);font-weight:500}
 
 /* grade rows */
 .grows{display:flex;flex-direction:column}
@@ -378,22 +388,38 @@ function tagHTML(type,g,size){const c=gradeColour(type,g);const lbl=esc(gradeLab
 const CSSCOL={red:"#D83A34",orange:"#F08A24",yellow:"#F5D02E",green:"#3DA35D",teal:"#2BA5A0",blue:"#2F6FD6",purple:"#8150C8",pink:"#EE7FB0",black:"#22262A",white:"#F7F7F4",grey:"#9AA0A6",gray:"#9AA0A6",brown:"#8A5A3B"};
 function holdHex(name){if(!name)return"";const r=holdRows().find(x=>eqi(x.value,name));if(r&&/^#[0-9a-f]{6}$/i.test(r.colour))return r.colour;return CSSCOL[String(name).trim().toLowerCase()]||"";}
 function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${cls||""}" style="background:${h}" aria-hidden="true"></span>`:`<span class="hdot none ${cls||""}" aria-hidden="true"></span>`;}
-/* Session summary: Total row, then a row per climb type with sent / rested / fell and that type's top send.
-   Tapping a type row shows that type's grades below. */
+/* Session summary, drawn: a ring of sent / rested / fell for the whole day, then a stacked bar per
+   climb type on one shared scale, with that type's top send. Tapping a type shows its grades below. */
+const RES_KEYS=[["Sent","sent","Sent"],["Rested","rest","Rested"],["Fell","fell","Fell"]];
+const RES_HEX={sent:"#1F4FB8",rest:"#6C8CEB",fell:"#DD6B26"};
 function daySummary(list,isToday){
-  if(!list.length)return`<div class="card dsum"><p class="hint" style="margin:6px 0">No climbs logged ${isToday?"yet today":"on this day"}. Tap ✓ or ✕ on a grade below.</p></div>`;
+  if(!list.length)return`<div class="card dsum"><p class="hint" style="margin:0">No climbs logged ${isToday?"yet today":"on this day"}. Tap ✓ or ✕ on a grade below.</p></div>`;
   const cnt=(a,r)=>a.filter(c=>c.result===r).length;
-  const rests=list.some(c=>c.type!=="Bouldering");   // the Rest column only matters once ropes are in play
-  const top=(type,a)=>{let best=-2,bg="";for(const c of a){if(c.result!=="Sent")continue;const i=gradeIdx(type,c.grade);if(!bg||i>best){best=i;bg=c.grade;}}return bg?tagHTML(type,bg,"sm"):"—";};
-  const cells=a=>`<td class="n">${a.length}</td><td class="n s">${cnt(a,"Sent")}</td>${rests?`<td class="n r">${cnt(a,"Rested")}</td>`:""}<td class="n f">${cnt(a,"Fell")}</td>`;
-  const sent=cnt(list,"Sent");
-  return`<div class="card dsum"><table class="dtab">
-    <thead><tr><th scope="col"><span class="vh">Type</span></th><th scope="col">Climbs</th><th scope="col">Sent</th>${rests?`<th scope="col">Rest</th>`:""}<th scope="col">Fell</th><th scope="col">Top send</th></tr></thead>
-    <tbody>
-      <tr class="tot"><td>Total</td>${cells(list)}<td><span class="rate">${Math.round(sent/list.length*100)}% sent</span></td></tr>
-      ${TYPES.map(t=>{const a=list.filter(c=>c.type===t.k);return`<tr class="typ${a.length?"":" zero"}${t.k===TYPE?" on":""}" data-act="type" data-v="${t.k}">
-        <td>${t.k}</td>${cells(a)}<td>${a.length?top(t.k,a):"—"}</td></tr>`;}).join("")}
-    </tbody></table></div>`;
+  const n=list.length,parts=RES_KEYS.map(([r,k,l])=>({k,l,v:cnt(list,r)}));
+  const shown=parts.filter(p=>p.v);
+  // ring: one arc per result, 2px gaps between arcs (none when there's only one)
+  const R=46,C=2*Math.PI*R,gap=shown.length>1?3:0;let off=0;
+  const arcs=shown.map(p=>{const len=Math.max(0,p.v/n*C-gap);const a=`<circle cx="56" cy="56" r="${R}" fill="none" stroke="${RES_HEX[p.k]}" stroke-width="14" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;off+=p.v/n*C;return a;}).join("");
+  const sent=parts[0].v,rested=parts[1].v;
+  const ropes=list.some(c=>c.type!=="Bouldering");
+  const legend=parts.filter(p=>p.k!=="rest"||ropes||p.v).map(p=>`<div><i style="background:${RES_HEX[p.k]}"></i>${p.l}<b>${p.v}</b></div>`).join("");
+  const max=Math.max(1,...TYPES.map(t=>list.filter(c=>c.type===t.k).length));
+  const top=(type,a)=>{let best=-2,bg="";for(const c of a){if(c.result!=="Sent")continue;const i=gradeIdx(type,c.grade);if(!bg||i>best){best=i;bg=c.grade;}}return bg;};
+  const bars=TYPES.map(t=>{
+    const a=list.filter(c=>c.type===t.k);const tg=top(t.k,a);
+    const segs=RES_KEYS.map(([r,k])=>({k,v:cnt(a,r)})).filter(x=>x.v);
+    const desc=a.length?`${t.k}: ${a.length} ${a.length===1?"climb":"climbs"}, ${segs.map(x=>x.v+" "+({sent:"sent",rest:"rested",fell:"fell"})[x.k]).join(", ")}${tg?", top send "+gradeLabel(tg):""}`:`${t.k}: none yet`;
+    const bar=a.length?`<span class="sbar" style="width:${(a.length/max*100).toFixed(1)}%">${segs.map(x=>`<i style="flex:${x.v};background:${RES_HEX[x.k]};color:${inkOn(RES_HEX[x.k])}">${x.v/a.length*(a.length/max)>.07?x.v:""}</i>`).join("")}</span>`:`<span class="sbar"><span class="none0"></span></span>`;
+    return`<button class="dtype${a.length?"":" zero"}${t.k===TYPE?" on":""}" data-act="type" data-v="${t.k}" aria-label="${esc(desc)}" aria-pressed="${t.k===TYPE}">
+      <span class="h"><span class="k">${t.k}</span>${tg?`<small>Top</small>${tagHTML(t.k,tg,"sm")}`:a.length?`<small>No sends yet</small>`:""}</span>${bar}</button>`;
+  }).join("");
+  return`<div class="card dsum">
+    <div class="dhero">
+      <div class="ring" role="img" aria-label="${n} climbs: ${parts.map(p=>p.v+" "+p.l.toLowerCase()).join(", ")}"><svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="${R}" fill="none" stroke="var(--sunk)" stroke-width="14"/>${arcs}</svg><span class="mid"><b>${n}</b><span>${n===1?"climb":"climbs"}</span></span></div>
+      <div class="dleg">${legend}<span class="rate">${Math.round(sent/n*100)}% sent${rested?` · ${Math.round((sent+rested)/n*100)}% finished`:""}</span></div>
+    </div>
+    <div class="dtypes">${bars}</div>
+  </div>`;
 }
 function hardest(list){const out=[];for(const t of TYPES){let best=-1,bg="";for(const c of list){if(c.type!==t.k||c.result!=="Sent")continue;const i=gradeIdx(t.k,c.grade);if(i>best){best=i;bg=c.grade;}else if(best<0&&!bg)bg=c.grade;}if(bg)out.push(gradeLabel(bg));}return out.join(" · ");}
 

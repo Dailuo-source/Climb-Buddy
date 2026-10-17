@@ -114,22 +114,23 @@ legend{padding:0}
 .sum b.tops{font-size:16px;line-height:1.2;min-height:30px;display:flex;align-items:center}
 .sum span{font-size:12px;color:var(--muted)}
 
-/* session summary */
-.dsum{padding:4px 16px}
-.dsrow{display:grid;grid-template-columns:78px 44px 1fr;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
-.dsrow:last-child{border-bottom:0}
-.dl{display:flex;flex-direction:column;font-weight:600;font-size:15px;line-height:1.2}
-.dl small{font-size:12px;font-weight:500;color:var(--muted)}
-.dn{font-family:var(--f-display);font-size:26px;line-height:1;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
-.dn.s{color:var(--sent)} .dn.f{color:var(--fell)} .dn.r{color:var(--rest)}
-.dt{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;min-width:0}
-.dt.col{flex-direction:column;align-items:stretch;gap:5px}
-.dt .none{color:var(--muted)}
-.ttag{display:inline-flex;align-items:center;gap:4px}
-.ttag small{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
-.mix{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--sunk);gap:2px}
-.mix i{display:block;height:100%}
-.rate{font-size:12.5px;color:var(--muted)}
+/* session summary: a table with a Total row, then one row per climb type */
+.dsum{padding:6px 14px 4px}
+.dtab{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.dtab th{font-size:11.5px;font-weight:600;color:var(--muted);text-align:center;padding:6px 2px 8px}
+.dtab th:first-child{text-align:left}
+.dtab th:last-child,.dtab td:last-child{text-align:right}
+.dtab td{padding:9px 2px;border-top:1px solid var(--line);text-align:center;font-size:15px}
+.dtab td:first-child{text-align:left;font-weight:600;font-size:14.5px;white-space:nowrap}
+.dtab .n{font-family:var(--f-display);font-weight:700;font-size:20px}
+.dtab .s{color:var(--sent)} .dtab .r{color:var(--rest)} .dtab .f{color:var(--fell)}
+.dtab tr.tot td{border-top:0}
+.dtab tr.tot .n{font-size:24px}
+.dtab tr.zero td{color:var(--muted);opacity:.6}
+.dtab tr.zero .n{color:var(--muted)}
+.dtab tr.typ{cursor:pointer}
+.dtab tr.typ.on td:first-child{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.dtab .rate{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
 
 /* grade rows */
 .grows{display:flex;flex-direction:column}
@@ -377,30 +378,22 @@ function tagHTML(type,g,size){const c=gradeColour(type,g);const lbl=esc(gradeLab
 const CSSCOL={red:"#D83A34",orange:"#F08A24",yellow:"#F5D02E",green:"#3DA35D",teal:"#2BA5A0",blue:"#2F6FD6",purple:"#8150C8",pink:"#EE7FB0",black:"#22262A",white:"#F7F7F4",grey:"#9AA0A6",gray:"#9AA0A6",brown:"#8A5A3B"};
 function holdHex(name){if(!name)return"";const r=holdRows().find(x=>eqi(x.value,name));if(r&&/^#[0-9a-f]{6}$/i.test(r.colour))return r.colour;return CSSCOL[String(name).trim().toLowerCase()]||"";}
 function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${cls||""}" style="background:${h}" aria-hidden="true"></span>`:`<span class="hdot none ${cls||""}" aria-hidden="true"></span>`;}
-/* Hardest grade per climb type in a list, as grade tags (rope types get a small TR / AB label) */
-const TYPE_ABBR={"Top rope":"TR","Auto belay":"AB"};
-function topTags(list){
-  const out=[];
-  for(const t of TYPES){let best=-2,bg="";
-    for(const c of list){if(c.type!==t.k)continue;const i=gradeIdx(t.k,c.grade);if(!bg||i>best){best=i;bg=c.grade;}}
-    if(bg)out.push(`<span class="ttag">${TYPE_ABBR[t.k]?`<small>${TYPE_ABBR[t.k]}</small>`:""}${tagHTML(t.k,bg,"sm")}</span>`);}
-  return out.join("");
-}
-/* Session summary: a Total row with the day's mix, then Sent / Rested / Fell with each one's hardest grades */
+/* Session summary: Total row, then a row per climb type with sent / rested / fell and that type's top send.
+   Tapping a type row shows that type's grades below. */
 function daySummary(list,isToday){
-  const by=r=>list.filter(c=>c.result===r);
-  const s=by("Sent"),r=by("Rested"),f=by("Fell"),n=list.length;
-  if(!n)return`<div class="card dsum"><p class="hint" style="margin:0">No climbs logged ${isToday?"yet today":"on this day"}. Tap ✓ or ✕ on a grade below.</p></div>`;
-  const pct=x=>(x/n*100).toFixed(1)+"%";
-  const row=(cls,label,cap,arr)=>`<div class="dsrow"><span class="dl">${label}<small>${cap}</small></span><b class="dn ${cls}">${arr.length}</b><span class="dt">${arr.length?topTags(arr):`<span class="none">—</span>`}</span></div>`;
-  return`<div class="card dsum">
-    <div class="dsrow total"><span class="dl">Total<small>${n===1?"climb":"climbs"}</small></span><b class="dn">${n}</b>
-      <span class="dt col"><span class="mix" role="img" aria-label="${s.length} sent, ${r.length} rested, ${f.length} fell">${s.length?`<i style="width:${pct(s.length)};background:var(--sent)"></i>`:""}${r.length?`<i style="width:${pct(r.length)};background:var(--rest-bar)"></i>`:""}${f.length?`<i style="width:${pct(f.length)};background:var(--fell-bar)"></i>`:""}</span>
-      <span class="rate">${Math.round(s.length/n*100)}% sent${r.length?` · ${Math.round((s.length+r.length)/n*100)}% finished`:""}</span></span></div>
-    ${row("s","Sent","top sends",s)}
-    ${r.length||list.some(c=>c.type!=="Bouldering")?row("r","Rested","hardest",r):""}
-    ${row("f","Fell","hardest",f)}
-  </div>`;
+  if(!list.length)return`<div class="card dsum"><p class="hint" style="margin:6px 0">No climbs logged ${isToday?"yet today":"on this day"}. Tap ✓ or ✕ on a grade below.</p></div>`;
+  const cnt=(a,r)=>a.filter(c=>c.result===r).length;
+  const rests=list.some(c=>c.type!=="Bouldering");   // the Rest column only matters once ropes are in play
+  const top=(type,a)=>{let best=-2,bg="";for(const c of a){if(c.result!=="Sent")continue;const i=gradeIdx(type,c.grade);if(!bg||i>best){best=i;bg=c.grade;}}return bg?tagHTML(type,bg,"sm"):"—";};
+  const cells=a=>`<td class="n">${a.length}</td><td class="n s">${cnt(a,"Sent")}</td>${rests?`<td class="n r">${cnt(a,"Rested")}</td>`:""}<td class="n f">${cnt(a,"Fell")}</td>`;
+  const sent=cnt(list,"Sent");
+  return`<div class="card dsum"><table class="dtab">
+    <thead><tr><th scope="col"><span class="vh">Type</span></th><th scope="col">Climbs</th><th scope="col">Sent</th>${rests?`<th scope="col">Rest</th>`:""}<th scope="col">Fell</th><th scope="col">Top send</th></tr></thead>
+    <tbody>
+      <tr class="tot"><td>Total</td>${cells(list)}<td><span class="rate">${Math.round(sent/list.length*100)}% sent</span></td></tr>
+      ${TYPES.map(t=>{const a=list.filter(c=>c.type===t.k);return`<tr class="typ${a.length?"":" zero"}${t.k===TYPE?" on":""}" data-act="type" data-v="${t.k}">
+        <td>${t.k}</td>${cells(a)}<td>${a.length?top(t.k,a):"—"}</td></tr>`;}).join("")}
+    </tbody></table></div>`;
 }
 function hardest(list){const out=[];for(const t of TYPES){let best=-1,bg="";for(const c of list){if(c.type!==t.k||c.result!=="Sent")continue;const i=gradeIdx(t.k,c.grade);if(i>best){best=i;bg=c.grade;}else if(best<0&&!bg)bg=c.grade;}if(bg)out.push(gradeLabel(bg));}return out.join(" · ");}
 

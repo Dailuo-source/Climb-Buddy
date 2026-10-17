@@ -22,15 +22,16 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 
 ## App structure (`index.html`, one file)
 
-- Tabs: **Session** (climber switch, date picker, totals, per-grade ✓/Rest/✕), **Projects**, **Map**, **Progress** (month view, per climber or both side by side).
+- Tabs: **Session** (date picker, totals, per-grade ✓/Rest/✕), **Projects**, **Map**, **Progress** (month view).
+- **Whose view**: one person switcher at the top of every tab (`whoSeg`), shared across tabs (`WHO` in localStorage `cb.who`; `BOTH` flag `cb.both`). Map, Projects and Progress also offer **Both**; Session always logs for one person. Swiping left/right anywhere switches (cycles Gary → Cecilia → Both, wraps); ignored while a panel is open or on anything that scrolls sideways (zoomed map, long chart). A person's projects = open ones they've tried and not yet sent (`openFor`). "This wall was reset" still resets everyone's projects on that wall.
 - **Map**: `HUB_MAP` traces Gary's floor plan (1227×1402 coordinates); each zone's `area` + `type` must match a Lists value. Projects view shows dots in hold colour; Activity view shades walls by climbs in the last 30 days; tapping a wall opens stats, its projects and "This wall was reset". Details panels include a mini map to tap the wall, and typing an anchor number picks the wall from the Anchors ranges.
 - Sync: same pattern as Pantry Pal (optimistic, batched ops, 60 s polling). Forms in open panels are never redrawn by a background sync.
-- Always light cream theme, even in phone dark mode (Gary's choice).
+- Always a light theme, even in phone dark mode (Gary's choice). Background tints by whose stats you're viewing: very light green for Gary, very light lavender for Cecilia, cream for Both (`data-who` on `<html>`, also sets the status-bar `theme-color`).
 - Icon: simple side-on grey rock with a face climbing an orange rope, feet on a cream wall, on lavender. Gary deleted the maskable icon; keep it out of the manifest and `sw.js`.
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `climb-buddy-v9`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `climb-buddy-v10`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Claude did this through Claude in Chrome last time: open the sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Sheet edits through the Google Sheets connector are fine. Insert rows rather than rewriting blocks in Lists, because the colour cells are painted.
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email. Push with `https://github.com/Dailuo-source/Climb-Buddy.git`.

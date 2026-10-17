@@ -24,6 +24,15 @@
   --f-body:"DM Sans","Segoe UI",system-ui,-apple-system,sans-serif;
   --tabh:64px; color-scheme:light;
 }
+/* Whose stats you're looking at tints the background: Gary green, Cecilia lavender, Both stays cream */
+:root[data-who="green"]{--bg:#EDF5EB;--sunk:#D8E8D3;--line:#D3E2CE;--line2:#BBCEB5}
+:root[data-who="lav"]{--bg:#F3EFFA;--sunk:#E2DAF2;--line:#DDD5EB;--line2:#C7BDDC}
+body,.top{transition:background-color .25s ease}
+#view.slide-l{animation:slideL .22s ease-out}
+#view.slide-r{animation:slideR .22s ease-out}
+@keyframes slideL{from{transform:translateX(36px);opacity:.35}}
+@keyframes slideR{from{transform:translateX(-36px);opacity:.35}}
+@media (prefers-reduced-motion:reduce){#view.slide-l,#view.slide-r{animation:none}body,.top{transition:none}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{min-height:100%}
@@ -356,7 +365,7 @@ let S={climbs:[],projects:[],lists:[]};
 let ready=false,auth="ok",KEY=LS.get("key",""),API=API_URL||LS.get("api",""),sheetUrl=LS.get("sheet",""),lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null;
 let GYM=LS.get("gym",""),WHO=LS.get("who",""),DAY=todayKey(),TYPE=LS.get("type","Bouldering");
-let tab=LS.get("tab","session"),projFilter="All",pMonth=todayKey().slice(0,7),pWho=LS.get("pwho","");
+let tab=LS.get("tab","session"),projFilter="All",pMonth=todayKey().slice(0,7),BOTH=LS.get("both","")==="1";
 function readLinkParams(){
   try{
     const h=new URLSearchParams((location.hash||"").replace(/^#/,""));const q=new URLSearchParams(location.search);
@@ -422,8 +431,45 @@ function settleDefaults(){
   const cs=climbers();if(!cs.includes(WHO)){WHO=cs[0];LS.set("who",WHO);}
   if(!GYM){GYM=gyms()[0]||"My gym";LS.set("gym",GYM);}
   if(!TYPES.some(t=>t.k===TYPE))TYPE="Bouldering";
-  if(pWho!=="*"&&!cs.includes(pWho))pWho=WHO;
+  if(cs.length<2)BOTH=false;
 }
+
+/* ---------- whose view ----------
+   One person is picked for every tab. Map, Projects and Progress can also show Both;
+   Session always logs for one person. Swipe left/right (or tap) to switch. */
+const canBoth=()=>tab!=="session"&&climbers().length>1;
+const cur=()=>BOTH&&canBoth()?"*":WHO;
+const whoOpts=()=>canBoth()?[...climbers(),"*"]:climbers();
+function themeFor(w){
+  if(w==="*")return"both";
+  if(eqi(w,"Cecilia"))return"lav";if(eqi(w,"Gary"))return"green";
+  return climbers().indexOf(w)%2?"lav":"green";
+}
+const THEME_HEX={green:"#EDF5EB",lav:"#F3EFFA",both:"#F3F1EA"};
+function applyTheme(){
+  const k=themeFor(cur());document.documentElement.dataset.who=k;
+  const m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",THEME_HEX[k]);
+}
+function whoSeg(){
+  const o=whoOpts();if(o.length<2)return"";
+  return`<div class="seg" role="group" aria-label="Whose climbs">${o.map(w=>`<button data-act="who" data-v="${esc(w)}" aria-pressed="${cur()===w}">${w==="*"?"Both":esc(w)}</button>`).join("")}</div>`;
+}
+function setWho(v,dir){
+  const prev=cur(),o=whoOpts();
+  if(v==="*")BOTH=true;else{WHO=v;LS.set("who",WHO);BOTH=false;}
+  LS.set("both",BOTH?"1":"");
+  if(cur()===prev)return;
+  if(dir==null)dir=o.indexOf(cur())>o.indexOf(prev)?1:-1;
+  render();
+  const v2=$("#view");v2.classList.remove("slide-l","slide-r");void v2.offsetWidth;v2.classList.add(dir>0?"slide-l":"slide-r");
+}
+function swipeWho(dir){
+  const o=whoOpts();if(o.length<2)return;
+  const i=o.indexOf(cur());setWho(o[(i+dir+o.length)%o.length],dir);
+}
+/* Projects belong to whoever has tried them; one person's view skips routes they've already sent */
+function triedBy(p,w){const t=Object.keys(projInfo(p).tries);return!t.length||t.includes(w);}
+const openFor=(p,w)=>isOpen(p)&&(w==="*"||(triedBy(p,w)&&!p.sentBy.includes(w)));
 
 /* ---------- derived ---------- */
 const atGym=c=>eqi(c.gym,GYM);
@@ -458,9 +504,10 @@ function render(msg){
       </form>${msg?`<p class="err">${esc(msg)}</p>`:""}</div>`;
     return;
   }
+  applyTheme();
   if(!ready){$("#title").textContent={session:"Today",projects:"Projects",progress:"Progress",map:"Map"}[tab];v.innerHTML=`<div class="empty"><strong>Loading your climbs…</strong>Reading your sheet.</div>`;return;}
   if(tab==="session")renderSession();else if(tab==="projects")renderProjects();else if(tab==="map")renderMap();else renderProgress();
-  const n=gymProjects().filter(isOpen).length;const b=$("#projBadge");b.hidden=!n;b.textContent=n;
+  const n=gymProjects().filter(p=>openFor(p,cur())).length;const b=$("#projBadge");b.hidden=!n;b.textContent=n;
 }
 // Forms in a sheet are never redrawn under your fingers; only the read-only day view refreshes
 function onData(){if(auth!=="ok"||!ready)return;render();if(sheet&&sheet.type==="day")renderSheet();}
@@ -478,7 +525,7 @@ function renderSession(){
   const cnt={};for(const c of mine){if(c.type!==TYPE)continue;const k=gkey(c.grade);cnt[k]=cnt[k]||{s:0,f:0,r:0};cnt[k][c.result==="Sent"?"s":c.result==="Rested"?"r":"f"]++;}
   const dayLbl=keyDate(DAY).toLocaleDateString([],{weekday:"long",month:"short",day:"numeric"});
   $("#view").innerHTML=`
-    <div class="seg" role="group" aria-label="Who's climbing">${climbers().map(c=>`<button data-act="who" data-v="${esc(c)}" aria-pressed="${c===WHO}">${esc(c)}</button>`).join("")}</div>
+    ${whoSeg()}
     <div class="datebar">
       <button class="iconbtn" data-act="prevDay" aria-label="Previous day">${ICON.left}</button>
       <label class="datepick"><span>${DAY===today?"Today · ":""}${esc(dayLbl)}</span>${ICON.down}<input type="date" id="dayInput" value="${DAY}" max="${today}" aria-label="Date you're logging for"></label>
@@ -518,19 +565,22 @@ function logClimb(res,grade){
 /* Projects */
 function renderProjects(){
   $("#title").textContent="Projects";
+  const w=cur(),solo=w!=="*";
   const all=gymProjects();
-  const open=all.filter(isOpen).sort((a,b)=>projInfo(b).last-projInfo(a).last);
+  const open=all.filter(p=>openFor(p,w)).sort((a,b)=>projInfo(b).last-projInfo(a).last);
   const counts={All:open.length};for(const t of TYPES)counts[t.k]=open.filter(p=>p.type===t.k).length;
   const list=projFilter==="All"?open:open.filter(p=>p.type===projFilter);
   const cutoff=Date.now()-60*864e5;
-  const done=all.filter(p=>!isOpen(p)&&(p.updated||p.added)>=cutoff).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  // Done for this person: they sent it, or the route is closed (sent by everyone or reset)
+  const done=all.filter(p=>(p.updated||p.added)>=cutoff&&(solo?triedBy(p,w)&&(!isOpen(p)||p.sentBy.includes(w)):!isOpen(p))).sort((a,b)=>(b.updated||0)-(a.updated||0));
   $("#view").innerHTML=`
-    <p class="hint">Routes you fell on at ${esc(GYM)} and haven't sent yet.</p>
+    ${whoSeg()}
+    <p class="hint">${solo?`Routes ${esc(w)} fell on at ${esc(GYM)} and hasn't sent yet.`:`Routes either of you fell on at ${esc(GYM)} and haven't both sent yet.`}</p>
     <div class="chips" role="group" aria-label="Filter projects">${["All",...TYPES.map(t=>t.k)].map(k=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${k} <span class="n">${counts[k]}</span></button>`).join("")}</div>
-    <div class="cards">${list.length?list.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":"No projects yet"}</strong>${open.length?"Try another filter.":"When you fall on a route, tap <b>Add details</b> and keep it here to come back to."}</div>`}</div>
+    <div class="cards">${list.length?list.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":solo?`No projects for ${esc(w)}`:"No projects yet"}</strong>${open.length?"Try another filter.":"When you fall on a route, tap <b>Add details</b> and keep it here to come back to."}</div>`}</div>
     ${done.length?`<h2 class="sech">Sent or reset recently</h2><div class="done">${done.map(p=>{const info=projInfo(p);const total=Object.values(info.tries).reduce((a,b)=>a+b,0);
-      const what=p.status==="Sent"?`${esc(p.sentBy.join(" & ")||"Sent")} sent it${total?` after ${total} ${total===1?"try":"tries"}`:""}`:"Route was reset";
-      return`<div class="drow">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(p.hold||"Route")} · ${what}</span><button class="btn small ghost" data-act="reopen" data-id="${p.id}">Reopen</button></div>`;}).join("")}</div>`:""}
+      const what=p.status==="Reset"?"Route was reset":`${esc(p.sentBy.join(" & ")||"Sent")} sent it${total?` after ${total} ${total===1?"try":"tries"}`:""}`;
+      return`<div class="drow">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(p.hold||"Route")} · ${what}</span>${isOpen(p)?"":`<button class="btn small ghost" data-act="reopen" data-id="${p.id}">Reopen</button>`}</div>`;}).join("")}</div>`:""}
     ${sheetLink()}`;
 }
 function projCard(p){
@@ -605,7 +655,7 @@ const gymMap=()=>eqi(GYM,HUB_MAP.gym)?HUB_MAP:null;
 const zoneById=id=>HUB_MAP.zones.find(z=>z.id===id);
 const inZone=(x,z)=>x.type===z.type&&(eqi(x.area,z.area)||(z.alias||[]).some(a=>eqi(x.area,a)));
 const zoneClimbs=z=>S.climbs.filter(c=>eqi(c.gym,HUB_MAP.gym)&&inZone(c,z));
-const zoneProjects=z=>S.projects.filter(p=>isOpen(p)&&eqi(p.gym,HUB_MAP.gym)&&inZone(p,z));
+const zoneProjects=(z,w)=>S.projects.filter(p=>openFor(p,w||"*")&&eqi(p.gym,HUB_MAP.gym)&&inZone(p,z));
 
 /* Anchor ranges live in the Lists tab: List "Anchors", Value like "Upper: 1-43" or "Pit: 77-86, 87-109" */
 function anchorRanges(){
@@ -686,20 +736,21 @@ function syncMini(){
 }
 
 /* Map tab */
-let mapSel=LS.get("mapsel",""),mapMode=LS.get("mapmode","projects"),mapWho=LS.get("mapwho","*"),mapZoom=+LS.get("mapz","1")||1;
+let mapSel=LS.get("mapsel",""),mapMode=LS.get("mapmode","projects"),mapZoom=+LS.get("mapz","1")||1;
 function renderMap(){
   $("#title").textContent="Map";
   const M=gymMap();
-  if(!M){$("#view").innerHTML=`<div class="empty"><strong>No map for ${esc(GYM)} yet</strong>The map is drawn for The Hub Mississauga. Switch gyms from the top of the screen.</div>`;return;}
-  const cs=climbers();if(mapWho!=="*"&&!cs.includes(mapWho))mapWho="*";
+  if(!M){$("#view").innerHTML=`${whoSeg()}<div class="empty"><strong>No map for ${esc(GYM)} yet</strong>The map is drawn for The Hub Mississauga. Switch gyms from the top of the screen.</div>`;return;}
+  const w=cur();
   const o={};
-  if(mapMode==="projects"){o.dots={};for(const z of M.zones){const ps=zoneProjects(z);if(ps.length)o.dots[z.id]=ps.map(p=>holdHex(p.hold));}}
-  else{const since=Date.now()-30*864e5;o.heat={};let mx=1;for(const z of M.zones){const n=zoneClimbs(z).filter(c=>c.when>=since&&(mapWho==="*"||c.climber===mapWho)).length;if(n){o.heat[z.id]=n;mx=Math.max(mx,n);}}o.heatMax=mx;}
+  if(mapMode==="projects"){o.dots={};for(const z of M.zones){const ps=zoneProjects(z,w);if(ps.length)o.dots[z.id]=ps.map(p=>holdHex(p.hold));}}
+  else{const since=Date.now()-30*864e5;o.heat={};let mx=1;for(const z of M.zones){const n=zoneClimbs(z).filter(c=>c.when>=since&&(w==="*"||c.climber===w)).length;if(n){o.heat[z.id]=n;mx=Math.max(mx,n);}}o.heatMax=mx;}
   if(mapSel&&zoneById(mapSel))o.sel=mapSel;
-  const openN=M.zones.reduce((a,z)=>a+zoneProjects(z).length,0);
+  const openN=M.zones.reduce((a,z)=>a+zoneProjects(z,w).length,0);
   $("#view").innerHTML=`
-    <div class="seg" role="group" aria-label="Show on map"><button data-act="mapMode" data-v="projects" aria-pressed="${mapMode==="projects"}">Projects${openN?` (${openN})`:""}</button><button data-act="mapMode" data-v="activity" aria-pressed="${mapMode==="activity"}">Activity</button></div>
-    ${mapMode==="activity"?`<div class="chips" role="group" aria-label="Whose activity">${[...cs,"*"].map(w=>`<button class="chip" data-act="mapWho" data-v="${esc(w)}" aria-pressed="${mapWho===w}">${w==="*"?"Both":esc(w)}</button>`).join("")}<span class="hint" style="align-self:center">Climbs in the last 30 days</span></div>`:""}
+    ${whoSeg()}
+    <div class="types" role="group" aria-label="Show on map"><button data-act="mapMode" data-v="projects" aria-pressed="${mapMode==="projects"}">Projects${openN?` (${openN})`:""}</button><button data-act="mapMode" data-v="activity" aria-pressed="${mapMode==="activity"}">Activity</button></div>
+    ${mapMode==="activity"?`<p class="hint">${w==="*"?"Both of your climbs":esc(w)+"'s climbs"} in the last 30 days.</p>`:""}
     <div class="mapwrap">
       <div class="mapbox" id="mapbox" style="--mz:${mapZoom}">${mapSVG(o)}</div>
     </div>
@@ -709,7 +760,9 @@ function renderMap(){
     ${sheetLink()}`;
 }
 function zonePanel(z){
-  const cs=zoneClimbs(z),ps=zoneProjects(z),rope=z.type!=="Bouldering";
+  const who=cur();
+  const cs=zoneClimbs(z).filter(c=>who==="*"||c.climber===who),ps=zoneProjects(z,who),rope=z.type!=="Bouldering";
+  const allPs=zoneProjects(z);
   const since=Date.now()-30*864e5,recent=cs.filter(c=>c.when>=since).length;
   const cnt=(a,r)=>a.filter(c=>c.result===r).length;
   const anchors=rope?anchorText(z.area):"";
@@ -718,17 +771,17 @@ function zonePanel(z){
     <div class="phead2"><h2 id="zoneTitle" style="font-family:var(--f-display);font-size:21px">${esc(z.area)}</h2><span class="ztype" style="background:${TYPE_TINT[z.type]}">${z.type}</span></div>
     ${rope?`<p class="hint">${anchors?`Anchors #${esc(anchors)}`:`Anchor numbers not set yet. Add them in the Lists tab as <b>Anchors</b>, e.g. “${esc(z.area)}: 1-20”.`}</p>`:""}
     ${people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Fell</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>
-    <p class="hint">${recent} ${recent===1?"climb":"climbs"} here in the last 30 days.</p>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
-    <h3 class="sech">Open projects (${ps.length})</h3>
+    <p class="hint">${recent} ${recent===1?"climb":"climbs"} here in the last 30 days${who==="*"?"":" by "+esc(who)}.</p>`:`<p class="hint">${who==="*"?"No climbs logged on this wall yet.":esc(who)+" hasn't logged a climb on this wall yet."}</p>`}
+    <h3 class="sech">${who==="*"?"Open projects":esc(who)+"'s open projects"} (${ps.length})</h3>
     ${ps.length?`<div class="cards">${ps.map(projCard).join("")}</div>`:`<p class="hint">None here right now.</p>`}
-    <button class="btn" data-act="zoneReset" data-z="${z.id}" ${ps.length?`data-confirm="Tap again: move ${ps.length} to Reset"`:"disabled"}>This wall was reset</button>
+    <button class="btn" data-act="zoneReset" data-z="${z.id}" ${allPs.length?`data-confirm="Tap again: move ${allPs.length} to Reset${who!=="*"&&allPs.length!==ps.length?" (both of you)":""}"`:"disabled"}>This wall was reset</button>
   </section>`;
 }
 
 /* Progress */
 function renderProgress(){
   $("#title").textContent="Progress";
-  const cs=climbers();if(pWho!=="*"&&!cs.includes(pWho))pWho=WHO;
+  const cs=climbers(),pWho=cur();
   const inMonth=S.climbs.filter(c=>atGym(c)&&dayKey(c.when).slice(0,7)===pMonth);
   const data=pWho==="*"?inMonth:inMonth.filter(c=>c.climber===pWho);
   const days=[...new Set(data.map(c=>dayKey(c.when)))].sort();
@@ -738,10 +791,10 @@ function renderProgress(){
   const per=days.map(k=>{const d=data.filter(c=>dayKey(c.when)===k);const s=d.filter(c=>c.result==="Sent").length,r=d.filter(c=>c.result==="Rested").length;return{k,s,r,f:d.length-s-r,t:d.length,top:hardest(d)};});
   const max=Math.max(1,...per.map(x=>x.t));const H=140;
   let html=`
+    ${whoSeg()}
     <div class="monthrow">
       <div class="month"><button class="iconbtn" data-act="month" data-d="-1" aria-label="Previous month">${ICON.left}</button><span>${esc(mLabel)}</span><button class="iconbtn" data-act="month" data-d="1" aria-label="Next month" ${pMonth>=thisMonth?"disabled":""}>${ICON.right}</button></div>
-    </div>
-    <div class="seg" role="group" aria-label="Whose progress">${cs.map(c=>`<button data-act="pwho" data-v="${esc(c)}" aria-pressed="${pWho===c}">${esc(c)}</button>`).join("")}${cs.length>1?`<button data-act="pwho" data-v="*" aria-pressed="${pWho==="*"}">Both</button>`:""}</div>`;
+    </div>`;
   if(!data.length){$("#view").innerHTML=html+`<div class="empty"><strong>No climbs in ${esc(mLabel)}</strong>Log a session and it shows up here.</div>`+sheetLink();return;}
   if(pWho==="*"&&cs.length>1){
     html+=`<div class="panel"><table class="ctable"><thead><tr><th scope="col">${esc(mLabel)}</th><th scope="col">Sessions</th><th scope="col">Climbs</th><th scope="col">Sent</th><th scope="col">Hardest</th></tr></thead><tbody>${cs.map(w=>{const d=inMonth.filter(c=>c.climber===w);const s=d.filter(c=>c.result==="Sent").length;return`<tr><td><b>${esc(w)}</b></td><td>${new Set(d.map(c=>dayKey(c.when))).size}</td><td>${d.length}</td><td>${d.length?Math.round(s/d.length*100)+"%":"—"}</td><td>${esc(hardest(d)||"—")}</td></tr>`;}).join("")}</tbody></table></div>`;
@@ -905,7 +958,7 @@ document.addEventListener("click",e=>{
     case"refreshNow":if(auth==="ok")flush();break;
     case"close":closeSheet();break;
     case"skipDetails":{const cid=sheet&&sheet.id;const c=S.climbs.find(x=>x.id===cid);closeSheet();if(c)toast(`${c.climber} ${resVerb(c)} a ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);break;}
-    case"who":WHO=t.dataset.v;LS.set("who",WHO);render();break;
+    case"who":setWho(t.dataset.v);break;
     case"type":TYPE=t.dataset.v;LS.set("type",TYPE);render();break;
     case"log":logClimb(t.dataset.res,t.dataset.g);break;
     case"prevDay":DAY=shiftDay(DAY,-1);render();break;
@@ -924,9 +977,7 @@ document.addEventListener("click",e=>{
     case"reopen":if(P){store.update("projects",P.id,{status:"Open"});toast("Back in your projects");}break;
     case"delProj":if(P){for(const c of S.climbs.filter(c=>c.project===P.id))store.update("climbs",c.id,{project:""});store.del("projects",P.id);closeSheet();toast("Project deleted");}break;
     case"month":{const d=keyDate(pMonth+"-01");d.setMonth(d.getMonth()+ +t.dataset.d);pMonth=dayKey(d.getTime()).slice(0,7);render();break;}
-    case"pwho":pWho=t.dataset.v;LS.set("pwho",pWho);render();break;
     case"mapMode":mapMode=t.dataset.v;LS.set("mapmode",mapMode);render();break;
-    case"mapWho":mapWho=t.dataset.v;LS.set("mapwho",mapWho);render();break;
     case"mapZoom":mapZoom=Math.max(1,Math.min(3,mapZoom+ +t.dataset.d));LS.set("mapz",mapZoom);render();break;
     case"mapSel":{mapSel=mapSel===t.dataset.z?"":t.dataset.z;LS.set("mapsel",mapSel);const box=$("#mapbox"),sx=box?box.scrollLeft:0,sy=box?box.scrollTop:0;render();const nb=$("#mapbox");if(nb){nb.scrollLeft=sx;nb.scrollTop=sy;}const h=$("#zoneTitle");if(h)h.scrollIntoView({behavior:"smooth",block:"nearest"});break;}
     case"pickArea":{const root=$("#sheetBody");const radios=[...root.querySelectorAll('input[name=area][type=radio]')];const hit=radios.find(i=>eqi(i.value,t.dataset.area));
@@ -963,6 +1014,28 @@ document.addEventListener("keydown",e=>{
   // Map walls are SVG groups: let Enter and Space press them like buttons
   if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("zone")){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}));}
 });
+
+/* ---------- swipe left/right to switch person ----------
+   Ignored while a panel is open and on anything that scrolls sideways (zoomed map, long charts). */
+let swipe=null;
+function scrollsSideways(el){
+  for(;el&&el!==document.body;el=el.parentElement){
+    if(el.scrollWidth>el.clientWidth+2){const ox=getComputedStyle(el).overflowX;if(ox==="auto"||ox==="scroll")return true;}
+  }
+  return false;
+}
+document.addEventListener("touchstart",e=>{
+  swipe=null;
+  if(e.touches.length!==1||sheet||!ready||auth!=="ok")return;
+  if(e.target.closest("#sheetWrap,#toast,.tabs,input,select,textarea")||scrollsSideways(e.target))return;
+  const p=e.touches[0];swipe={x:p.clientX,y:p.clientY,t:Date.now()};
+},{passive:true});
+document.addEventListener("touchend",e=>{
+  if(!swipe)return;const p=e.changedTouches[0],dx=p.clientX-swipe.x,dy=p.clientY-swipe.y,dt=Date.now()-swipe.t;swipe=null;
+  if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6||dt>800)return;
+  swipeWho(dx<0?1:-1);
+},{passive:true});
+document.addEventListener("touchcancel",()=>{swipe=null;},{passive:true});
 
 async function boot(){
   readLinkParams();

@@ -114,6 +114,23 @@ legend{padding:0}
 .sum b.tops{font-size:16px;line-height:1.2;min-height:30px;display:flex;align-items:center}
 .sum span{font-size:12px;color:var(--muted)}
 
+/* session summary */
+.dsum{padding:4px 16px}
+.dsrow{display:grid;grid-template-columns:78px 44px 1fr;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.dsrow:last-child{border-bottom:0}
+.dl{display:flex;flex-direction:column;font-weight:600;font-size:15px;line-height:1.2}
+.dl small{font-size:12px;font-weight:500;color:var(--muted)}
+.dn{font-family:var(--f-display);font-size:26px;line-height:1;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.dn.s{color:var(--sent)} .dn.f{color:var(--fell)} .dn.r{color:var(--rest)}
+.dt{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;min-width:0}
+.dt.col{flex-direction:column;align-items:stretch;gap:5px}
+.dt .none{color:var(--muted)}
+.ttag{display:inline-flex;align-items:center;gap:4px}
+.ttag small{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.mix{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--sunk);gap:2px}
+.mix i{display:block;height:100%}
+.rate{font-size:12.5px;color:var(--muted)}
+
 /* grade rows */
 .grows{display:flex;flex-direction:column}
 .grow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -360,6 +377,31 @@ function tagHTML(type,g,size){const c=gradeColour(type,g);const lbl=esc(gradeLab
 const CSSCOL={red:"#D83A34",orange:"#F08A24",yellow:"#F5D02E",green:"#3DA35D",teal:"#2BA5A0",blue:"#2F6FD6",purple:"#8150C8",pink:"#EE7FB0",black:"#22262A",white:"#F7F7F4",grey:"#9AA0A6",gray:"#9AA0A6",brown:"#8A5A3B"};
 function holdHex(name){if(!name)return"";const r=holdRows().find(x=>eqi(x.value,name));if(r&&/^#[0-9a-f]{6}$/i.test(r.colour))return r.colour;return CSSCOL[String(name).trim().toLowerCase()]||"";}
 function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${cls||""}" style="background:${h}" aria-hidden="true"></span>`:`<span class="hdot none ${cls||""}" aria-hidden="true"></span>`;}
+/* Hardest grade per climb type in a list, as grade tags (rope types get a small TR / AB label) */
+const TYPE_ABBR={"Top rope":"TR","Auto belay":"AB"};
+function topTags(list){
+  const out=[];
+  for(const t of TYPES){let best=-2,bg="";
+    for(const c of list){if(c.type!==t.k)continue;const i=gradeIdx(t.k,c.grade);if(!bg||i>best){best=i;bg=c.grade;}}
+    if(bg)out.push(`<span class="ttag">${TYPE_ABBR[t.k]?`<small>${TYPE_ABBR[t.k]}</small>`:""}${tagHTML(t.k,bg,"sm")}</span>`);}
+  return out.join("");
+}
+/* Session summary: a Total row with the day's mix, then Sent / Rested / Fell with each one's hardest grades */
+function daySummary(list,isToday){
+  const by=r=>list.filter(c=>c.result===r);
+  const s=by("Sent"),r=by("Rested"),f=by("Fell"),n=list.length;
+  if(!n)return`<div class="card dsum"><p class="hint" style="margin:0">No climbs logged ${isToday?"yet today":"on this day"}. Tap ✓ or ✕ on a grade below.</p></div>`;
+  const pct=x=>(x/n*100).toFixed(1)+"%";
+  const row=(cls,label,cap,arr)=>`<div class="dsrow"><span class="dl">${label}<small>${cap}</small></span><b class="dn ${cls}">${arr.length}</b><span class="dt">${arr.length?topTags(arr):`<span class="none">—</span>`}</span></div>`;
+  return`<div class="card dsum">
+    <div class="dsrow total"><span class="dl">Total<small>${n===1?"climb":"climbs"}</small></span><b class="dn">${n}</b>
+      <span class="dt col"><span class="mix" role="img" aria-label="${s.length} sent, ${r.length} rested, ${f.length} fell">${s.length?`<i style="width:${pct(s.length)};background:var(--sent)"></i>`:""}${r.length?`<i style="width:${pct(r.length)};background:var(--rest-bar)"></i>`:""}${f.length?`<i style="width:${pct(f.length)};background:var(--fell-bar)"></i>`:""}</span>
+      <span class="rate">${Math.round(s.length/n*100)}% sent${r.length?` · ${Math.round((s.length+r.length)/n*100)}% finished`:""}</span></span></div>
+    ${row("s","Sent","top sends",s)}
+    ${r.length||list.some(c=>c.type!=="Bouldering")?row("r","Rested","hardest",r):""}
+    ${row("f","Fell","hardest",f)}
+  </div>`;
+}
 function hardest(list){const out=[];for(const t of TYPES){let best=-1,bg="";for(const c of list){if(c.type!==t.k||c.result!=="Sent")continue;const i=gradeIdx(t.k,c.grade);if(i>best){best=i;bg=c.grade;}else if(best<0&&!bg)bg=c.grade;}if(bg)out.push(gradeLabel(bg));}return out.join(" · ");}
 
 /* =====================================================================
@@ -579,15 +621,7 @@ function renderSession(){
       <button class="iconbtn" data-act="nextDay" aria-label="Next day" ${DAY>=today?"disabled":""}>${ICON.right}</button>
     </div>
     ${DAY!==today?`<div class="backfill"><span>Logging for an earlier day</span><button class="btn small" data-act="goToday">Back to today</button></div>`:""}
-    <div class="card">
-      <div class="sum">
-        <div><b>${mine.length}</b><span>climbs</span></div>
-        <div><b class="s">${sent}</b><span>sent</span></div>
-        ${rested?`<div><b class="r">${rested}</b><span>rested</span></div>`:""}
-        <div><b class="f">${fell}</b><span>fell</span></div>
-        <div><b class="tops">${esc(hardest(mine)||"—")}</b><span>top send</span></div>
-      </div>
-    </div>
+    ${daySummary(mine,DAY===today)}
     <div class="types" role="group" aria-label="Climb type">${TYPES.map(t=>`<button data-act="type" data-v="${t.k}" aria-pressed="${t.k===TYPE}">${t.k}</button>`).join("")}</div>
     <div class="grows">${rows.length?rows.map(g=>{const k=gkey(g),c=cnt[k]||{s:0,f:0,r:0};const L=esc(gradeLabel(g));return`
       <div class="grow">

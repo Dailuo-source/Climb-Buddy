@@ -28,10 +28,16 @@
 :root[data-who="green"]{--bg:#EDF5EB;--sunk:#D8E8D3;--line:#D3E2CE;--line2:#BBCEB5}
 :root[data-who="lav"]{--bg:#F3EFFA;--sunk:#E2DAF2;--line:#DDD5EB;--line2:#C7BDDC}
 body,.top{transition:background-color .25s ease}
-#view.slide-l{animation:slideL .22s ease-out}
-#view.slide-r{animation:slideR .22s ease-out}
-@keyframes slideL{from{transform:translateX(36px);opacity:.35}}
-@keyframes slideR{from{transform:translateX(-36px);opacity:.35}}
+:root.notrans body,:root.notrans .top{transition:none}
+#view.slide-l{animation:slideL .2s ease-out}
+#view.slide-r{animation:slideR .2s ease-out}
+@keyframes slideL{from{transform:translateX(28px);opacity:.6}}
+@keyframes slideR{from{transform:translateX(-28px);opacity:.6}}
+/* person switcher: the black highlight is its own layer so it can glide between names as you swipe */
+.wseg{position:relative}
+.wseg .pill{position:absolute;top:4px;bottom:4px;--w:calc((100% - 8px - (var(--n) - 1) * 4px) / var(--n));width:var(--w);left:calc(4px + var(--i) * (var(--w) + 4px));background:var(--ink);border-radius:10px;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.wseg button,.wseg button[aria-pressed="true"]{position:relative;z-index:1;background:transparent;color:var(--ink);font-weight:500;transition:color .12s}
+.wseg button.hl{color:#fff;font-weight:600}
 @media (prefers-reduced-motion:reduce){#view.slide-l,#view.slide-r{animation:none}body,.top{transition:none}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -451,8 +457,8 @@ function applyTheme(){
   const m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",THEME_HEX[k]);
 }
 function whoSeg(){
-  const o=whoOpts();if(o.length<2)return"";
-  return`<div class="seg" role="group" aria-label="Whose climbs">${o.map(w=>`<button data-act="who" data-v="${esc(w)}" aria-pressed="${cur()===w}">${w==="*"?"Both":esc(w)}</button>`).join("")}</div>`;
+  const o=whoOpts();if(o.length<2)return"";const i=o.indexOf(cur());
+  return`<div class="seg wseg" role="group" aria-label="Whose climbs" style="--n:${o.length};--i:${i}"><span class="pill" aria-hidden="true"></span>${o.map(w=>`<button data-act="who" data-v="${esc(w)}" aria-pressed="${cur()===w}" class="${cur()===w?"hl":""}">${w==="*"?"Both":esc(w)}</button>`).join("")}</div>`;
 }
 function setWho(v,dir){
   const prev=cur(),o=whoOpts();
@@ -463,9 +469,48 @@ function setWho(v,dir){
   render();
   const v2=$("#view");v2.classList.remove("slide-l","slide-r");void v2.offsetWidth;v2.classList.add(dir>0?"slide-l":"slide-r");
 }
-function swipeWho(dir){
-  const o=whoOpts();if(o.length<2)return;
-  const i=o.indexOf(cur());setWho(o[(i+dir+o.length)%o.length],dir);
+const nextWho=dir=>{const o=whoOpts();return o[(o.indexOf(cur())+dir+o.length)%o.length];};
+
+/* While switching, the new person's colour sweeps across the screen as a soft gradient,
+   the black highlight glides between names and the page drifts with your finger.
+   p goes 0 → 1; dir +1 means the next person is coming in from the right. */
+const REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function paintSwitch(target,dir,p){
+  const o=whoOpts(),i=o.indexOf(cur()),j=o.indexOf(target);
+  const from=THEME_HEX[themeFor(cur())],to=THEME_HEX[themeFor(target)];
+  const e=-25+150*p;                    // where the soft edge sits, as % in from the side the new colour enters
+  const g=`linear-gradient(${dir>0?270:90}deg,${to} ${(e-25).toFixed(1)}%,${from} ${(e+25).toFixed(1)}%)`;
+  document.body.style.backgroundImage=g;const top=$(".top");if(top)top.style.backgroundImage=g;
+  const seg=$("#view .wseg");
+  if(seg){seg.style.setProperty("--i",(i+(j-i)*p).toFixed(3));
+    seg.querySelectorAll("button").forEach((b,k)=>b.classList.toggle("hl",k===(p>.5?j:i)));}
+  const v=$("#view");v.style.transform=`translateX(${(-dir*p*44).toFixed(1)}px)`;v.style.opacity=(1-.3*p).toFixed(3);
+}
+function clearSwitch(){
+  document.body.style.backgroundImage="";const top=$(".top");if(top)top.style.backgroundImage="";
+  const v=$("#view");v.style.transform="";v.style.opacity="";v.style.transition="";
+}
+let switchAnim=null;
+function animateSwitch(target,dir,from,commit){
+  cancelAnimationFrame(switchAnim);
+  if(REDUCED){clearSwitch();if(commit)setWho(target,dir);return;}
+  const to=commit?1:0,dur=Math.max(90,Math.abs(to-from)*240),t0=performance.now();
+  const step=now=>{
+    const k=Math.min(1,(now-t0)/dur),ease=1-Math.pow(1-k,3);
+    paintSwitch(target,dir,from+(to-from)*ease);
+    if(k<1){switchAnim=requestAnimationFrame(step);return;}
+    // land without the colour fading back through the old tint
+    document.documentElement.classList.add("notrans");
+    if(commit)setWho(target,dir);
+    clearSwitch();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove("notrans")));
+  };
+  switchAnim=requestAnimationFrame(step);
+}
+function tapWho(v){
+  if(v===cur())return;
+  const o=whoOpts(),dir=o.indexOf(v)>o.indexOf(cur())?1:-1;
+  animateSwitch(v,dir,0,true);
 }
 /* Projects belong to whoever has tried them; one person's view skips routes they've already sent */
 function triedBy(p,w){const t=Object.keys(projInfo(p).tries);return!t.length||t.includes(w);}
@@ -478,8 +523,10 @@ const isOpen=p=>p.status==="Open";
 const gymProjects=()=>S.projects.filter(p=>eqi(p.gym,GYM));
 function projInfo(p){
   const cs=S.climbs.filter(c=>c.project===p.id);
-  const tries={};let last=p.added||0;
+  // Last tried comes from the climbs themselves (a project made today for yesterday's climb was tried yesterday)
+  const tries={};let last=0;
   for(const c of cs){if(c.result!=="Sent")tries[c.climber]=(tries[c.climber]||0)+(c.tries||1);last=Math.max(last,c.when);}
+  if(!last)last=p.added||0;
   for(const w of p.sentBy)if(!(w in tries))tries[w]=0;
   return{tries,last,climbs:cs};
 }
@@ -643,6 +690,15 @@ const HUB_MAP={
     {id:"aUE",area:"Upper Entrance",type:"Auto belay",pts:"706,1008 769,1008 769,1087 706,1087",lbl:[860,1035],pin:[737,1047],lines:["Auto belay","Upper Entrance"],fs:22},
     {id:"rUE",area:"Upper Entrance",type:"Top rope",pts:"706,1087 769,1087 769,1150 713,1207 595,1207",lbl:[870,1160],pin:[715,1160],lines:["Upper","Entrance"],fs:24}
   ],
+  /* Anchor numbers run along each rope wall's climbing face, spread evenly between `from` and `to`
+     (widened to any Anchors ranges in the Lists tab). `path` starts at the `from` end.
+     Estimates: Pit runs north → south down its west face (so #106 is near the south end).
+     Upper runs from the south end up its east face, then west along its north edge, so its last
+     numbers meet the top of the Pit. Reverse a path or change from/to if the gym's numbering differs. */
+  anchorWalls:[
+    {area:"Pit",type:"Top rope",from:77,to:109,path:"595,270 595,482 627,514 627,707 646,707 646,771 624,792 624,970 568,1027 568,1110 595,1137 595,1207"},
+    {area:"Upper",type:"Top rope",from:1,to:53,path:"769,1008 769,970 820,920 820,838 774,793 774,531 872,433 872,335 807,270 595,270"}
+  ],
   features:[
     {name:"Boards & Training",pts:"12,18 282,18 282,132 98,132 98,618 12,618",lbl:[55,380],lines:["Boards & Training"],rot:true},
     {name:"Stadium seating",pts:"285,775 463,775 463,1203 285,1203",lbl:[374,990],lines:["Stadium","seating"]},
@@ -670,7 +726,30 @@ const anchorText=area=>anchorRanges().filter(r=>eqi(r.area,area)).map(r=>r.lo===
 function areaForAnchor(type,num){
   const allowed=areaRows(type).map(r=>r.value);
   const hit=anchorRanges().find(r=>num>=r.lo&&num<=r.hi&&allowed.some(a=>eqi(a,r.area)));
-  return hit?hit.area:"";
+  if(hit)return hit.area;
+  const w=HUB_MAP.anchorWalls.find(w=>num>=w.from&&num<=w.to&&allowed.some(a=>eqi(a,w.area)));
+  return w?w.area:"";
+}
+/* Estimated spot on the map for an anchor number: walk along the wall's face in proportion */
+function anchorPoint(area,num){
+  num=parseInt(num,10);if(!num)return null;
+  const w=HUB_MAP.anchorWalls.find(w=>eqi(w.area,area));if(!w)return null;
+  let lo=w.from,hi=w.to;
+  for(const r of anchorRanges())if(eqi(r.area,area)){lo=Math.min(lo,r.lo);hi=Math.max(hi,r.hi);}
+  const t=Math.max(0,Math.min(1,(num-lo)/Math.max(1,hi-lo)));
+  const P=w.path.split(" ").map(s=>s.split(",").map(Number));
+  const seg=[];let total=0;for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);seg.push(l);total+=l;}
+  let d=t*total,i=0;while(i<seg.length-1&&d>seg[i]){d-=seg[i];i++;}
+  const a=P[i],b=P[i+1],f=seg[i]?d/seg[i]:0;
+  const x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f;
+  // the number label sits out in front of the wall face (paths are drawn with the face on their left-hand normal)
+  const L=seg[i]||1,nx=-(b[1]-a[1])/L,ny=(b[0]-a[0])/L;
+  return{x,y,nx,ny,n:num};
+}
+function anchorPinSVG(pt,colour,big){
+  const r=big?22:17,lx=pt.x+pt.nx*(r+30),ly=pt.y+pt.ny*(r+30);
+  return`<g pointer-events="none"><circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${r}" fill="${colour||"#C9C4B8"}" stroke="${MAP_INK}" stroke-width="5"/>`+
+    `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${big?30:24}" font-weight="700" fill="${MAP_INK}" stroke="#FBF8F1" stroke-width="8" paint-order="stroke">#${pt.n}</text></g>`;
 }
 
 /* One SVG for both the Map tab and the small pickers.
@@ -719,20 +798,25 @@ function mapSVG(o){
     if(list.length>6){const i=5,row=Math.floor(i/per),col=i%per;const x=z.pin[0]+(col-1)*sp,y=z.pin[1]+row*sp-sp/2;
       s+=`<circle cx="${x}" cy="${y}" r="21" fill="${MAP_INK}" pointer-events="none"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="700" fill="#fff" pointer-events="none">+${list.length-5}</text>`;}
   }
+  if(o.pins)for(const p of o.pins)s+=anchorPinSVG(p.pt,p.colour,p.big);
   if(o.heat)for(const z of M.zones){const n=o.heat[z.id];if(!n)continue;
     s+=`<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="26" fill="#fff" stroke="${MAP_INK}" stroke-width="4" pointer-events="none"/><text x="${z.pin[0]}" y="${z.pin[1]}" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="700" fill="${MAP_INK}" pointer-events="none">${n}</text>`;}
   return s+`</svg>`;
 }
 /* Small map shown in a details panel: tap a wall to fill in Where */
-function miniMap(type,gym,area){
+function miniSVG(type,area,anchor){
+  const pt=typeOf(type).anchor&&area&&anchor?anchorPoint(area,anchor):null;
+  return mapSVG({type,sel:area||"",pins:pt?[{pt,colour:"#FFD98A",big:true}]:null});
+}
+function miniMap(type,gym,area,anchor){
   if(!eqi(gym,HUB_MAP.gym)||!HUB_MAP.zones.some(z=>z.type===type))return"";
-  return`<div class="minimap" aria-label="Tap a wall to choose where">${mapSVG({type,sel:area||""})}</div><p class="hint" style="margin-top:-8px">Tap a wall on the map, or pick it below.</p>`;
+  return`<div class="minimap" data-type="${esc(type)}" aria-label="Tap a wall to choose where">${miniSVG(type,area,anchor)}</div><p class="hint" style="margin-top:-8px">Tap a wall on the map, or pick it below.${typeOf(type).anchor?" An anchor number shows roughly where it is on the wall.":""}</p>`;
 }
 function syncMini(){
-  const root=$("#sheetBody");if(!root)return;
+  const root=$("#sheetBody");if(!root)return;const mm=root.querySelector(".minimap");if(!mm)return;
   const ch=root.querySelector('input[name=area]:checked')||root.querySelector('input[name=area]:not([type=radio])');
-  const v=ch?ch.value:"";
-  root.querySelectorAll(".minimap .zone").forEach(g=>{const on=!!v&&eqi(g.dataset.area,v);g.classList.toggle("sel",on);g.setAttribute("aria-pressed",String(on));});
+  const an=root.querySelector("#fAnchor");
+  mm.innerHTML=miniSVG(mm.dataset.type,ch?ch.value:"",an?an.value:"");
 }
 
 /* Map tab */
@@ -743,7 +827,8 @@ function renderMap(){
   if(!M){$("#view").innerHTML=`${whoSeg()}<div class="empty"><strong>No map for ${esc(GYM)} yet</strong>The map is drawn for The Hub Mississauga. Switch gyms from the top of the screen.</div>`;return;}
   const w=cur();
   const o={};
-  if(mapMode==="projects"){o.dots={};for(const z of M.zones){const ps=zoneProjects(z,w);if(ps.length)o.dots[z.id]=ps.map(p=>holdHex(p.hold));}}
+  // Projects with an anchor number sit at that spot on the wall; the rest cluster in the middle of their wall
+  if(mapMode==="projects"){o.dots={};o.pins=[];for(const z of M.zones){const loose=[];for(const p of zoneProjects(z,w)){const pt=z.type!=="Bouldering"&&p.anchor?anchorPoint(z.area,p.anchor):null;if(pt)o.pins.push({pt,colour:holdHex(p.hold)});else loose.push(holdHex(p.hold));}if(loose.length)o.dots[z.id]=loose;}}
   else{const since=Date.now()-30*864e5;o.heat={};let mx=1;for(const z of M.zones){const n=zoneClimbs(z).filter(c=>c.when>=since&&(w==="*"||c.climber===w)).length;if(n){o.heat[z.id]=n;mx=Math.max(mx,n);}}o.heatMax=mx;}
   if(mapSel&&zoneById(mapSel))o.sel=mapSel;
   const openN=M.zones.reduce((a,z)=>a+zoneProjects(z,w).length,0);
@@ -865,7 +950,7 @@ function climbSheet(c){
     <div class="inrow"><label for="fDay" class="flabel" style="margin:0">Date</label><input id="fDay" name="day" type="date" value="${dayKey(c.when)}" max="${todayKey()}" style="width:auto"></div>
     ${matches.length?`<fieldset><legend class="flabel">${res==="Sent"?"Did you send one of your projects?":"Is it one of your projects?"}</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}" ${sheet.link===p.id?"checked":""}><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="new" ${sheet.link==="new"?"checked":""}><span>${res==="Sent"?"No, another route":"A new route"}</span></label></div></fieldset>`:""}
     <div id="newFields" class="stack" ${sheet.link!=="new"?"hidden":""}>
-      ${miniMap(c.type,c.gym||GYM,c.area)}
+      ${miniMap(c.type,c.gym||GYM,c.area,c.anchor)}
       ${areaField(c.type,c.area)}
       ${anchorField(c.type,c.anchor)}
       ${holdField(c.hold)}
@@ -900,7 +985,7 @@ function saveClimb(form){
   const d=Object.assign(base,{area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||"")});
   if(c.project){store.update("projects",c.project,{area:d.area,anchor:d.anchor,hold:d.hold});}
   else if(c.result!=="Sent"&&f.get("addProj")){
-    d.project=store.add("projects",{type:c.type,grade:c.grade,hold:d.hold,area:d.area,anchor:d.anchor,gym:c.gym||GYM,note:d.note,status:"Open",sentBy:[],added:Date.now()});
+    d.project=store.add("projects",{type:c.type,grade:c.grade,hold:d.hold,area:d.area,anchor:d.anchor,gym:c.gym||GYM,note:d.note,status:"Open",sentBy:[],added:d.when||c.when||Date.now()});
   }
   store.update("climbs",c.id,d);
   closeSheet();toast(d.project?"Saved to Projects":"Saved");
@@ -910,7 +995,7 @@ function projSheet(p){
   return head(`Edit project`,esc(p.type)+" · "+esc(p.gym||GYM))+`
   <form id="projForm" data-id="${p.id}" autocomplete="off">
     <label class="field">Grade<select name="grade">${grades.map(r=>`<option value="${esc(r.value)}" ${gkey(r.value)===gkey(p.grade)?"selected":""}>${esc(gradeLabel(r.value))}</option>`).join("")}${has?"":`<option selected>${esc(p.grade)}</option>`}</select></label>
-    ${miniMap(p.type,p.gym||GYM,p.area)}
+    ${miniMap(p.type,p.gym||GYM,p.area,p.anchor)}
     ${areaField(p.type,p.area)}
     ${anchorField(p.type,p.anchor)}
     ${holdField(p.hold)}
@@ -958,7 +1043,7 @@ document.addEventListener("click",e=>{
     case"refreshNow":if(auth==="ok")flush();break;
     case"close":closeSheet();break;
     case"skipDetails":{const cid=sheet&&sheet.id;const c=S.climbs.find(x=>x.id===cid);closeSheet();if(c)toast(`${c.climber} ${resVerb(c)} a ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);break;}
-    case"who":setWho(t.dataset.v);break;
+    case"who":tapWho(t.dataset.v);break;
     case"type":TYPE=t.dataset.v;LS.set("type",TYPE);render();break;
     case"log":logClimb(t.dataset.res,t.dataset.g);break;
     case"prevDay":DAY=shiftDay(DAY,-1);render();break;
@@ -990,10 +1075,12 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("click",e=>{if(e.target.id==="dayInput"&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
 document.addEventListener("input",e=>{
-  // Typing an anchor number picks the wall it belongs to
-  if(e.target.id==="fAnchor"){const n=parseInt(e.target.value,10);const form=e.target.form;if(!n||!form)return;
-    const c=form.id==="climbForm"?S.climbs.find(x=>x.id===form.dataset.id):S.projects.find(x=>x.id===form.dataset.id);if(!c)return;
-    const a=areaForAnchor(c.type,n);if(!a)return;const r=[...form.querySelectorAll('input[name=area][type=radio]')].find(i=>eqi(i.value,a));if(r){r.checked=true;syncMini();}}
+  // Typing an anchor number picks the wall it belongs to and pins roughly where it is on the map
+  if(e.target.id==="fAnchor"){const n=parseInt(e.target.value,10);const form=e.target.form;if(!form)return;
+    const c=form.id==="climbForm"?S.climbs.find(x=>x.id===form.dataset.id):S.projects.find(x=>x.id===form.dataset.id);
+    const a=n&&c?areaForAnchor(c.type,n):"";
+    const r=a?[...form.querySelectorAll('input[name=area][type=radio]')].find(i=>eqi(i.value,a)):null;if(r)r.checked=true;
+    syncMini();}
 });
 document.addEventListener("change",e=>{
   if(e.target.name==="area"){syncMini();}
@@ -1024,18 +1111,35 @@ function scrollsSideways(el){
   }
   return false;
 }
+// The screen follows your finger: past ~a third of the way (or a quick flick) it switches, otherwise it springs back
+const dragP=dx=>Math.min(1,Math.abs(dx)/(Math.min(innerWidth,600)*.7));
 document.addEventListener("touchstart",e=>{
   swipe=null;
-  if(e.touches.length!==1||sheet||!ready||auth!=="ok")return;
+  if(e.touches.length!==1||sheet||!ready||auth!=="ok"||whoOpts().length<2)return;
   if(e.target.closest("#sheetWrap,#toast,.tabs,input,select,textarea")||scrollsSideways(e.target))return;
-  const p=e.touches[0];swipe={x:p.clientX,y:p.clientY,t:Date.now()};
+  cancelAnimationFrame(switchAnim);
+  const p=e.touches[0];swipe={x:p.clientX,y:p.clientY,t:Date.now(),mode:"",dx:0};
 },{passive:true});
+document.addEventListener("touchmove",e=>{
+  if(!swipe)return;const p=e.touches[0],dx=p.clientX-swipe.x,dy=p.clientY-swipe.y;
+  if(!swipe.mode){
+    if(Math.abs(dx)<10&&Math.abs(dy)<10)return;
+    swipe.mode=Math.abs(dx)>Math.abs(dy)*1.2?"h":"v";
+    if(swipe.mode==="v"){swipe=null;return;}
+  }
+  if(e.cancelable)e.preventDefault();   // stop the page scrolling up and down while you swipe sideways
+  swipe.dx=dx;const dir=dx<0?1:-1;
+  if(swipe.dir&&swipe.dir!==dir)clearSwitch();
+  swipe.dir=dir;
+  paintSwitch(nextWho(dir),dir,dragP(dx));
+},{passive:false});
 document.addEventListener("touchend",e=>{
-  if(!swipe)return;const p=e.changedTouches[0],dx=p.clientX-swipe.x,dy=p.clientY-swipe.y,dt=Date.now()-swipe.t;swipe=null;
-  if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6||dt>800)return;
-  swipeWho(dx<0?1:-1);
+  if(!swipe||swipe.mode!=="h"){swipe=null;return;}
+  const {dx,dir,t}=swipe;swipe=null;
+  const fast=Math.abs(dx)>40&&Date.now()-t<250;
+  animateSwitch(nextWho(dir),dir,dragP(dx),dragP(dx)>.35||fast);
 },{passive:true});
-document.addEventListener("touchcancel",()=>{swipe=null;},{passive:true});
+document.addEventListener("touchcancel",()=>{if(swipe&&swipe.dir)animateSwitch(nextWho(swipe.dir),swipe.dir,dragP(swipe.dx),false);swipe=null;},{passive:true});
 
 async function boot(){
   readLinkParams();

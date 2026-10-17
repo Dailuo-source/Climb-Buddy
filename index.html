@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-dark="1">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F3F1EA">
-<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#0B1622">
+<meta name="color-scheme" content="dark only">
 <title>Climb Buddy</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="favicon-64.png">
@@ -36,8 +36,33 @@ body,.top{transition:background-color .25s ease}
 /* person switcher: the black highlight is its own layer so it can glide between names as you swipe */
 .wseg{position:relative}
 .wseg .pill{position:absolute;top:4px;bottom:4px;--w:calc((100% - 8px - (var(--n) - 1) * 4px) / var(--n));width:var(--w);left:calc(4px + var(--i) * (var(--w) + 4px));background:var(--ink);border-radius:10px;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.18)}
-.wseg button,.wseg button[aria-pressed="true"]{position:relative;z-index:1;background:transparent;color:var(--ink);font-weight:500;transition:color .12s}
-.wseg button.hl{color:#fff;font-weight:600}
+.seg.wseg button,.seg.wseg button[aria-pressed="true"]{position:relative;z-index:1;background:transparent;color:var(--ink);font-weight:500;transition:color .12s}
+.seg.wseg button.hl{color:#fff;font-weight:600}
+/* ---------- dark mode, built on Gary's palette: indigo #402E7A, violet #4C3BCF, blue #4B70F5, cyan #3DC2EC,
+   with a warm coral as the complement for falls. Gary = deep teal-navy, Cecilia = deep plum, Both = midnight indigo. ---------- */
+:root[data-dark]{color-scheme:dark;
+  --bg:#100E22;--surface:#1B1838;--sunk:#252147;--ink:#ECEBFA;--muted:#A3A0C8;--line:#2C2752;--line2:#423B72;
+  --accent:#3DC2EC;--accent-ink:#08202C;
+  --sent:#3DC2EC;--sent-ink:#08202C;--sent-soft:#0F3346;
+  --fell:#FF8A66;--fell-soft:#3A1E26;--fell-line:#8A3F38;--fell-bar:#6236C9;--chart-sent:#6FD6F6;
+  --rest:#A193FA;--rest-soft:#2A2260;--rest-line:#5B4CC4;--rest-bar:#5B7BF3;
+  --scrim:rgba(4,3,14,.65);--shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.45)}
+:root[data-dark][data-who="green"]{--bg:#0B1622;--surface:#132235;--sunk:#1B2E45;--line:#20364F;--line2:#34506E;--muted:#9DB2C8}
+:root[data-dark][data-who="lav"]{--bg:#150F2C;--surface:#221A44;--sunk:#2D2357;--line:#352A62;--line2:#4D3F84;--muted:#ADA2D4}
+/* the name highlight, active tab and selected chips pop in cyan / violet */
+:root[data-dark] .wseg .pill{background:linear-gradient(135deg,#3DC2EC,#4B70F5);box-shadow:0 2px 10px rgba(61,194,236,.35)}
+:root[data-dark] .seg.wseg button.hl{color:#08202C}
+:root[data-dark] .tab[aria-selected="true"]{color:#3DC2EC}
+:root[data-dark] .tab[aria-selected="true"]::after{background:#3DC2EC}
+:root[data-dark] .types button[aria-pressed="true"]{border-bottom-color:#3DC2EC}
+:root[data-dark] .seg:not(.wseg) button[aria-pressed="true"],:root[data-dark] .chip[aria-pressed="true"],:root[data-dark] .pill input:checked+span{background:#4C3BCF;border-color:#4C3BCF;color:#fff}
+:root[data-dark] .btn.primary{background:#4B70F5;border-color:#4B70F5;color:#fff}
+:root[data-dark] .tbtn.sent{box-shadow:0 2px 10px rgba(61,194,236,.25)}
+:root[data-dark] .check{accent-color:#3DC2EC}
+:root[data-dark] .minimap,:root[data-dark] .mapwrap{background:#000;border-color:#26263A}
+:root[data-dark] .mapbox{background:#000}
+:root[data-dark] .zone.sel polygon{fill:rgba(255,196,77,.42);stroke:#FFC44D}
+:root[data-dark] .sync.on::before{background:#3DC2EC}
 @media (prefers-reduced-motion:reduce){#view.slide-l,#view.slide-r{animation:none}body,.top{transition:none}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -114,6 +139,15 @@ legend{padding:0}
 .sum b.tops{font-size:16px;line-height:1.2;min-height:30px;display:flex;align-items:center}
 .sum span{font-size:12px;color:var(--muted)}
 
+/* ---------- press feedback: dip + brighten while held, then a quick ring as it lets go ---------- */
+:root{--tap-ring:rgba(31,79,184,.38)}
+:root[data-dark]{--tap-ring:rgba(61,194,236,.6)}
+.tapping{transform:scale(.95)!important;filter:brightness(1.18);transition:transform .07s ease-out,filter .07s ease-out}
+.tapped{animation:tapPop .42s ease-out}
+@keyframes tapPop{0%{transform:scale(.95);filter:brightness(1.3);box-shadow:0 0 0 0 var(--tap-ring)}55%{filter:brightness(1.1);box-shadow:0 0 0 10px transparent}100%{transform:none;filter:none;box-shadow:0 0 0 0 transparent}}
+.zone.tapping polygon,.zone.tapped polygon{filter:brightness(1.7)}
+.zone.tapping,.zone.tapped{transform:none!important;animation:none;box-shadow:none}
+@media (prefers-reduced-motion:reduce){.tapping{transform:none!important}.tapped{animation:tapFade .3s ease-out}@keyframes tapFade{0%{filter:brightness(1.3)}}}
 /* session summary: a ring for the whole day + a stacked bar per climb type (shared scale).
    Chart colours are deeper than the UI's soft fills so they pass contrast and colour-blind checks. */
 .dsum{--c-sent:#1F4FB8;--c-rest:#6C8CEB;--c-fell:#DD6B26;padding:14px 16px;display:flex;flex-direction:column;gap:14px}
@@ -129,7 +163,7 @@ legend{padding:0}
 .dleg b{margin-left:auto;font-family:var(--f-display);font-size:17px;font-variant-numeric:tabular-nums}
 .dleg .rate{font-size:12.5px;color:var(--muted);padding-top:2px;border-top:1px solid var(--line);margin-top:2px}
 .dtypes{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:8px}
-.dtype{appearance:none;border:0;background:none;padding:6px 0;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;width:100%;color:inherit}
+.dtype{appearance:none;border:0;background:none;padding:6px 8px;margin:0 -8px;border-radius:12px;width:calc(100% + 16px)!important;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;width:100%;color:inherit}
 .dtype .h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;min-height:24px}
 .dtype .h .k{flex:1}
 .dtype.on .h .k{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
@@ -151,7 +185,7 @@ legend{padding:0}
 .gcount .s{color:var(--sent)} .gcount .f{color:var(--fell)} .gcount .r{color:var(--rest)}
 .gcount.zero{opacity:.7}
 .tbtn{appearance:none;height:44px;border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none}
-.tbtn svg{width:22px;height:22px}
+.tbtn svg{width:25px;height:25px}
 .tbtn.fell{width:48px;border:1.5px solid var(--fell-line);background:var(--fell-soft);color:var(--fell)}
 .tbtn.sent{width:58px;border:0;background:var(--sent);color:var(--sent-ink)}
 .tbtn.rest{width:50px;border:1.5px solid var(--rest-line);background:var(--rest-soft);color:var(--rest);font:700 13px var(--f-body)}
@@ -345,8 +379,8 @@ const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;"
 const eqi=(a,b)=>String(a==null?"":a).trim().toLowerCase()===String(b==null?"":b).trim().toLowerCase();
 const LS={get(k,d){try{const v=localStorage.getItem("cb."+k);return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem("cb."+k,v);}catch(e){}}};
 const ICON={
-  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
-  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
   left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
   right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
   down:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
@@ -391,7 +425,9 @@ function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${c
 /* Session summary, drawn: a ring of sent / rested / fell for the whole day, then a stacked bar per
    climb type on one shared scale, with that type's top send. Tapping a type shows its grades below. */
 const RES_KEYS=[["Sent","sent","Sent"],["Rested","rest","Rested"],["Fell","fell","Fell"]];
-const RES_HEX={sent:"#1F4FB8",rest:"#6C8CEB",fell:"#DD6B26"};
+// both sets pass the colour-blind / contrast validator on their own backgrounds
+const RES_LIGHT={sent:"#1F4FB8",rest:"#6C8CEB",fell:"#DD6B26"},RES_DARK={sent:"#6FD6F6",rest:"#5B7BF3",fell:"#6236C9"};
+let RES_HEX=RES_LIGHT;
 function daySummary(list,isToday){
   if(!list.length)return`<div class="card dsum"><p class="hint" style="margin:0">No climbs logged ${isToday?"yet today":"on this day"}. Tap ✓ or ✕ on a grade below.</p></div>`;
   const cnt=(a,r)=>a.filter(c=>c.result===r).length;
@@ -512,9 +548,15 @@ function themeFor(w){
   if(eqi(w,"Cecilia"))return"lav";if(eqi(w,"Gary"))return"green";
   return climbers().indexOf(w)%2?"lav":"green";
 }
-const THEME_HEX={green:"#EDF5EB",lav:"#F3EFFA",both:"#F3F1EA"};
+// Always dark (Gary's choice). The light colours are still defined below if that ever changes.
+const isDark=()=>true;
+const THEME_LIGHT={green:"#EDF5EB",lav:"#F3EFFA",both:"#F3F1EA"},THEME_DARK={green:"#0B1622",lav:"#150F2C",both:"#100E22"};
+let THEME_HEX=THEME_LIGHT;
 function applyTheme(){
-  const k=themeFor(cur());document.documentElement.dataset.who=k;
+  const dk=isDark(),root=document.documentElement;
+  if(dk)root.dataset.dark="1";else delete root.dataset.dark;
+  THEME_HEX=dk?THEME_DARK:THEME_LIGHT;RES_HEX=dk?RES_DARK:RES_LIGHT;Object.assign(MAPC,dk?MAP_DARK:MAP_LIGHT);MAP_INK=MAPC.ink;
+  const k=themeFor(cur());root.dataset.who=k;
   const m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",THEME_HEX[k]);
 }
 function whoSeg(){
@@ -616,6 +658,7 @@ function render(msg){
   if(!ready){$("#title").textContent={session:"Today",projects:"Projects",progress:"Progress",map:"Map"}[tab];v.innerHTML=`<div class="empty"><strong>Loading your climbs…</strong>Reading your sheet.</div>`;return;}
   if(tab==="session")renderSession();else if(tab==="projects")renderProjects();else if(tab==="map")renderMap();else renderProgress();
   const n=gymProjects().filter(p=>openFor(p,cur())).length;const b=$("#projBadge");b.hidden=!n;b.textContent=n;
+  replayTap();
 }
 // Forms in a sheet are never redrawn under your fingers; only the read-only day view refreshes
 function onData(){if(auth!=="ok"||!ready)return;render();if(sheet&&sheet.type==="day")renderSheet();}
@@ -758,8 +801,14 @@ const HUB_MAP={
     {name:"Speed climb",lbl:[428,330],lines:["Speed","climb"],fs:20}
   ]
 };
-const TYPE_TINT={"Bouldering":"#FBE0CF","Top rope":"#D9E5FB","Auto belay":"#E7DFFB"};
-const MAP_INK="#2D3A34";
+const MAP_LIGHT={edge:{},featEdge:"#2D3A34",wall:"#2D3A34",ink:"#2D3A34",floor:"#FBF8F1",feat:"#ECE8DE",off:"#F1EEE6",heat:"31,79,184",chip:"#fff",tint:{"Bouldering":"#FBE0CF","Top rope":"#D9E5FB","Auto belay":"#E7DFFB"}};
+// dark map: black floor, walls drawn as glowing outlines in the palette (violet boulders, blue top rope, cyan auto belay)
+const MAP_DARK={ink:"#E8E8F4",floor:"#000000",feat:"#111117",featEdge:"#3A3A4C",wall:"#5E5E78",off:"#0A0A10",heat:"61,194,236",chip:"#000000",
+  tint:{"Bouldering":"rgba(124,105,242,.30)","Top rope":"rgba(75,112,245,.32)","Auto belay":"rgba(61,194,236,.26)"},
+  edge:{"Bouldering":"#A493FF","Top rope":"#7393FF","Auto belay":"#52D2F6"}};
+const MAPC=Object.assign({},MAP_LIGHT);
+const TYPE_TINT=new Proxy({},{get:(_,k)=>MAPC.tint[k]});
+let MAP_INK="#2D3A34";
 const gymMap=()=>eqi(GYM,HUB_MAP.gym)?HUB_MAP:null;
 const zoneById=id=>HUB_MAP.zones.find(z=>z.id===id);
 const inZone=(x,z)=>x.type===z.type&&(eqi(x.area,z.area)||(z.alias||[]).some(a=>eqi(x.area,a)));
@@ -802,7 +851,7 @@ function anchorPoint(area,num){
 function anchorPinSVG(pt,colour,big){
   const r=big?22:17,lx=pt.x+pt.nx*(r+30),ly=pt.y+pt.ny*(r+30);
   return`<g pointer-events="none"><circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${r}" fill="${colour||"#C9C4B8"}" stroke="${MAP_INK}" stroke-width="5"/>`+
-    `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${big?30:24}" font-weight="700" fill="${MAP_INK}" stroke="#FBF8F1" stroke-width="8" paint-order="stroke">#${pt.n}</text></g>`;
+    `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${big?30:24}" font-weight="700" fill="${MAP_INK}" stroke="${MAPC.floor}" stroke-width="8" paint-order="stroke">#${pt.n}</text></g>`;
 }
 
 /* One SVG for both the Map tab and the small pickers.
@@ -823,18 +872,18 @@ function mapSVG(o){
     return`<text x="${x}" y="${y0}" text-anchor="middle" dominant-baseline="middle" font-size="${fs}" font-weight="${bold?700:600}" fill="${MAP_INK}" opacity="${dim?.4:1}"${tf} pointer-events="none">${lines.map((l,i)=>`<tspan x="${x}" dy="${i?lh:0}"${item.anchors&&i===lines.length-1?` font-size="${fs*.8}" font-weight="500"`:""}>${esc(l)}</tspan>`).join("")}</text>`;
   };
   let s=`<svg viewBox="${vb.join(" ")}" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans, system-ui, sans-serif" role="group" aria-label="Map of ${esc(M.gym)}">`;
-  s+=`<rect x="12" y="18" width="1201" height="1377" fill="#FBF8F1"/>`;
-  for(const f of M.features)if(f.pts)s+=`<polygon points="${f.pts}" fill="#ECE8DE" stroke="${MAP_INK}" stroke-width="5" stroke-linejoin="round"/>`;
+  s+=`<rect x="12" y="18" width="1201" height="1377" fill="${MAPC.floor}"/>`;
+  for(const f of M.features)if(f.pts)s+=`<polygon points="${f.pts}" fill="${MAPC.feat}" stroke="${MAPC.featEdge}" stroke-width="5" stroke-linejoin="round"/>`;
   for(const z of M.zones){
     const active=!o.type||z.type===o.type;
     const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
     let fill=TYPE_TINT[z.type];
-    if(o.heat){const n=o.heat[z.id]||0;fill=n?`rgba(31,79,184,${(.12+.42*n/o.heatMax).toFixed(2)})`:"#F1EEE6";}
+    if(o.heat){const n=o.heat[z.id]||0;fill=n?`rgba(${MAPC.heat},${(.12+.42*n/o.heatMax).toFixed(2)})`:MAPC.off;}
     const name=`${z.area} (${z.type})`;
-    s+=active?`<g class="zone${sel?" sel":""}" data-act="${o.type?"pickArea":"mapSel"}" data-z="${z.id}" data-area="${esc(z.area)}" tabindex="0" role="button" aria-label="${esc(name)}" aria-pressed="${!!sel}"><polygon points="${z.pts}" fill="${fill}" stroke="${MAP_INK}" stroke-width="5" stroke-linejoin="round"/></g>`
-      :`<polygon points="${z.pts}" fill="#F1EEE6" stroke="${MAP_INK}" stroke-width="4" stroke-linejoin="round" opacity=".45" aria-hidden="true"/>`;
+    s+=active?`<g class="zone${sel?" sel":""}" data-act="${o.type?"pickArea":"mapSel"}" data-z="${z.id}" data-area="${esc(z.area)}" tabindex="0" role="button" aria-label="${esc(name)}" aria-pressed="${!!sel}"><polygon points="${z.pts}" fill="${fill}" stroke="${MAPC.edge[z.type]||MAP_INK}" stroke-width="5" stroke-linejoin="round"/></g>`
+      :`<polygon points="${z.pts}" fill="${MAPC.off}" stroke="${MAPC.featEdge}" stroke-width="4" stroke-linejoin="round" opacity=".45" aria-hidden="true"/>`;
   }
-  s+=`<rect x="12" y="18" width="1201" height="1377" fill="none" stroke="${MAP_INK}" stroke-width="12"/>`;
+  s+=`<rect x="12" y="18" width="1201" height="1377" fill="none" stroke="${MAPC.wall}" stroke-width="12"/>`;
   for(const f of M.features)s+=label(f,false,!!o.type);
   for(const z of M.zones){
     const active=!o.type||z.type===o.type;
@@ -849,17 +898,17 @@ function mapSVG(o){
       const x=z.pin[0]+(col-(n-1)/2)*sp,y=z.pin[1]+row*sp-((Math.ceil(show.length/per)-1)*sp)/2;
       s+=`<circle cx="${x}" cy="${y}" r="17" fill="${c||"#C9C4B8"}" stroke="${MAP_INK}" stroke-width="5" pointer-events="none"/>`;});
     if(list.length>6){const i=5,row=Math.floor(i/per),col=i%per;const x=z.pin[0]+(col-1)*sp,y=z.pin[1]+row*sp-sp/2;
-      s+=`<circle cx="${x}" cy="${y}" r="21" fill="${MAP_INK}" pointer-events="none"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="700" fill="#fff" pointer-events="none">+${list.length-5}</text>`;}
+      s+=`<circle cx="${x}" cy="${y}" r="21" fill="${MAP_INK}" pointer-events="none"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="700" fill="${MAPC.chip}" pointer-events="none">+${list.length-5}</text>`;}
   }
   if(o.pins)for(const p of o.pins)s+=anchorPinSVG(p.pt,p.colour,p.big);
   if(o.heat)for(const z of M.zones){const n=o.heat[z.id];if(!n)continue;
-    s+=`<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="26" fill="#fff" stroke="${MAP_INK}" stroke-width="4" pointer-events="none"/><text x="${z.pin[0]}" y="${z.pin[1]}" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="700" fill="${MAP_INK}" pointer-events="none">${n}</text>`;}
+    s+=`<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="26" fill="${MAPC.chip}" stroke="${MAP_INK}" stroke-width="4" pointer-events="none"/><text x="${z.pin[0]}" y="${z.pin[1]}" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="700" fill="${MAP_INK}" pointer-events="none">${n}</text>`;}
   return s+`</svg>`;
 }
 /* Small map shown in a details panel: tap a wall to fill in Where */
 function miniSVG(type,area,anchor){
   const pt=typeOf(type).anchor&&area&&anchor?anchorPoint(area,anchor):null;
-  return mapSVG({type,sel:area||"",pins:pt?[{pt,colour:"#FFD98A",big:true}]:null});
+  return mapSVG({type,sel:area||"",pins:pt?[{pt,colour:"#3DC2EC",big:true}]:null});
 }
 function miniMap(type,gym,area,anchor){
   if(!eqi(gym,HUB_MAP.gym)||!HUB_MAP.zones.some(z=>z.type===type))return"";
@@ -944,8 +993,8 @@ function renderProgress(){
       <div class="kpi"><b class="small">${esc(hardest(data)||"—")}</b><span>hardest sends</span></div>
     </div>`;
   }
-  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--sent)"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rested</span>`:""}<span><i style="background:var(--fell-bar)"></i>Fell</span></div></div>
-    <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.r?`<i style="height:${Math.round(x.r/max*H)}px;background:var(--rest-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--sent)"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
+  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--chart-sent,var(--sent))"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rested</span>`:""}<span><i style="background:var(--fell-bar)"></i>Fell</span></div></div>
+    <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.r?`<i style="height:${Math.round(x.r/max*H)}px;background:var(--rest-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--chart-sent,var(--sent))"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
   // sends by grade, per type
   let gb="";const bmax=Math.max(1,...TYPES.flatMap(t=>gradeCounts(t.k,data).map(r=>r.s)));
   for(const t of TYPES){const rows=gradeCounts(t.k,data);if(!rows.length)continue;
@@ -974,6 +1023,7 @@ function renderSheet(){
   else if(sheet.type==="project"){const p=S.projects.find(x=>x.id===sheet.id);if(!p){closeSheet();return;}b.innerHTML=projSheet(p);}
   else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
   else if(sheet.type==="gym")b.innerHTML=gymSheet();
+  replayTap();
 }
 function areaField(type,val){
   const rows=areaRows(type);
@@ -1193,6 +1243,29 @@ document.addEventListener("touchend",e=>{
   animateSwitch(nextWho(dir),dir,dragP(dx),dragP(dx)>.35||fast);
 },{passive:true});
 document.addEventListener("touchcancel",()=>{if(swipe&&swipe.dir)animateSwitch(nextWho(swipe.dir),swipe.dir,dragP(swipe.dx),false);swipe=null;},{passive:true});
+
+/* ---------- press feedback ----------
+   Most taps redraw the screen, so the ring is replayed on the redrawn copy of the same button. */
+const TAP_SEL="button,.chip,label.pill,label.sw,.zone,.srow,.dtype,.phead";
+const TAP_KEYS=["act","tab","v","id","res","g","z","d","k"];
+let lastTap=null;
+const tapTarget=el=>el.matches("label.pill,label.sw")?el.querySelector("span")||el:el;
+function tapKey(el){const parts=TAP_KEYS.filter(k=>el.dataset[k]!=null).map(k=>`[data-${k}="${CSS.escape(el.dataset[k])}"]`);return parts.length?parts.join(""):null;}
+function popTap(t){t.classList.remove("tapping","tapped");void t.offsetWidth;t.classList.add("tapped");setTimeout(()=>t.classList.remove("tapped"),450);}
+document.addEventListener("pointerdown",e=>{
+  const el=e.target.closest(TAP_SEL);if(!el||el.disabled)return;
+  const t=tapTarget(el);t.classList.add("tapping");
+  const key=tapKey(el),root0=el.closest("#sheetWrap")||document;
+  lastTap={el:t,key,nth:key?[...root0.querySelectorAll(key)].indexOf(el):0,inSheet:!!el.closest("#sheetWrap"),x:e.clientX,y:e.clientY,at:Date.now()};
+},{passive:true});
+document.addEventListener("pointermove",e=>{if(lastTap&&Math.hypot(e.clientX-lastTap.x,e.clientY-lastTap.y)>12){lastTap.el.classList.remove("tapping");lastTap=null;}},{passive:true});
+document.addEventListener("pointerup",()=>{if(!lastTap)return;popTap(lastTap.el);lastTap.at=Date.now();},{passive:true});
+document.addEventListener("pointercancel",()=>{if(lastTap){lastTap.el.classList.remove("tapping");lastTap=null;}},{passive:true});
+function replayTap(){
+  if(!lastTap||lastTap.el.isConnected||!lastTap.key||Date.now()-lastTap.at>600)return;
+  const root=lastTap.inSheet?$("#sheetWrap"):document;
+  const all=root?[...root.querySelectorAll(lastTap.key)]:[];const el=all[lastTap.nth]||all[0];if(el){const t=tapTarget(el);lastTap.el=t;popTap(t);}
+}
 
 async function boot(){
   readLinkParams();

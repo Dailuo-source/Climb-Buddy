@@ -1,4 +1,8 @@
-# Climb Buddy: handoff notes
+# Climb Buddy — Brief
+
+> **Claude: read this first.** Open only the files a change touches, and use the code map below to jump to a function instead of reading whole files.
+> `index.html` is about 102 KB (~26k tokens): don't read it whole; search for a function name (e.g. `grep -n "function render" index.html`) and read just that function.
+> At the end of a work session, update **Status** and add one line to **Changelog** (keep about 10).
 
 Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / Rest / ✕ per grade to log sends, finishes with rests (ropes only) and falls. Every tap opens a details panel (wall, anchor, hold colour, tries, rests, note, date), routes they fall on become projects, and there's a map of the gym. Used on their Samsung Android phones (Chrome PWA).
 
@@ -45,3 +49,38 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 ## Ideas mentioned but not built
 
 - Tracking speed climb or Boards & Training sessions (they're labels on the map for now).
+
+## Code map
+API: op-batched like Pantry Pal (`{key, ops: [{op: add|update|del, coll, id, data}]}` → whole state).
+
+| File | Lines | What's in it |
+|---|---|---|
+| `Code.gs` | 488 | `doGet`/`doPost`/`api`; read/write (`readAll_`, `applyOp_`, `table_`, `headerMap_`, `fromCell_`/`toCell_`); sheet menu (`onOpen`, `setup`, `showKey`, `setWebAppUrl`, `resetKey`); tabs (`buildTab_`, `seedLists_`, `paintSwatch_`/`paintAllSwatches_` for Lists colours) |
+| `index.html` | 1281 | CSS (lines ~15–339), markup (~341–366), one `<script>` (~367–1279) |
+| `sw.js`, `manifest.webmanifest` | small | offline cache (`CACHE`), PWA manifest |
+
+Inside the `index.html` script, search for:
+- Lists and grades: `listRows`, `areaRows`, `gradeIdx`, `gradeColour`, `normType`, `holdHex`, `holdDot`, `tagHTML`
+- Sync: `readLinkParams`, `callApi`, `enqueue`, `flush`, `normalize`, `settleDefaults`, `boot`
+- Theme and person switch: `themeFor`, `applyTheme`, `whoSeg`, `setWho`, `paintSwitch`, `animateSwitch`, `tapWho`
+- Screens: `setTab`, `render`, `onData`
+- Session tab: `renderSession`, `daySummary`, `hardest`, `logClimb`
+- Projects: `renderProjects`, `projCard`, `projInfo`, `triedBy`, `openFor`, `markProjectSent`
+- Map: `HUB_MAP`, `anchorRanges`, `areaForAnchor`, `anchorPoint`, `mapSVG`, `miniMap`, `renderMap`, `zonePanel`
+- Progress: `renderProgress`, `gradeCounts`
+- Panels: `openSheet`, `renderSheet`, `climbSheet`, `saveClimb`, `projSheet`, `daySheet`, `gymSheet`, `areaField`, `holdField`
+- Tap feedback: `TAP_SEL`, `tapKey`, `replayTap`, `scrollsSideways`
+
+## Status
+- Working: logging (✓ / Rest / ✕ with details), projects, Hub map with anchors, Progress, per-person views with swipe, always-dark theme.
+- Open: Gary to confirm the anchor numbering estimate and add the remaining anchors; the old workers.dev Worker (has Gary's name in the URL) can be removed, since he wants pages.dev only.
+- Ideas: speed climb or Boards & Training sessions (labels on the map for now).
+
+## Changelog (latest first, keep about 10 lines)
+- 2026-10-18: Turned the handoff notes into a brief (read-first rules, code map, status, changelog)
+- 2026-10-17: Always-dark theme in Gary's palette, black map, blue/purple charts, press feedback
+- 2026-10-17: Session summary as a chart: day ring plus stacked bar per climb type
+- 2026-10-16: Session summary: Total row plus a row per climb type with top send
+- 2026-10-16: Session summary: total row with mix bar, plus Sent/Rested/Fell rows with top grades
+- 2026-10-16: Fix last-tried dates, finger-following swipe, anchor spots on the map
+- 2026-10-16: Per-person views on every tab, swipe to switch, green/lavender tint

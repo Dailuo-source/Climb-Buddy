@@ -1267,8 +1267,26 @@ function replayTap(){
   const all=root?[...root.querySelectorAll(lastTap.key)]:[];const el=all[lastTap.nth]||all[0];if(el){const t=tapTarget(el);lastTap.el=t;popTap(t);}
 }
 
+/* ---------- phone Back button ----------
+   Keeps one spare history entry (the "trap") on top of the page so Android's Back lands here instead of closing the app.
+   Back closes an open panel, then returns to the Session tab, then asks for a second Back before closing.
+   Chrome ignores entries added without a tap, so the trap is also re-added on the next touch. */
+let exitArmed=0;
+const trapped=()=>!!(history.state&&history.state.cbTrap);
+function armBack(){if(!trapped())try{history.pushState({cbTrap:1},"");}catch(e){}}
+window.addEventListener("popstate",()=>{
+  if(trapped())return;
+  if(sheet){if(sheet.fresh&&sheet.type==="climb")$("#sheetBody [data-act=skipDetails]")?.click();else closeSheet();armBack();return;}
+  if(tab!=="session"){setTab("session");armBack();return;}
+  if(Date.now()-exitArmed<2500)return;
+  exitArmed=Date.now();toast("Press Back again to close Climb Buddy");
+  setTimeout(()=>{if(Date.now()-exitArmed>=2500)armBack();},2600);
+});
+document.addEventListener("pointerdown",()=>{exitArmed=0;armBack();},true);
+
 async function boot(){
   readLinkParams();
+  armBack();
   if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
   if(!API||!KEY)auth="need";
   render();

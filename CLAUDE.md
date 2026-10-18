@@ -35,12 +35,13 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 - Overview charts (Session ring + per-type bars, Progress "Climbs per session") use only blue/purple shades, separated by brightness so they pass the colour-blind checks: sent #6FD6F6, rested #5B7BF3, fell #6236C9 (`RES_DARK`, `--chart-sent`, `--rest-bar`, `--fell-bar`).
 - Map in dark: black floor, walls as palette-coloured outlines with faint fills (`MAP_DARK`: violet boulders, blue top rope, cyan auto belay), near-white labels, tapped wall gold, anchor pin cyan.
 - Press feedback: anything tappable (`TAP_SEL`) dips and brightens while held (`.tapping`), then pulses a cyan ring (`.tapped`). Taps usually redraw the screen, so `replayTap()` (end of `render`/`renderSheet`) finds the same button again by its data-* attributes plus index and plays the ring there.
+- **Phone Back button** (`armBack`, `popstate` handler before `boot`): one spare history entry `{cbTrap:1}` sits on top so Back stays in the app. Back closes an open panel (a just-logged climb's panel acts like Skip details, with Undo), then goes to the Session tab, then shows "Press Back again to close" and lets a second Back within 2.5 s exit. Chrome skips history entries added without a tap, so the trap is also re-added on every `pointerdown`.
 - The name switcher's buttons must stay transparent (`.seg.wseg button`) so the gliding highlight shows; a plain `.wseg button` rule loses to `.seg button[aria-pressed]`.
 - Icon: thick-line kawaii coral chalk bag with a face and drawstring, on sky blue. Gary deleted the maskable icon; keep it out of the manifest and `sw.js`.
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `climb-buddy-v16`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `climb-buddy-v17`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Claude did this through Claude in Chrome last time: open the sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Sheet edits through the Google Sheets connector are fine. Insert rows rather than rewriting blocks in Lists, because the colour cells are painted.
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email. Push with `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -68,6 +69,7 @@ Inside the `index.html` script, search for:
 - Projects: `renderProjects`, `projCard`, `projInfo`, `triedBy`, `openFor`, `markProjectSent`
 - Map: `HUB_MAP`, `anchorRanges`, `areaForAnchor`, `anchorPoint`, `mapSVG`, `miniMap`, `renderMap`, `zonePanel`
 - Progress: `renderProgress`, `gradeCounts`
+- Back button: `armBack`, `trapped`, `exitArmed`
 - Panels: `openSheet`, `renderSheet`, `climbSheet`, `saveClimb`, `projSheet`, `daySheet`, `gymSheet`, `areaField`, `holdField`
 - Tap feedback: `TAP_SEL`, `tapKey`, `replayTap`, `scrollsSideways`
 
@@ -77,6 +79,7 @@ Inside the `index.html` script, search for:
 - Ideas: speed climb or Boards & Training sessions (labels on the map for now).
 
 ## Changelog (latest first, keep about 10 lines)
+- 2026-10-18: Phone Back button closes panels and returns to Session instead of closing the app; double Back to exit
 - 2026-10-18: New thick-line kawaii app icon (chalk bag on sky blue)
 - 2026-10-18: Turned the handoff notes into a brief (read-first rules, code map, status, changelog)
 - 2026-10-17: Always-dark theme in Gary's palette, black map, blue/purple charts, press feedback

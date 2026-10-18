@@ -36,11 +36,11 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 - Map in dark: black floor, walls as palette-coloured outlines with faint fills (`MAP_DARK`: violet boulders, blue top rope, cyan auto belay), near-white labels, tapped wall gold, anchor pin cyan.
 - Press feedback: anything tappable (`TAP_SEL`) dips and brightens while held (`.tapping`), then pulses a cyan ring (`.tapped`). Taps usually redraw the screen, so `replayTap()` (end of `render`/`renderSheet`) finds the same button again by its data-* attributes plus index and plays the ring there.
 - The name switcher's buttons must stay transparent (`.seg.wseg button`) so the gliding highlight shows; a plain `.wseg button` rule loses to `.seg button[aria-pressed]`.
-- Icon: simple side-on grey rock with a face climbing an orange rope, feet on a cream wall, on lavender. Gary deleted the maskable icon; keep it out of the manifest and `sw.js`.
+- Icon: thick-line kawaii coral chalk bag with a face and drawstring, on sky blue. Gary deleted the maskable icon; keep it out of the manifest and `sw.js`.
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `climb-buddy-v15`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `climb-buddy-v16`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Claude did this through Claude in Chrome last time: open the sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Sheet edits through the Google Sheets connector are fine. Insert rows rather than rewriting blocks in Lists, because the colour cells are painted.
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email. Push with `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -77,6 +77,7 @@ Inside the `index.html` script, search for:
 - Ideas: speed climb or Boards & Training sessions (labels on the map for now).
 
 ## Changelog (latest first, keep about 10 lines)
+- 2026-10-18: New thick-line kawaii app icon (chalk bag on sky blue)
 - 2026-10-18: Turned the handoff notes into a brief (read-first rules, code map, status, changelog)
 - 2026-10-17: Always-dark theme in Gary's palette, black map, blue/purple charts, press feedback
 - 2026-10-17: Session summary as a chart: day ring plus stacked bar per climb type

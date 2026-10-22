@@ -28,7 +28,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 - Tabs: **Session** (date picker, `daySummary` drawn as a ring + stacked bar per type, since Gary prefers visuals; tapping a type switches the grade list; per-grade ✓/Rest/✕), **Projects**, **Map**, **Progress**.
 - **Whose view**: one switcher on every tab (`whoSeg`, `cb.who`, `cb.both`). Map, Projects, Progress also offer **Both**; Session logs for one person. Swiping switches with a finger-following animation (`paintSwitch`, commit past 35% or a flick via `animateSwitch`); ignored with a panel open or on sideways-scrolling content. A person's projects = open ones they tried and haven't sent (`openFor`).
 - The switcher buttons must stay transparent (`.seg.wseg button`); a plain `.wseg button` rule loses to `.seg button[aria-pressed]`.
-- **Map**: `HUB_MAP` (1227×1402); each zone's `area` + `type` must match a Lists value. `HUB_MAP.anchorWalls` spreads anchor numbers along each rope wall path (`anchorPoint`), widened by Lists ranges (numbering is Claude's estimate, Gary to confirm).
+- **Map**: `HUB_MAP` (1227×1402); each zone's `area` + `type` must match a Lists value. `HUB_MAP.anchorWalls` spreads anchor numbers along each rope wall path (`anchorPoint`), widened by Lists ranges (numbering is Claude's estimate, Gary to confirm). Toggle is **Activity** then **Projects**; opening the tab always lands on Activity by Day at the latest session (`mapLand` in `setTab`). Activity has Day / Week / Month chips (`cb.mapper`) and ‹ › stepping (`mapPeriod`, `mapStep`): Day steps through session days only, Week is Mon–Sun, Month is calendar. A thin sent/rested/fell bar + Top (`periodSummary`), heat map and the wall panel's recent line all follow the period.
 - **Always dark** (`isDark()` true, `<html data-dark="1">`). Palette: indigo #402E7A, violet #4C3BCF, blue #4B70F5, cyan #3DC2EC. Background tone shows whose stats: teal-navy Gary (`data-who="green"`), plum Cecilia (`"lav"`), midnight indigo Both; also sets `theme-color`. ✕ buttons and fell counts stay coral. Light tokens (`THEME_LIGHT`, `RES_LIGHT`, `MAP_LIGHT`) are kept in case light returns.
 - Charts use only blue/purple shades separated by brightness (colour-blind safe): sent #6FD6F6, rested #5B7BF3, fell #6236C9 (`RES_DARK`, `--chart-sent`, `--rest-bar`, `--fell-bar`).
 - Map in dark: black floor, palette outlines with faint fills (`MAP_DARK`), tapped wall gold, anchor pin cyan.
@@ -39,7 +39,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v17`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v18`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome: sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Sheet edits via the Google Sheets connector are fine; insert rows in Lists rather than rewriting blocks (colour cells are painted).
 - Commits use author `Claude <noreply@anthropic.com>`. Push to `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -60,7 +60,7 @@ API: op-batched like Pantry Pal (`{key, ops: [{op: add|update|del, coll, id, dat
 | File | Lines | What's in it |
 |---|---|---|
 | `Code.gs` | 488 | `doGet`/`doPost`/`api`; read/write (`readAll_`, `applyOp_`, `table_`, `headerMap_`, `fromCell_`/`toCell_`); menu (`onOpen`, `setup`, `showKey`, `setWebAppUrl`, `resetKey`); tabs (`buildTab_`, `seedLists_`, `paintSwatch_`/`paintAllSwatches_`) |
-| `web/index.html` | 1281 | CSS (~15–339), markup (~341–366), one `<script>` (~367–1279) |
+| `web/index.html` | 1364 | CSS (~15–346), markup (~348–373), one `<script>` (~374–1362) |
 | `web/sw.js`, `manifest.webmanifest` | small | offline cache (`CACHE`), PWA manifest |
 
 Inside the `index.html` script, search for:
@@ -70,22 +70,22 @@ Inside the `index.html` script, search for:
 - Screens: `setTab`, `render`, `onData`
 - Session tab: `renderSession`, `daySummary`, `hardest`, `logClimb`
 - Projects: `renderProjects`, `projCard`, `projInfo`, `triedBy`, `openFor`, `markProjectSent`
-- Map: `HUB_MAP`, `anchorRanges`, `areaForAnchor`, `anchorPoint`, `mapSVG`, `miniMap`, `renderMap`, `zonePanel`
+- Map: `HUB_MAP`, `anchorRanges`, `areaForAnchor`, `anchorPoint`, `mapSVG`, `miniMap`, `renderMap`, `mapLand`, `mapPeriod`, `mapStep`, `setMapPer`, `periodSummary`, `zonePanel`
 - Progress: `renderProgress`, `gradeCounts`
 - Back button: `armBack`, `trapped`, `exitArmed`
 - Panels: `openSheet`, `renderSheet`, `climbSheet`, `saveClimb`, `projSheet`, `daySheet`, `gymSheet`, `areaField`, `holdField`
 - Tap feedback: `TAP_SEL`, `tapKey`, `replayTap`, `scrollsSideways`
 
 ## Status
-- Working: logging with details, projects, Hub map with anchors, Progress, per-person views with swipe, always-dark theme.
+- Working: logging with details, projects, Hub map with anchors and Day/Week/Month activity, Progress, per-person views with swipe, always-dark theme.
 - Open: Gary to confirm anchor numbering and add the remaining anchors (whiteboard hints: Upper 49–53, Pit 77/80/83); remove the old workers.dev Worker.
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
 
 ## Changelog (latest first, keep about 5 lines)
-- 2026-10-21: Moved the site files into `web/`; only that folder is published
+- 2026-10-22: Map Activity by Day / Week / Month with ‹ › stepping; Map opens on Activity at the latest session
 - 2026-10-22: Trimmed this brief
+- 2026-10-21: Moved the site files into `web/`; only that folder is published
 - 2026-10-18: Phone Back button stays in the app; double Back to exit
-- 2026-10-18: New kawaii app icon (chalk bag on sky blue)
 - 2026-10-17: Always-dark theme in Gary's palette, black map, blue/purple charts, press feedback
 
 ## Working efficiently

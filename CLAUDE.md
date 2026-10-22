@@ -1,7 +1,7 @@
 # Climb Buddy — Brief
 
 > **Claude: read this first.** Open only the files a change touches; use the code map to jump to a function.
-> `index.html` is ~102 KB: search for a function name (e.g. `grep -n "function render" index.html`) and read just that function.
+> `web/index.html` is ~102 KB: search for a function name (e.g. `grep -n "function render" web/index.html`) and read just that function.
 > At the end of a work session, update **Status** and add one line to **Changelog** (keep about 5).
 
 Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / Rest / ✕ per grade to log sends, finishes with rests (ropes only) and falls; each tap opens a details panel (wall, anchor, hold colour, tries, rests, note, date). Falls become projects; there's a gym map. Samsung Android phones, Chrome PWA.
@@ -10,7 +10,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 
 | Piece | Location |
 | --- | --- |
-| Live app | https://climbbuddy.pages.dev/ (Cloudflare Pages from `main`). Gary wants pages.dev only; the old workers.dev Worker "climbbuddy" (has his name in the URL) can go |
+| Live app | https://climbbuddy.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Gary wants pages.dev only; the old workers.dev Worker "climbbuddy" (has his name in the URL) can go |
 | Database | Google Sheet **Climb Buddy**, id `1AmIjYEFQOTm5U4ZjXuo2UK5LXney1yc8b8zvyANcJu4`. Tabs: Climbs, Projects, Lists |
 | Backend | Apps Script bound to the sheet; source is `Code.gs`. Web app version 3 |
 | Connecting a phone | Menu **Climb Buddy → Show app key and phone link** → `https://climbbuddy.pages.dev/#api=<exec>&key=<key>` (stored as `cb.api`, `cb.key`); `APP_SITE` in Code.gs builds it |
@@ -39,10 +39,20 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `climb-buddy-v17`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v17`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome: sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Sheet edits via the Google Sheets connector are fine; insert rows in Lists rather than rewriting blocks (colour cells are painted).
 - Commits use author `Claude <noreply@anthropic.com>`. Push to `https://github.com/Dailuo-source/Climb-Buddy.git`.
+
+## Deploying Code.gs
+
+- Web app deployment ID: `AKfycbyZJS90k7Zpis9_o34t4vWSLGaIU6TUgyeSylhCwXLSuR8NK2ATQOEudUofVRXhlERI`. Always update this deployment so the /exec URL never changes.
+- From this folder, `.clasp.json` points clasp at the script project (rootDir is the repo root, where `Code.gs` is):
+  ```
+  clasp push
+  clasp deploy -i AKfycbyZJS90k7Zpis9_o34t4vWSLGaIU6TUgyeSylhCwXLSuR8NK2ATQOEudUofVRXhlERI -d "what changed"
+  ```
+- Never run `clasp deploy` without `-i`: that creates a new deployment with a new /exec URL. `clasp deployments` lists them.
 
 ## Code map
 API: op-batched like Pantry Pal (`{key, ops: [{op: add|update|del, coll, id, data}]}` → whole state).
@@ -50,8 +60,8 @@ API: op-batched like Pantry Pal (`{key, ops: [{op: add|update|del, coll, id, dat
 | File | Lines | What's in it |
 |---|---|---|
 | `Code.gs` | 488 | `doGet`/`doPost`/`api`; read/write (`readAll_`, `applyOp_`, `table_`, `headerMap_`, `fromCell_`/`toCell_`); menu (`onOpen`, `setup`, `showKey`, `setWebAppUrl`, `resetKey`); tabs (`buildTab_`, `seedLists_`, `paintSwatch_`/`paintAllSwatches_`) |
-| `index.html` | 1281 | CSS (~15–339), markup (~341–366), one `<script>` (~367–1279) |
-| `sw.js`, `manifest.webmanifest` | small | offline cache (`CACHE`), PWA manifest |
+| `web/index.html` | 1281 | CSS (~15–339), markup (~341–366), one `<script>` (~367–1279) |
+| `web/sw.js`, `manifest.webmanifest` | small | offline cache (`CACHE`), PWA manifest |
 
 Inside the `index.html` script, search for:
 - Lists and grades: `listRows`, `areaRows`, `gradeIdx`, `gradeColour`, `normType`, `holdHex`, `holdDot`, `tagHTML`
@@ -72,6 +82,7 @@ Inside the `index.html` script, search for:
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-21: Moved the site files into `web/`; only that folder is published
 - 2026-10-22: Trimmed this brief
 - 2026-10-18: Phone Back button stays in the app; double Back to exit
 - 2026-10-18: New kawaii app icon (chalk bag on sky blue)

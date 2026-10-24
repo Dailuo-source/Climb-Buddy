@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Full gym map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1622}
+a{color:#3DC2EC}a:hover{color:#8FE0F7}
+button,a{font:inherit;cursor:pointer;transition:transform .12s ease,filter .12s ease}
+button{color:inherit}
+button:active,a:active{transform:scale(.95);filter:brightness(1.25)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0B1622; color: #ECEBFA; font-family: 'DM Sans', system-ui, sans-serif; font-size: 15px">
+
+<div style="display: flex; align-items: center; gap: 8px; padding: 14px 12px 8px">
+<a href="Main.dc.html" style="height: 44px; padding: 0 12px; border-radius: 14px; background: #132235; color: #ECEBFA; display: inline-flex; align-items: center; text-decoration: none; font-weight: 600">‹ Climb</a>
+<b style="flex: 1; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">The Hub</b>
+<span style="font-size: 13px; color: #8FE0F7; font-weight: 600">Gary</span>
+</div>
+
+<div style="display: flex; align-items: center; gap: 6px; padding: 0 12px 8px">
+<div role="group" aria-label="Period" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; border-radius: 12px; background: #132235">
+<button style="height: 34px; padding: 0 10px; border: 0; border-radius: 9px; background: transparent; color: #9DB2C8; font-size: 13px; font-weight: 600">Day</button>
+<button aria-pressed="true" style="height: 34px; padding: 0 10px; border: 0; border-radius: 9px; background: #4C3BCF; color: #fff; font-size: 13px; font-weight: 600">Week</button>
+<button style="height: 34px; padding: 0 10px; border: 0; border-radius: 9px; background: transparent; color: #9DB2C8; font-size: 13px; font-weight: 600">Month</button>
+</div>
+<button aria-label="Previous week" style="width: 40px; height: 40px; border-radius: 12px; border: 1px solid #20364F; background: #132235">‹</button>
+<span style="flex: 1; text-align: center; font-size: 13px; font-weight: 600">Oct 19–25</span>
+<button aria-label="Next week" disabled="" style="width: 40px; height: 40px; border-radius: 12px; border: 1px solid #20364F; background: #132235; opacity: .35">›</button>
+</div>
+
+<div style="display: flex; gap: 14px; padding: 0 16px 8px; font-size: 12px; color: #9DB2C8">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 22px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, rgba(61,194,236,.15), rgba(61,194,236,.8))"></span>Glow = climbs this week</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 18px; border-radius: 50%; background: #3DC2EC; border: 2px solid #0B1622; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center"><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 9V1l5 2-5 2" fill="#08202C" stroke="#08202C" stroke-linejoin="round"></path></svg></span>Flag = open project</span>
+</div>
+
+<div style="display: flex; justify-content: center">
+<svg viewBox="0 0 1227 1402" width="350" height="400" role="img" aria-label="The Hub map for this week, Upper selected">
+<rect width="1227" height="1402" rx="30" fill="#000"></rect>
+<g fill="#111117" stroke="#3A3A4C" stroke-width="4"><polygon points="12,18 282,18 282,132 98,132 98,618 12,618"></polygon><polygon points="285,775 463,775 463,1203 285,1203"></polygon></g>
+<g stroke="#5E5E78" stroke-width="5" stroke-linejoin="round">
+<polygon points="852,18 1213,18 1032,198" fill="rgba(61,194,236,.55)"></polygon>
+<polygon points="1032,198 1213,18 1213,380" fill="rgba(61,194,236,.3)"></polygon>
+<polygon points="1213,488 1170,488 1104,553 1104,630 1134,660 1134,772 1155,793 1155,829 1213,829" fill="rgba(61,194,236,.15)"></polygon>
+<polygon points="1155,829 1155,868 1104,917 1104,1010 1134,1040 1134,1207 1213,1207 1213,829" fill="rgba(61,194,236,.4)"></polygon>
+<polygon points="322,1332 518,1332 550,1365 1030,1365 1030,1395 322,1395" fill="#16161F"></polygon>
+<polygon points="12,1395 98,1307 322,1307 322,1395" fill="#16161F"></polygon>
+<polygon points="12,1082 98,1082 98,1307 12,1395" fill="#16161F"></polygon>
+<polygon points="12,732 98,732 98,815 125,815 125,957 98,957 98,1082 12,1082" fill="rgba(61,194,236,.15)"></polygon>
+<polygon points="362,18 478,18 478,67 362,67" fill="#16161F"></polygon>
+<polygon points="478,18 807,18 807,64 775,97 720,97 690,68 582,68 540,107 503,107 492,67 478,67" fill="rgba(61,194,236,.2)"></polygon>
+<polygon points="282,270 373,270 373,405 282,707 282,530 298,515 298,420 282,405" fill="#16161F"></polygon>
+<polygon points="373,405 388,420 388,530 354,565 354,688 337,707 282,707" fill="#16161F"></polygon>
+<polygon points="595,270 706,380 706,1087 595,1207 595,1137 568,1110 568,1027 624,970 624,792 646,771 646,707 627,707 627,514 595,482" fill="rgba(61,194,236,.35)"></polygon>
+<polygon points="706,1008 769,1008 769,1087 706,1087" fill="#16161F"></polygon>
+<polygon points="706,1087 769,1087 769,1150 713,1207 595,1207" fill="#16161F"></polygon>
+</g>
+<polygon points="595,270 807,270 872,335 872,433 774,531 774,793 820,838 820,920 769,970 769,1008 706,1008 706,380" fill="rgba(61,194,236,.8)" stroke="#F5C451" stroke-width="14" stroke-linejoin="round"></polygon>
+<g fill="#ECEBFA" font-family="DM Sans, sans-serif" font-weight="700" font-size="40" text-anchor="middle">
+<text x="1040" y="90">Cave Left</text><text x="1150" y="230">Cave R</text><text x="1050" y="660">Comp L</text><text x="1050" y="1000">Comp R</text><text x="700" y="1310">Learners</text><text x="200" y="1290">Corner</text><text x="170" y="900">Stage 3</text><text x="640" y="150">Upper Back</text><text x="470" y="600">The Pit</text><text x="900" y="620" fill="#FBE3A6">Upper</text><text x="374" y="995" fill="#6D7790" font-size="34">Seating</text><text x="190" y="380" fill="#6D7790" font-size="34">Boards</text>
+</g>
+<g stroke="#0B1622" stroke-width="8" fill="#3DC2EC"><circle cx="740" cy="640" r="40"></circle><circle cx="740" cy="860" r="40"></circle><circle cx="1160" cy="300" r="40"></circle><circle cx="56" cy="1010" r="40"></circle></g>
+<g fill="#08202C" stroke="#08202C" stroke-width="6" stroke-linejoin="round"><path d="M731 660 V620 L757 630 L731 641"></path><path d="M731 880 V840 L757 850 L731 861"></path><path d="M1151 320 V280 L1177 290 L1151 301"></path><path d="M47 1030 V990 L73 1000 L47 1011"></path></g>
+</svg>
+</div>
+
+<section style="position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 16px 18px; border-radius: 24px 24px 0 0; background: #132235; border-top: 1px solid #34506E; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; color: #FBE3A6">Upper <span style="font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: #9DB2C8">· Top rope · anchors 1–53</span></b></div>
+<div style="display: flex; height: 10px; border-radius: 6px; overflow: hidden"><span style="flex: 5; background: #6FD6F6"></span><span style="flex: 1; background: #5B7BF3"></span><span style="flex: 1; background: #6236C9"></span></div>
+<span style="font-size: 13px; color: #C9D6E4">7 climbs this week · 5 sent · hardest 5.10+</span>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px; border-radius: 12px; background: #1B2E45; font-size: 14px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #3DA35D"></span><b>5.10+</b> Green · #9<span style="margin-left: auto; font-size: 12px; color: #9DB2C8">2 tries</span></div>
+<div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px; border-radius: 12px; background: #1B2E45; font-size: 14px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #8150C8"></span><b>5.11−</b> Purple · #22<span style="margin-left: auto; font-size: 12px; color: #9DB2C8">1 try</span></div>
+</div>
+<div style="display: flex; gap: 8px">
+<a href="Main.dc.html" style="flex: 1; height: 48px; border-radius: 14px; background: #4B70F5; color: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; text-decoration: none">Log a climb here</a>
+<button style="height: 48px; padding: 0 14px; border-radius: 14px; border: 1px solid #34506E; background: transparent; font-weight: 600">Wall history</button>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

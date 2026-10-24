@@ -4,6 +4,7 @@
  * The Sheet is the database:
  *   Climbs   — one row per climb you log (sent or fell)
  *   Projects — routes you fell on and want to come back to
+ *   Notes    — each climber's own beta notes on a project (kept per person)
  *   Lists    — climbers, gyms, grades + tag colours, wall areas, hold colours.
  *              Edit these and the app picks them up on its next sync.
  *
@@ -15,10 +16,10 @@ const APP_NAME = 'Climb Buddy';
 // Where the app lives. Used to build the one-tap phone link in the menu.
 const APP_SITE = 'https://climbbuddy.pages.dev/';
 
-const TYPES = ['Bouldering', 'Top rope', 'Auto belay'];
+const TYPES = ['Bouldering', 'Top rope', 'Auto belay', 'Kilter Board'];
 const RESULTS = ['Sent', 'Rested', 'Fell'];
 const STATUSES = ['Open', 'Sent', 'Reset'];
-const LIST_NAMES = ['Climber', 'Gym', 'Boulder grade', 'Rope grade', 'Boulder area', 'Rope area', 'Auto belay area', 'Anchors', 'Hold colour'];
+const LIST_NAMES = ['Climber', 'Gym', 'Boulder grade', 'Rope grade', 'Boulder area', 'Rope area', 'Auto belay area', 'Anchors', 'Hold colour', 'Kilter grade'];
 
 // [field, header label, type, column width]. `key` is the field a row must have to count.
 const SCHEMA = {
@@ -39,12 +40,16 @@ const SCHEMA = {
       ['rests', 'Rests', 'num', 55],
       ['note', 'Note', 'text', 240],
       ['project', 'Project ID', 'text', 95],
+      ['video', 'Video links', 'text', 220],   // Google Photos share links, one per line
+      ['angle', 'Angle', 'num', 60],           // Kilter Board angle in degrees
+      ['problem', 'Problem name', 'text', 150], // Kilter Board problem
     ],
   },
   projects: {
     sheet: 'Projects', key: 'grade',
     cols: [
       ['id', 'ID', 'id', 95],
+      ['name', 'Name', 'text', 130],
       ['type', 'Type', 'type', 95],
       ['grade', 'Grade', 'text', 65],
       ['hold', 'Hold colour', 'text', 95],
@@ -56,6 +61,16 @@ const SCHEMA = {
       ['sentBy', 'Sent by', 'list', 130],
       ['added', 'Added', 'date', 110],
       ['updated', 'Updated', 'date', 110],
+    ],
+  },
+  notes: {
+    sheet: 'Notes', key: 'note',
+    cols: [
+      ['id', 'ID', 'id', 80],
+      ['project', 'Project ID', 'text', 95],
+      ['climber', 'Climber', 'text', 95],
+      ['when', 'When', 'datetime', 150],
+      ['note', 'Note', 'text', 320],
     ],
   },
   lists: {
@@ -237,7 +252,13 @@ function applyOp_(op) {
   if (!sch) throw new Error('Unknown list "' + op.coll + '".');
   const ss = ss_();
   const sh = ss.getSheetByName(sch.sheet) || buildTab_(ss, sch);
-  const t = table_(sh, sch);
+  let t = table_(sh, sch);
+  // A field the sheet has no column for yet (added in a newer version) gets its header now
+  const missing = sch.cols.filter(function (c) { return op.data && c[0] in op.data && t.cols[c[0]] == null; });
+  if (missing.length) {
+    missing.forEach(function (c) { sh.getRange(1, sh.getLastColumn() + 1).setValue(c[1]).setFontWeight('bold'); });
+    t = table_(sh, sch);
+  }
   const row = op.id ? t.rowOf[op.id] : null;
 
   if (op.op === 'del') {
@@ -297,6 +318,7 @@ function setup() {
   });
 
   seedLists_(ss);
+  addKilterGrades_(ss);
   paintAllSwatches_(ss);
 
   let key = props.getProperty('APP_KEY');
@@ -456,6 +478,19 @@ function paintAllSwatches_(ss) {
   if (t.cols.colour == null) return;
   const vals = sh.getRange(2, t.cols.colour + 1, sh.getLastRow() - 1, 1).getValues();
   vals.forEach(function (v, i) { paintSwatch_(sh, i + 2, t.cols, v[0]); });
+}
+
+// Kilter Board grades V0–V16. Added once, also to a sheet that already has its own lists.
+function addKilterGrades_(ss) {
+  const sh = ss.getSheetByName(SCHEMA.lists.sheet);
+  const t = table_(sh, SCHEMA.lists);
+  if (sh.getLastRow() >= 2 && t.cols.list != null) {
+    const names = sh.getRange(2, t.cols.list + 1, sh.getLastRow() - 1, 1).getValues();
+    if (names.some(function (r) { return String(r[0]).trim() === 'Kilter grade'; })) return;
+  }
+  for (let v = 0; v <= 16; v++) {
+    applyOp_({ op: 'add', coll: 'lists', id: newId_(), data: { list: 'Kilter grade', value: 'V' + v, colour: '', gym: '' } });
+  }
 }
 
 function seedLists_(ss) {

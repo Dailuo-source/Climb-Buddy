@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Log or edit a climb</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1622}
+a{color:#3DC2EC}a:hover{color:#8FE0F7}
+button,a{font:inherit;cursor:pointer;transition:transform .12s ease,filter .12s ease}
+button{color:inherit}
+button:active,a:active{transform:scale(.95);filter:brightness(1.25)}
+input{font:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 1060px; position: relative; overflow: hidden; background: #05090F; color: #ECEBFA; font-family: 'DM Sans', system-ui, sans-serif; font-size: 15px">
+<div style="padding: 22px 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #3A4A5C">Climb Buddy</div>
+
+<section role="dialog" aria-label="Log a climb" style="position: absolute; left: 0; right: 0; bottom: 0; top: 70px; border-radius: 26px 26px 0 0; background: #132235; border-top: 1px solid #34506E; padding: 10px 16px 16px; display: flex; flex-direction: column; gap: 14px">
+<span style="align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #34506E"></span>
+<div style="display: flex; align-items: flex-start; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px">Log a climb</h2><span style="font-size: 13px; color: #9DB2C8">Today · Gary · same screen opens to edit one</span></div>
+<a href="Main.dc.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 14px; background: #1B2E45; color: #ECEBFA; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; text-decoration: none">×</a>
+</div>
+
+<!-- category -->
+<div role="group" aria-label="What you climbed" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<button style="height: 72px; border-radius: 16px; border: 2px solid #20364F; background: #1B2E45; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 600; color: #9DB2C8"><svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><path d="M4 25C3 17 8 9 15 8C22 7 28 13 28 20C28 25 25 27 20 27H9C6 27 4 27 4 25Z" fill="#fff" stroke="#1E2235" stroke-width="1.6" stroke-linejoin="round"></path><circle cx="10" cy="14" r="1.8" fill="#FFC98A" stroke="#1E2235" stroke-width="1"></circle><circle cx="12" cy="19" r="1.4" fill="#1E2235"></circle><circle cx="20" cy="19" r="1.4" fill="#1E2235"></circle><ellipse cx="9.8" cy="22" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><ellipse cx="22.2" cy="22" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><path d="M14.8 21.6 Q16 22.8 17.2 21.6" fill="none" stroke="#1E2235" stroke-width="1.2" stroke-linecap="round"></path></svg>Boulder</button>
+<button aria-pressed="true" style="height: 72px; border-radius: 16px; border: 2px solid #3DC2EC; background: #0F3346; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 700; color: #ECEBFA; box-shadow: 0 0 12px rgba(61,194,236,.35)"><svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><path d="M16 1V10" stroke="#1E2235" stroke-width="4" stroke-linecap="round"></path><path d="M16 1V10" stroke="#3DC2EC" stroke-width="2" stroke-linecap="round"></path><ellipse cx="16" cy="19" rx="10" ry="9" fill="#fff" stroke="#1E2235" stroke-width="1.6"></ellipse><circle cx="12" cy="18" r="1.4" fill="#1E2235"></circle><circle cx="20" cy="18" r="1.4" fill="#1E2235"></circle><ellipse cx="9.8" cy="21" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><ellipse cx="22.2" cy="21" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><path d="M14.8 20.6 Q16 21.8 17.2 20.6" fill="none" stroke="#1E2235" stroke-width="1.2" stroke-linecap="round"></path></svg>Top rope</button>
+<button style="height: 72px; border-radius: 16px; border: 2px solid #20364F; background: #1B2E45; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 600; color: #9DB2C8"><svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><rect x="14" y="23" width="4" height="8" rx="1.5" fill="#C4B8F5" stroke="#1E2235" stroke-width="1.3"></rect><rect x="5" y="4" width="22" height="20" rx="7" fill="#fff" stroke="#1E2235" stroke-width="1.6"></rect><circle cx="16" cy="8.5" r="1.6" fill="#C4B8F5" stroke="#1E2235" stroke-width="1"></circle><circle cx="12" cy="15" r="1.4" fill="#1E2235"></circle><circle cx="20" cy="15" r="1.4" fill="#1E2235"></circle><ellipse cx="9.8" cy="18" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><ellipse cx="22.2" cy="18" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><path d="M14.8 17.6 Q16 18.8 17.2 17.6" fill="none" stroke="#1E2235" stroke-width="1.2" stroke-linecap="round"></path></svg>Auto belay</button>
+<button style="height: 72px; border-radius: 16px; border: 2px solid #20364F; background: #1B2E45; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 600; color: #9DB2C8"><svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="5" fill="#fff" stroke="#1E2235" stroke-width="1.6" transform="rotate(-8 16 16)"></rect><circle cx="9" cy="9" r="1.8" fill="#8FE3C8" stroke="#1E2235" stroke-width="1"></circle><circle cx="23" cy="8" r="1.8" fill="#F27BA0" stroke="#1E2235" stroke-width="1"></circle><circle cx="9.5" cy="23.5" r="1.8" fill="#A9C8F2" stroke="#1E2235" stroke-width="1"></circle><circle cx="23.5" cy="23" r="1.8" fill="#FFC98A" stroke="#1E2235" stroke-width="1"></circle><circle cx="12" cy="15" r="1.4" fill="#1E2235"></circle><circle cx="20" cy="15" r="1.4" fill="#1E2235"></circle><ellipse cx="9.8" cy="18" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><ellipse cx="22.2" cy="18" rx="1.6" ry="1" fill="#F4A6B5"></ellipse><path d="M14.8 17.6 Q16 18.8 17.2 17.6" fill="none" stroke="#1E2235" stroke-width="1.2" stroke-linecap="round"></path></svg>Kilter</button>
+</div>
+
+<!-- result: the chosen one is solid with a tick badge, the others fade back -->
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div role="group" aria-label="Result" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<button aria-pressed="true" style="position: relative; height: 58px; border-radius: 16px; border: 3px solid #ECEBFA; background: #3DC2EC; color: #08202C; font-size: 17px; font-weight: 800; box-shadow: 0 0 16px rgba(61,194,236,.55); display: inline-flex; align-items: center; justify-content: center; gap: 6px"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#fff" stroke="#1E2235" stroke-width="1.6"></circle><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#1FA3CF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>Sent<span style="position: absolute; top: -9px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: #ECEBFA; color: #08202C; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid #132235">✓</span></button>
+<button aria-pressed="false" style="height: 58px; border-radius: 16px; border: 1px solid #34506E; background: transparent; color: #7D8FA6; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; opacity: .7"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#2A2260" stroke="#8C7CF0" stroke-width="1.6"></circle><path d="M9.5 8.5v7M14.5 8.5v7" stroke="#C9C0FF" stroke-width="3" stroke-linecap="round"></path></svg>Rested</button>
+<button aria-pressed="false" style="height: 58px; border-radius: 16px; border: 1px solid #34506E; background: transparent; color: #7D8FA6; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; opacity: .7"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#CDBFFB" stroke="#1E2235" stroke-width="1.6"></circle><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#5B3FC4" stroke-width="3" stroke-linecap="round"></path></svg>Fell</button>
+</div>
+<span style="font-size: 12px; color: #9DB2C8">Rested only appears for Top rope. Boulder, Auto belay and Kilter show Sent and Fell.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #9DB2C8">Grade</span>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<button style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #34506E; background: transparent; color: #9DB2C8; font-weight: 600">5.9</button>
+<button style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #34506E; background: transparent; color: #9DB2C8; font-weight: 600">5.10−</button>
+<button aria-pressed="true" style="flex: 1; height: 44px; border-radius: 12px; border: 2px solid #ECEBFA; background: #4C3BCF; color: #fff; font-weight: 800">5.10+</button>
+<button style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #34506E; background: transparent; color: #9DB2C8; font-weight: 600">5.11−</button>
+<button style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #34506E; background: transparent; color: #9DB2C8; font-weight: 600">5.11+</button>
+<button style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #34506E; background: transparent; color: #9DB2C8; font-weight: 600">5.12−</button>
+<button style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #34506E; background: transparent; color: #9DB2C8; font-weight: 600">5.12+</button>
+</div>
+</div>
+
+<div style="display: flex; gap: 12px; align-items: stretch">
+<svg viewBox="0 0 1227 1402" width="88" height="100" role="img" aria-label="Mini map with Upper anchor 14 marked">
+<rect width="1227" height="1402" rx="60" fill="#000"></rect>
+<g fill="#16161F" stroke="#5E5E78" stroke-width="10"><polygon points="852,18 1213,18 1032,198"></polygon><polygon points="1032,198 1213,18 1213,380"></polygon><polygon points="1155,829 1155,868 1104,917 1104,1010 1134,1040 1134,1207 1213,1207 1213,829"></polygon><polygon points="1213,488 1170,488 1104,553 1104,630 1134,660 1134,772 1155,793 1155,829 1213,829"></polygon><polygon points="595,270 706,380 706,1087 595,1207 595,1137 568,1110 568,1027 624,970 624,792 646,771 646,707 627,707 627,514 595,482"></polygon><polygon points="322,1332 518,1332 550,1365 1030,1365 1030,1395 322,1395"></polygon><polygon points="12,732 98,732 98,815 125,815 125,957 98,957 98,1082 12,1082"></polygon><polygon points="12,1082 98,1082 98,1307 12,1395"></polygon></g>
+<polygon points="595,270 807,270 872,335 872,433 774,531 774,793 820,838 820,920 769,970 769,1008 706,1008 706,380" fill="rgba(245,196,81,.35)" stroke="#F5C451" stroke-width="18"></polygon>
+<circle cx="800" cy="860" r="60" fill="#3DC2EC" stroke="#000" stroke-width="14"></circle>
+</svg>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9DB2C8">Wall<button style="height: 44px; border-radius: 12px; border: 1px solid #34506E; background: #1B2E45; text-align: left; padding: 0 12px; font-weight: 600; color: #ECEBFA">Upper ▾</button></label>
+<label style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: #9DB2C8">Anchor #<input value="14" inputmode="numeric" style="width: 80px; height: 40px; box-sizing: border-box; border-radius: 12px; border: 1px solid #34506E; background: #1B2E45; color: #ECEBFA; text-align: center; font-weight: 700"></label>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #9DB2C8">Hold colour</span>
+<div style="display: flex; gap: 8px">
+<button aria-label="Yellow" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #34506E; background: #F5D02E"></button>
+<button aria-label="Pink" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #34506E; background: #EE7FB0"></button>
+<button aria-label="Blue, selected" aria-pressed="true" style="width: 38px; height: 38px; border-radius: 50%; border: 3px solid #ECEBFA; background: #2F6FD6; box-shadow: 0 0 0 3px #3DC2EC"></button>
+<button aria-label="Green" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #34506E; background: #3DA35D"></button>
+<button aria-label="Orange" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #34506E; background: #F08A24"></button>
+<button aria-label="Red" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #34506E; background: #D83A34"></button>
+<button aria-label="Black" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #5E5E78; background: #22262A"></button>
+</div>
+</div>
+
+<div style="display: flex; gap: 10px">
+<div style="flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 6px; border-radius: 14px; background: #1B2E45">
+<button aria-label="Fewer tries" style="width: 40px; height: 40px; border-radius: 10px; border: 0; background: #20364F; font-size: 18px">−</button>
+<span style="display: flex; flex-direction: column; align-items: center; line-height: 1.1"><b style="font-size: 18px">3</b><span style="font-size: 11px; color: #9DB2C8">tries</span></span>
+<button aria-label="More tries" style="width: 40px; height: 40px; border-radius: 10px; border: 0; background: #20364F; font-size: 18px">+</button>
+</div>
+<div role="group" aria-label="Who climbed it" style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 14px; background: #1B2E45">
+<button aria-pressed="true" style="border: 0; border-radius: 10px; background: #0F3346; box-shadow: inset 0 0 0 2px #3DC2EC; font-weight: 700; color: #8FE0F7">Gary</button>
+<button style="border: 0; border-radius: 10px; background: transparent; font-weight: 600; color: #9DB2C8">Cecilia</button>
+</div>
+</div>
+
+<!-- photo / video for this try -->
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #9DB2C8">Video of this try · Google Photos link</span>
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 14px; background: #1B2E45; border: 1px solid #34506E">
+<a href="#" aria-label="Open video in Google Photos" style="width: 56px; height: 48px; border-radius: 12px; background: #0A1420; display: inline-flex; align-items: center; justify-content: center; text-decoration: none"><span style="width: 30px; height: 30px; border-radius: 50%; background: rgba(236,235,250,.9); display: inline-flex; align-items: center; justify-content: center"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5.5 3.5v9l7-4.5z" fill="#0B1622"></path></svg></span></a>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3"><b style="font-size: 14px">Open in Google Photos</b><span style="font-size: 12px; color: #9DB2C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">photos.app.goo.gl/…</span></span>
+<button aria-label="Remove link" style="width: 40px; height: 40px; border-radius: 10px; border: 0; background: #20364F; font-size: 18px">×</button>
+</div>
+<button style="height: 44px; border-radius: 14px; border: 2px dashed #34506E; background: transparent; color: #9DB2C8; font-weight: 600">+ Paste another link</button>
+<span style="font-size: 12px; color: #9DB2C8">Or in Google Photos tap Share → Climb Buddy and pick the try.</span>
+</div>
+
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: #0F3346; border: 1px solid #2B7A96">
+<span style="width: 28px; height: 28px; border-radius: 50%; background: #3DC2EC; display: inline-flex; align-items: center; justify-content: center"><svg viewBox="0 0 10 10" width="12" height="12" aria-hidden="true"><path d="M3 9V1l5 2-5 2" fill="#08202C" stroke="#08202C" stroke-linejoin="round"></path></svg></span>
+<span style="flex: 1; font-size: 13px; line-height: 1.3"><b>Blue 5.10+ project</b><br><span style="color: #9DB2C8">This send closes it for you</span></span>
+<button style="height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid #2B7A96; background: transparent; color: #8FE0F7; font-size: 13px; font-weight: 600">Change</button>
+</div>
+
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9DB2C8">Note<input value="Finally stuck the heel hook at clip 3" style="height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #34506E; background: #1B2E45; color: #ECEBFA"></label>
+
+<div style="margin-top: auto; display: flex; gap: 10px">
+<button style="height: 50px; padding: 0 16px; border-radius: 14px; border: 1px solid #8A3F38; background: transparent; color: #FF8A66; font-weight: 700">Delete</button>
+<a href="Main.dc.html" style="flex: 1; height: 50px; border-radius: 14px; background: #4B70F5; color: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; text-decoration: none">Save</a>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1060}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

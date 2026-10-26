@@ -43,13 +43,13 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a cate
 - Charts separate sent / rested / fell by lightness (colour-blind safe): sent mid (Gary #2A9FD0, Cecilia #D9609A, `CHART_SENT` / `--chart-sent`), rested deep violet #5B45D6, fell light #CDBFFB (`RES_DARK`, `--rest-bar`, `--fell-bar`).
 - Map in dark: black floor, palette outlines with faint fills (`MAP_DARK`), tapped wall gold, anchor pin cyan.
 - Press feedback: `TAP_SEL` dips while held (`.tapping`), then a cyan ring (`.tapped`); `replayTap()` at the end of `render`/`renderSheet`.
-- **Back button** (`armBack`, `popstate`): a spare `{cbTrap:1}` entry keeps Back in the app; closes a panel (an unsaved new climb is dropped), then goes to Climb, then "Press Back again to close" (2.5 s). Chrome skips entries added without a tap, so the trap is re-added on every `pointerdown`.
+- **Back button** (`popstate`, `reconcileBack`, `navDepth`, `backTokens`): each Back goes up one level (closes a panel, project page → Projects, any tab → Climb, then "Press Back again to close" and the next Back leaves). History entries are only Back tokens `{cbTrap:n}`; the app keeps one more token than levels deep. **Chrome skips entries added without a tap** (that skipped page made Back jump to an older load of the app), so a token is only added in a click/keydown listener (one per tap, checked with `navigator.userActivation`), never from `popstate` or `boot`; extra tokens left when something closes in code are dropped with `history.go` (`dropPops` ignores that pop).
 - Sync: optimistic, batched ops, 60 s polling. Forms in open panels are never redrawn by background sync.
 - Icon: kawaii coral chalk bag on sky blue. Keep the maskable icon out of the manifest and `sw.js`.
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v26`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v27`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome: sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Sheet edits via the Google Sheets connector are fine; insert rows in Lists rather than rewriting blocks (colour cells are painted).
 - Commits use author `Claude <noreply@anthropic.com>`. Push to `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -82,7 +82,7 @@ Inside the `index.html` script, search for:
 - Projects: `renderProjects`, `projCard`, `renderProject`, `projLog`, `myNotes`, `projInfo`, `triedBy`, `openFor`, `markProjectSent`, `editProject`, `projSheet`, `saveProject`
 - Map: `HUB_MAP`, `marksSVG`, `projMap`, `progressMap`, `anchorRanges`, `areaForAnchor`, `anchorPoint`, `mapSVG`, `miniMap`, `renderMap`, `mapLand`, `mapPeriod`, `mapStep`, `setMapPer`, `zonePanel`, `FLAG_SVG`
 - Progress: `renderProgress`, `gradeCounts`
-- Back button: `armBack`, `trapped`, `exitArmed`
+- Back button: `reconcileBack`, `navDepth`, `backTokens`, `dropPops`
 - Share: `readShare`, `showShare`, `shareSheet`, `attachShare`, `recentClimbs`
 - Panels: `openSheet`, `renderSheet`, `newClimb`, `editClimb`, `climbSheet`, `readForm`, `setField`, `linkProject`, `saveClimb`, `undoSave`, `projSheet`, `daySheet`, `gymSheet`, `areaField`, `holdField`
 - Tap feedback: `TAP_SEL`, `tapKey`, `replayTap`, `scrollsSideways`
@@ -98,11 +98,11 @@ The October 2026 redesign is finished; the rules above describe it. The approved
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-26: Phone Back fixed: no more jumping out to an older load of the app (Back tokens are only added on a tap)
 - 2026-10-26: Maps on every tab: Climb map shows the day's climbs with counts (no flags); Projects map with grade tags where each project is; Progress map of sends, hardest per wall and new bests
 - 2026-10-26: Redesign stage 6: Share → Climb Buddy from Google Photos adds the video link to a climb (or a new one); brief tidied, redesign done
 - 2026-10-26: Redesign stage 5: Projects list cards, + New, a page per project (quick log, beta notes per person, every try), Edit project panel with status
 - 2026-10-26: Anchors split per Gary (Small Wall 71–74, 88–91; rest Pit, also in Lists); overhead bridge drawn dashed, not a wall; anchor ranges no longer printed on the map
-- 2026-10-25: Map redrawn from Gary's new floor plan: Kilter Board box, Training, reshaped Pit and small wall with the bar, anchors placed where he drew them
 
 ## Working efficiently
 - Find code with search first, then read only the relevant lines. Don't read index.html top to bottom.

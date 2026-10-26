@@ -1711,27 +1711,33 @@ function replayTap(){
 }
 
 /* ---------- phone Back button ----------
-   Keeps one spare history entry (the "trap") on top of the page so Android's Back lands here instead of closing the app.
-   Back closes an open panel, then returns to the Session tab, then asks for a second Back before closing.
-   Chrome ignores entries added without a tap, so the trap is also re-added on the next touch. */
-let exitArmed=0;
-const trapped=()=>!!(history.state&&history.state.cbTrap);
-function armBack(){if(!trapped())try{history.pushState({cbTrap:1},"");}catch(e){}}
+   Each Back goes up one level: closes a panel, then a project page → Projects, then any tab → Climb,
+   then "Press Back again to close". History entries are only Back tokens ({cbTrap:n}); we want one more
+   token than levels deep (navDepth). Chrome skips entries added without a tap, so a token is only ever
+   added right after a tap (one per tap, which is all a tap needs), and never from the Back handler itself.
+   Tokens left over when a panel closes in code (Save, ‹ Climb) are dropped with history.go. */
+let dropPops=0;
+const navDepth=()=>(tab==="session"?0:tab==="proj"?2:1)+(sheet?1:0);
+const backTokens=()=>((history.state&&history.state.cbTrap)|0);
+function reconcileBack(){
+  const want=navDepth()+1,have=backTokens();
+  if(have>want){dropPops++;history.go(want-have);return;}
+  const ua=navigator.userActivation;
+  if(have<want&&(!ua||ua.isActive))try{history.pushState({cbTrap:have+1},"");}catch(e){}
+}
 window.addEventListener("popstate",()=>{
-  if(trapped())return;
-  if(sheet){closeSheet();armBack();return;}
-  if(tab==="proj"){setTab("projects");armBack();return;}
-  if(tab!=="session"){setTab("session");armBack();return;}
-  if(Date.now()-exitArmed<2500)return;
-  exitArmed=Date.now();toast("Press Back again to close Climb Buddy");
-  setTimeout(()=>{if(Date.now()-exitArmed>=2500)armBack();},2600);
+  if(dropPops){dropPops--;return;}
+  if(sheet){closeSheet();return;}
+  if(tab==="proj"){setTab("projects");return;}
+  if(tab!=="session"){setTab("session");return;}
+  toast("Press Back again to close Climb Buddy");
 });
-document.addEventListener("pointerdown",()=>{exitArmed=0;armBack();},true);
+document.addEventListener("click",()=>setTimeout(reconcileBack,0),true);
+document.addEventListener("keydown",()=>setTimeout(reconcileBack,0),true);
 
 async function boot(){
   readLinkParams();
   readShare();
-  armBack();
   if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
   if(!API||!KEY)auth="need";
   render();

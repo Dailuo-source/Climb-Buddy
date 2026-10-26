@@ -857,7 +857,7 @@ const HUB_MAP={
     {id:"aUB",area:"Upper Back",type:"Auto belay",pts:"362,18 478,18 478,67 362,67",lbl:[420,100],pin:[420,43],lines:["Auto belay","Upper Back"],fs:22},
     {id:"rUB",area:"Upper Back",type:"Top rope",pts:"478,18 807,18 807,64 775,97 720,97 690,68 582,68 540,107 503,107 492,67 478,67",lbl:[640,140],pin:[640,42],lines:["Upper Back"],fs:26},
     {id:"aUL",area:"Upper Learners",type:"Auto belay",pts:"282,271 346,271 346,524 322,548 322,668 282,706 282,529 299,513 299,420 282,404",lbl:[200,470],pin:[314,330],lines:["Auto belay","Upper","Learners"],fs:22},
-    {id:"rPS",area:"Pit Small Wall",type:"Top rope",pts:"346,271 374,271 374,404 388,420 388,477 595,477 627,515 627,608 558,530 388,530 355,564 355,690 338,706 282,706 322,668 322,548 346,524",lbl:[455,600],pin:[338,610],lines:["Pit","Small Wall"],fs:24},
+    {id:"rPS",area:"Pit Small Wall",type:"Top rope",pts:"346,271 374,271 374,404 388,420 388,530 355,564 355,690 338,706 282,706 322,668 322,548 346,524",lbl:[455,600],pin:[338,610],lines:["Pit","Small Wall"],fs:24},
     {id:"rPit",area:"Pit",type:"Top rope",pts:"595,271 595,477 627,515 627,668 613,709 621,751 613,837 613,908 623,967 593,1029 593,1108 609,1135 609,1206 705,1087 705,380",lbl:[530,780],pin:[660,620],lines:["The Pit"]},
     {id:"rUp",area:"Upper",type:"Top rope",pts:"595,270 807,270 872,335 872,433 774,531 774,793 820,838 820,920 769,970 769,1008 706,1008 706,380",lbl:[790,400],pin:[740,640],lines:["Upper"]},
     {id:"aUE",area:"Upper Entrance",type:"Auto belay",pts:"706,1008 769,1008 769,1087 706,1087",lbl:[860,1035],pin:[737,1047],lines:["Auto belay","Upper Entrance"],fs:22},
@@ -867,15 +867,17 @@ const HUB_MAP={
   /* Anchor numbers as drawn on Gary's floor plan (Oct 25). Each run follows a wall face: [anchor #, x, y],
      with null for corners in between. Numbers between two drawn ones are spread along the wall.
      Labels sit on the left-hand side of the direction of travel (side:-1 = right-hand side).
-     Speed climb is 71-74. 106 to 107 crosses the gap with no anchors. */
+     Speed climb is 71-74. 75-82 and 92-98 hang on the overhead bridge (not a wall; counted as Pit).
+     106 to 107 crosses the gap with no anchors. */
   anchorRuns:[
     {side:-1,pts:[[71,374,278],[74,374,397],[null,374,404],[75,388,425],[null,388,477],[77,424,477],[78,487,477],[81,552,477],[82,585,477],[null,595,477],[87,595,278]]},
     {pts:[[88,355,690],[null,355,564],[91,372,547],[null,388,530],[95,549,530],[null,558,530],[98,627,608],[null,627,668],[null,613,709],[102,621,751],[null,613,837],[null,613,908],[null,623,967],[106,606,1002],[null,593,1029],[107,593,1111],[null,609,1135],[109,609,1198]]},
     {pts:[[1,617,1197],[null,705,1087],[null,705,380],[43,602,277]]}
   ],
   /* Which wall an anchor number belongs to when the Lists tab doesn't say */
-  anchorAreas:[{area:"Upper",lo:1,hi:43},{area:"Pit Small Wall",lo:71,hi:82},{area:"Pit",lo:83,hi:109}],
+  anchorAreas:[{area:"Upper",lo:1,hi:43},{area:"Pit Small Wall",lo:71,hi:74},{area:"Pit",lo:75,hi:87},{area:"Pit Small Wall",lo:88,hi:91},{area:"Pit",lo:92,hi:109}],
   features:[
+    {name:"Bridge",pts:"388,477 595,477 627,515 627,608 558,530 388,530",dash:true,lbl:[490,503],lines:["Bridge (overhead)"],fs:18},
     {name:"Training",pts:"12,132 100,132 100,671 12,671",lbl:[56,400],lines:["Training"],rot:true},
     {name:"Stadium seating",pts:"285,775 463,775 463,1203 285,1203",lbl:[374,990],lines:["Stadium","seating"]},
     {name:"Speed climb",lbl:[440,322],lines:["Speed climb","#71–74"],fs:20}
@@ -954,7 +956,7 @@ function mapSVG(o){
   };
   let s=`<svg viewBox="${vb.join(" ")}" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans, system-ui, sans-serif" role="group" aria-label="Map of ${esc(M.gym)}">`;
   s+=`<rect x="12" y="18" width="1201" height="1377" fill="${MAPC.floor}"/>`;
-  for(const f of M.features)if(f.pts)s+=`<polygon points="${f.pts}" fill="${MAPC.feat}" stroke="${MAPC.featEdge}" stroke-width="5" stroke-linejoin="round"/>`;
+  for(const f of M.features)if(f.pts)s+=`<polygon points="${f.pts}" fill="${f.dash?"none":MAPC.feat}" stroke="${MAPC.featEdge}" stroke-width="5" stroke-linejoin="round"${f.dash?' stroke-dasharray="14 10"':""}/>`;
   for(const z of M.zones){
     const active=!o.type||z.type===o.type;
     const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
@@ -969,7 +971,7 @@ function mapSVG(o){
   for(const z of M.zones){
     const active=!o.type||z.type===o.type;
     const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
-    const anchors=z.type!=="Bouldering"&&!o.type?anchorText(z.area):"";
+    const anchors="";
     s+=label(Object.assign({},z,{anchors:anchors?"#"+anchors:""}),sel,!active);
   }}
   if(o.dots)for(const z of M.zones){

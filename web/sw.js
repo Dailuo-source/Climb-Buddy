@@ -1,7 +1,7 @@
 // Climb Buddy service worker: makes the app installable and lets it open at the gym with bad signal.
 // Your climbs always live in your Google Sheet; only the app's own files are cached here.
 // Bump the version when you change files so phones pick up the update.
-const CACHE = 'climb-buddy-v24';
+const CACHE = 'climb-buddy-v25';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './favicon-64.png'];
 
 self.addEventListener('install', (e) => {
@@ -22,8 +22,8 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request, { cache: 'no-cache' })
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        // a shared link arrives as ?url=… on the start page; only the plain files are kept
+        if (!url.search) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
         return res;
       })
       .catch(() => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match('./index.html')))

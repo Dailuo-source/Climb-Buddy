@@ -448,6 +448,15 @@ legend{padding:0}
 .pfoot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .ccat.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .rbtn.st[aria-pressed="true"]{background:var(--me);color:var(--me-ink)}
+.shlist{display:flex;flex-direction:column;gap:6px}
+.shrow{display:block;position:relative;cursor:pointer}
+.shrow input{position:absolute;opacity:0;pointer-events:none}
+.shrow>span{display:flex;align-items:center;gap:8px;min-height:52px;padding:6px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line2)}
+.shrow .ricon{width:26px;height:26px;flex:none}.shrow .cicon{width:24px;height:24px;flex:none}
+.shrow .w{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shrow small{font-size:11px;color:var(--muted);white-space:nowrap}
+.shrow input:checked+span{border:2px solid #fff;background:var(--me-soft)}
+.shrow input:focus-visible+span{outline:2px solid var(--me)}
 </style>
 </head>
 <body>
@@ -619,7 +628,7 @@ async function flush(){
     S=normalize(res.state);queue.forEach(applyLocal);
     settleDefaults();
     const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
-    if(first)render();else onData();
+    if(first){render();showShare();}else onData();
     if(queue.length){clearTimeout(flushT);flushT=setTimeout(flush,350);}
     return;
   }
@@ -1233,6 +1242,7 @@ function renderSheet(){
   if(sheet.type==="climb"){if(sheet.id&&!S.climbs.some(x=>x.id===sheet.id)){closeSheet();return;}b.innerHTML=climbSheet();}
   else if(sheet.type==="project"){if(sheet.id&&!S.projects.some(x=>x.id===sheet.id)){closeSheet();return;}b.innerHTML=projSheet();}
   else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
+  else if(sheet.type==="share")b.innerHTML=shareSheet();
   else if(sheet.type==="gym")b.innerHTML=gymSheet();
   replayTap();
 }
@@ -1413,6 +1423,42 @@ function saveProject(){
     toast("Project added",[{label:"Undo",fn:()=>{store.del("projects",id);if(tab==="proj")setTab("projects");}}]);
   }
 }
+/* Share → Climb Buddy: Google Photos shares a link (manifest share_target, GET ?title&text&url).
+   The app opens, waits for the sheet, then asks which climb gets the video (latest of the picked person first). */
+let shared=null;
+function readShare(){
+  try{
+    const q=new URLSearchParams(location.search);
+    if(!q.has("url")&&!q.has("text")&&!q.has("title"))return;
+    const m=[q.get("url"),q.get("text"),q.get("title")].filter(Boolean).join(" ").match(/https?:\/\/[^\s"'<>]+/i);
+    history.replaceState(null,"",location.pathname);
+    if(m)shared=m[0].replace(/[).,\]]+$/,"");
+  }catch(e){}
+}
+const recentClimbs=()=>S.climbs.filter(atGym).sort((a,b)=>b.when-a.when).slice(0,12);
+function showShare(){
+  if(!shared||!ready||auth!=="ok")return;
+  const url=shared,list=recentClimbs();shared=null;
+  const pick=(list.find(c=>c.climber===WHO)||list[0]||{}).id||"";
+  openSheet({type:"share",url,pick});
+}
+function shareSheet(){
+  const list=recentClimbs();
+  return head("Add this video",esc(sheet.url.replace(/^https?:\/\//,"").slice(0,42))+(sheet.url.length>50?"…":""))+`
+  <form id="shareForm" autocomplete="off">
+    ${list.length?`<fieldset><legend class="flabel">Which climb is it?</legend><div class="shlist">${list.map(c=>{const v=videoLinks(c).length;
+      return`<label class="shrow"><input type="radio" name="sc" value="${c.id}" ${c.id===sheet.pick?"checked":""}><span>${resIcon(c.result)}${catIcon(c.type)}${tagHTML(c.type,c.grade,"sm")}<span class="w">${esc([c.climber,relDay(dayKey(c.when)),c.type==="Kilter Board"?"Kilter":c.area||""].filter(Boolean).join(" · "))}</span>${v?`<small>${v} ${v===1?"video":"videos"}</small>`:""}</span></label>`;}).join("")}</div></fieldset>`
+      :`<p class="hint">No climbs logged at ${esc(GYM)} yet.</p>`}
+    <div class="foot"><button type="button" class="btn" data-act="shareNew">Log a new climb</button>${list.length?`<button type="submit" class="btn primary">Add to this climb</button>`:""}</div>
+  </form>`;
+}
+function attachShare(form){
+  const id=new FormData(form).get("sc"),c=id&&S.climbs.find(x=>x.id===id);if(!c)return;
+  const url=sheet.url,old=String(c.video||""),vids=videoLinks(c);
+  if(!vids.includes(url))store.update("climbs",c.id,{video:[...vids,url].join("\n")});
+  closeSheet();toast(`Video added to ${c.climber}'s ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.update("climbs",c.id,{video:old})}]);
+}
+
 function daySheet(k){
   const list=dayClimbs(k).sort((a,b)=>a.when-b.when);
   const cs=[...new Set(list.map(c=>c.climber))];
@@ -1472,6 +1518,7 @@ document.addEventListener("click",e=>{
     case"editProj":if(P)editProject(P);break;
     case"newProj":editProject(null);break;
     case"openProj":if(P){projId=P.id;LS.set("projid",projId);if(sheet)closeSheet();setTab("proj");}break;
+    case"shareNew":if(sheet&&sheet.type==="share"){const url=sheet.url;closeSheet();newClimb(TYPE,"");sheet.d.videos=[url];renderSheet();}break;
     case"pjf":if(sheet&&sheet.d){readProjForm();setProjField(t.dataset.f,t.dataset.v);renderSheet();}break;
     case"projLog":if(P)projLog(P,t.dataset.v);break;
     case"delNote":{const n=S.notes.find(x=>x.id===id);if(!n)break;const keep=Object.assign({},n);delete keep.id;store.del("notes",id);toast("Note deleted",[{label:"Undo",fn:()=>enqueue({op:"add",coll:"notes",id,data:keep})}]);break;}
@@ -1512,6 +1559,7 @@ document.addEventListener("submit",e=>{
     if(!k)return;API=u.split(/[?#]/)[0];LS.set("api",API);KEY=k;LS.set("key",KEY);auth="ok";ready=false;render();flush();return;}
   if(id==="climbForm")saveClimb();
   if(id==="projForm")saveProject();
+  if(id==="shareForm")attachShare(e.target);
   if(id==="noteForm"){const v=String(new FormData(e.target).get("note")||"").trim();if(!v)return;const inp=e.target.querySelector("input");if(inp)inp.value="";store.add("notes",{project:e.target.dataset.id,climber:WHO,when:Date.now(),note:v});}
   if(id==="gymForm"){const v=$("#gymInput").value.trim();if(!v)return;if(!gyms().some(g=>eqi(g,v)))store.add("lists",{list:"Gym",value:v,colour:"",gym:""});GYM=v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+v);}
 });
@@ -1562,7 +1610,7 @@ document.addEventListener("touchcancel",()=>{if(swipe&&swipe.dir)animateSwitch(n
 
 /* ---------- press feedback ----------
    Most taps redraw the screen, so the ring is replayed on the redrawn copy of the same button. */
-const TAP_SEL="button,.chip,label.pill,label.sw,.zone,.srow,.phead";
+const TAP_SEL="button,.chip,label.pill,label.sw,label.shrow,.zone,.srow,.phead";
 const TAP_KEYS=["act","tab","f","v","id","res","g","z","d","k"];
 let lastTap=null;
 const tapTarget=el=>el.matches("label.pill,label.sw")?el.querySelector("span")||el:el;
@@ -1603,6 +1651,7 @@ document.addEventListener("pointerdown",()=>{exitArmed=0;armBack();},true);
 
 async function boot(){
   readLinkParams();
+  readShare();
   armBack();
   if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
   if(!API||!KEY)auth="need";

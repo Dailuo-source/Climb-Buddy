@@ -6,14 +6,12 @@
 
 Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a category tile and fill in one panel (result, grade, wall, anchor, hold colour, tries, rests, who, video links, note, date); tap any climb to change any of it. Falls become projects; there's a gym map. Samsung Android phones, Chrome PWA.
 
-> **A redesign is in progress.** The approved mockup is in `design/` (six `.dc.html` screens, not published). Follow **Redesign** below, one stage per session. Until a stage is done, the rest of this brief describes the current app.
-
 ## Where things live
 
 | Piece | Location |
 | --- | --- |
 | Live app | https://climbbuddy.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Gary wants pages.dev only; the old workers.dev Worker "climbbuddy" (has his name in the URL) can go |
-| Database | Google Sheet **Climb Buddy**, id `1AmIjYEFQOTm5U4ZjXuo2UK5LXney1yc8b8zvyANcJu4`. Tabs: Climbs, Projects, Lists |
+| Database | Google Sheet **Climb Buddy**, id `1AmIjYEFQOTm5U4ZjXuo2UK5LXney1yc8b8zvyANcJu4`. Tabs: Climbs, Projects, Notes, Lists |
 | Backend | Apps Script bound to the sheet; source is `Code.gs`. Web app version 3 |
 | Connecting a phone | Menu **Climb Buddy → Show app key and phone link** → `https://climbbuddy.pages.dev/#api=<exec>&key=<key>` (stored as `cb.api`, `cb.key`); `APP_SITE` in Code.gs builds it |
 | Setup guide | `SETUP.md` |
@@ -36,6 +34,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a cate
 - **Projects tab** (`renderProjects`): one person (no Both); "<Name>'s projects" + **+ New**; chips All / Boulder / Rope (`PF`, `pfMatch`; Rope = Top rope + Auto belay; never Kilter); `projCard` is a button (hold-colour strip, category icon, grade, name, where, a dot per try in result colours, last beta note, last tried, `CHEV`) that opens the project page; "Sent or reset recently" (tap opens it, Reopen for reset ones).
 - **Project page** (`renderProject`, `tab==="proj"`, `projId` / `cb.projid`; not in the tab bar, Projects stays highlighted; phone Back returns to Projects; no swipe): ‹ Projects, the person, ✎ Edit; hero with hold ball, grade, name, category + where, status pill, mini map with the anchor pin (`act:"noop"`); stats (tries, sessions, rests last time or last tried); quick log Fell / Rested (Top rope only) / Sent it! (`projLog`, for WHO on DAY, Undo); **Beta notes** (`myNotes(p, WHO)`, Notes tab, add inline with `noteForm`, × deletes with Undo; a half-typed note survives sync redraws); **Every try** (this person's climbs on it as `climbRow`, tap to edit); Route was reset / Reopen, Delete project (also removes its notes; climbs stay).
 - **Edit / New project panel** (`editProject(p|null)`, `projSheet`, sheet type `project`, draft in `sheet.d`, `readProjForm` / `setProjField` via `data-act="pjf"`, `saveProject`): name, status (Open / Sent / Route reset; edit only: Sent adds WHO to Sent by, Open again takes them off), category (3, no Kilter), grade chips, mini map + wall + anchor, hold colour; Delete or Cancel / Save with Undo. A new project gets `owner: WHO` and opens its page.
+- **Videos:** links only, nothing uploaded. Climbs keep Google Photos share links (`video`, one per line); rows show a play tile that opens the first. **Share → Climb Buddy**: the manifest's `share_target` (GET `./?title&text&url`) opens the app; `readShare` (in `boot`) pulls the first link out and clears the address; after the first sync `showShare` opens the `share` sheet (`shareSheet`): the 12 latest climbs at this gym, the picked person's latest preselected; **Add to this climb** (`attachShare`, Undo) or **Log a new climb** (new climb panel with the link filled in). `sw.js` doesn't cache addresses with a query.
 - Icons: `catIcon(type)` (Bouldering, Top rope, Auto belay, Kilter Board) and `resIcon(result)` (Sent in `--sent`, Rested deep violet, Fell light purple), SVGs from `design/`. Shown on type buttons, project cards and the day's climb rows.
 - **Map**: `HUB_MAP` (1227×1402); each zone's `area` + `type` must match a Lists value. Traced from Gary's floor plan of 2026-10-25 (image px → map: x·0.945, y·0.946, see the anchor comment). `HUB_MAP.anchorRuns` holds the anchor numbers where Gary drew them, along each wall face; `anchorPoint` finds a number on its run and spreads in-between numbers along the wall (area-agnostic). `anchorAreas` says which wall a number belongs to when Lists has no Anchors row (Upper 1–43; Pit Small Wall 71–74 and 88–91; Pit 75–87 and 92–109; the Lists Anchors rows say the same and win). Speed climb is Pit Small Wall 71–74 (label only). The **bridge** joining the small wall to the Pit is overhead (you walk under it): drawn as a dashed feature, not a wall; its anchors (75–82, 92–98) count as Pit. Anchor numbers are not printed on the map; only a picked anchor shows as a pin in the log panel's mini map. Kilter Board is a zone (`any:true`: every Kilter climb counts there, no anchors or projects); Training is a plain feature. **Full map** (`renderMap`, `tab==="map"`, not in the tab bar; ‹ Climb and phone Back return): one view, no toggle. Walls glow with both climbers' climbs for the period (count chip on each wall), flags mark open projects (`o.flags`, nudged off the count). Opens on Day at the latest session (`mapLand` in `setTab`); Day / Week / Month chips (`cb.mapper`) and ‹ › stepping (`mapPeriod("*")`, `mapStep`): Day steps through session days only, Week is Mon–Sun, Month is calendar. Tapping a wall opens `zonePanel`: sent bar and line for the period, that wall's open projects (tap to edit), **Log a climb here** (`logHere`: picks the wall, back to Climb, opens the picker), **Wall history** (all-time table per person, `wallHist`), This wall was reset.
 - **Always dark** (`isDark()` true, `<html data-dark="1">`). Palette: indigo #402E7A, violet #4C3BCF, blue #4B70F5, cyan #3DC2EC. Background tone shows whose stats: teal-navy Gary (`data-who="green"`), plum Cecilia (`"lav"`), midnight indigo Both; also sets `theme-color`. `--me` is the person's colour (cyan / pink); `--sent` and `--accent` follow it. Fell is light purple #CDBFFB everywhere (`--fell`, dark text `--fell-ink`); no coral left. Light tokens (`THEME_LIGHT`, `RES_LIGHT`, `MAP_LIGHT`) are kept in case light returns.
@@ -48,7 +47,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a cate
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v24`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v25`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome: sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Sheet edits via the Google Sheets connector are fine; insert rows in Lists rather than rewriting blocks (colour cells are painted).
 - Commits use author `Claude <noreply@anthropic.com>`. Push to `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -69,7 +68,7 @@ API: op-batched like Pantry Pal (`{key, ops: [{op: add|update|del, coll, id, dat
 | File | Lines | What's in it |
 |---|---|---|
 | `Code.gs` | 524 | `doGet`/`doPost`/`api`; read/write (`readAll_`, `applyOp_`, `table_`, `headerMap_`, `fromCell_`/`toCell_`); menu (`onOpen`, `setup`, `showKey`, `setWebAppUrl`, `resetKey`); tabs (`buildTab_`, `seedLists_`, `paintSwatch_`/`paintAllSwatches_`) |
-| `web/index.html` | 1616 | CSS (~15–346), markup (~348–373), one `<script>` (~374–1362) |
+| `web/index.html` | 1665 | CSS, then the markup, then one `<script>` (search for names, line numbers drift) |
 | `web/sw.js`, `manifest.webmanifest` | small | offline cache (`CACHE`), PWA manifest |
 
 Inside the `index.html` script, search for:
@@ -82,47 +81,26 @@ Inside the `index.html` script, search for:
 - Map: `HUB_MAP`, `anchorRanges`, `areaForAnchor`, `anchorPoint`, `mapSVG`, `miniMap`, `renderMap`, `mapLand`, `mapPeriod`, `mapStep`, `setMapPer`, `zonePanel`, `FLAG_SVG`
 - Progress: `renderProgress`, `gradeCounts`
 - Back button: `armBack`, `trapped`, `exitArmed`
+- Share: `readShare`, `showShare`, `shareSheet`, `attachShare`, `recentClimbs`
 - Panels: `openSheet`, `renderSheet`, `newClimb`, `editClimb`, `climbSheet`, `readForm`, `setField`, `linkProject`, `saveClimb`, `undoSave`, `projSheet`, `daySheet`, `gymSheet`, `areaField`, `holdField`
 - Tap feedback: `TAP_SEL`, `tapKey`, `replayTap`, `scrollsSideways`
 
-## Redesign (approved 2026-10-24, mockup in `design/`)
+## Redesign (done 2026-10-26)
 
-Gary's problems with the current app: logging is clunky and hard to fix; projects are hard to track or edit; the map is useful but stuck on its own tab, and its Activity/Projects toggle splits things; his and Cecilia's views look alike; nobody uses **Both**.
-
-**Decisions**
-- **Tabs:** Climb (home), Projects, Progress. The Map tab is removed; its code moves into Climb plus a full-screen map panel.
-- **Person switch:** two big buttons with kawaii avatars (Gary: chalk bag, cyan `#3DC2EC`; Cecilia: hold with a bow, pink `#F7A1C4`). The selected one is filled in that person's colour; their colour carries through the page (keep the per-person background tones). **Both** is removed from Climb and Projects but **stays on Progress**.
-- **Climb (home)** (`design/Main.dc.html`): date bar; map card (compact `mapSVG` beside today's stats: count, sent/rested/fell bar, hardest, open projects); tapping a wall selects it (gold) and the wall fills in when logging; **Full map ⤢** opens the full map. Then **Log a climb**: four tiles (Boulder, Top rope, Auto belay, Kilter Board) with counts for the day; the selected wall's category tile is highlighted. The per-grade ✓/Rest/✕ rows are gone. Then **Today's climbs** (kept): one row per climb with result badge, category icon, grade, wall/anchor, hold dot, tries/note, and a play tile when it has a video. Tapping a row opens it for editing. Toast after save: Undo.
-- **Log / edit a climb** (`design/Edit-climb.dc.html`): one panel for new and existing climbs. Category (4 icon buttons), Result (Sent / Rested / Fell; **Rested only for Top rope**), Grade chips in rows of 4 (ropes include 5.12− / 5.12+), wall + anchor + mini map (Kilter: angle and problem name instead), hold colour, tries stepper, who climbed it, Google Photos video links, project link, note, date, Delete / Save. **Everything is editable**, including grade, result, category and climber.
-- **Selected state must be obvious**: the chosen result / grade / status is solid, bright, outlined in white, with a tick badge; the rest are plain outlines at reduced opacity.
-- **Result colours:** Sent cyan (Gary) or pink (Cecilia), Rested deep violet, **Fell light purple `#CDBFFB`** (replaces coral everywhere, including the Progress charts; keep chart colours separated by lightness). Bubbly round icons for all three: white circle, `#1E2235` outline, rounded thick ✓ / ✕ / pause bars.
-- **Category icons** (kawaii, Karate-Ka Companion style: white fill, `#1E2235` outline, dot eyes, pink blush, small smile): boulder (rock with warm hold spots), top rope (hold on a cyan rope), auto belay (box with a lavender strap), Kilter Board (tilted board with four coloured holds). Used on the home tiles, the log panel, Today's climbs, project cards and project pages. Exact SVGs are in `design/`.
-- **Projects** (`design/Projects.dc.html`): heading "<Name>'s projects" + **+ New** (add a project without falling first); filter chips All / Boulder / Rope (no Kilter); cards with hold-colour strip, category icon, grade, name, where, a dot per try, last note, last tried; a big chevron, centred vertically on the right. "Sent recently" list with Reopen.
-- **Project page** (`design/Project.dc.html`): back, person, ✎ Edit; hero (hold colour, grade, name, category icon, where, status, mini map with pin); stats (tries, sessions, rests last time); quick log Fell / Rested / Sent it!; **Beta notes** (this climber only, add a note inline); **Every try** (each try, tap to edit, video tile); Route was reset / Delete project.
-- **Edit project** (`design/Edit-project.dc.html`): name, status (Open / Sent / Route reset), category (no Kilter), grade, wall + anchor + map, hold colour. Tries keep their own details.
-- **Full map** (`design/Map.dc.html`): one view, no Activity/Projects toggle: walls glow with climbs for the Day / Week / Month period, flags mark open projects, always both. Legend uses the same flag pin as the map. Tapping a wall opens a panel: climbs and sent bar for the period, that wall's projects, **Log a climb here**, Wall history. Kilter has its own box top-left.
-- **Videos:** links only, nothing uploaded. Paste a Google Photos share link (several allowed) on a climb; the row shows a play tile that opens the link. Also a **share target**: in Google Photos, Share → Climb Buddy opens the app with the link and asks which climb to attach it to (`share_target` in the manifest, GET with `url`/`text` params; pick from recent climbs, default the latest).
-
-**Build plan (one stage per session)**
-1. ~~Backend~~: Code.gs columns (Video links, Angle, Problem name, project Name), Notes tab, Kilter Board type and grades. *Done 2026-10-24; Gary deploys with clasp and runs Set up / repair sheets.*
-2. ~~Shell + person switch + icons~~: 3 tabs, new person switcher (no Both outside Progress), kawaii category and result icons, Fell colour change. *Done 2026-10-25; the map stays reachable from Full map ⤢ on Climb (with Both) until stage 3.*
-3. ~~Climb home~~: map card on home (wall tap selects), Log a climb tiles, Today's climbs list; remove grade rows and the Map tab; full-map panel. *Done 2026-10-25; tiles open a stop-gap result + grade picker, then the old details panel, until stage 4.*
-4. ~~Log / edit panel~~: the new climb panel (all fields editable, Rested only for Top rope, Kilter fields, video links). *Done 2026-10-25.*
-5. ~~Projects~~: list redesign, + New, project page, edit project, beta notes (Notes tab). *Done 2026-10-26; Code.gs gained the project `owner` column (Gary deploys with clasp).*
-6. **Video share target** (manifest + handler), polish, update this brief (design rules, code map) and remove the redesign notice.
+The October 2026 redesign is finished; the rules above describe it. The approved mockup is in `design/` (six `.dc.html` screens, not published) and holds the exact icon SVGs. It fixed what Gary found clunky: hard-to-fix logging, projects that were hard to track or edit, a map stuck on its own tab with an Activity/Projects toggle, his and Cecilia's views looking alike, and an unused **Both** view. Kept from it: selected states must be obvious (solid, white outline, tick badge; the rest faded), kawaii icons in the Karate-Ka Companion style, Fell is light purple, Rested only for top rope, Kilter Board is never a project, beta notes are per person.
 
 ## Status
-- Redesign: stages 1–5 done; next is stage 6 (Google Photos share target, polish, final brief clean-up).
-- Working: Climb home with map card and tiles, one log / edit panel (Kilter, video links) with Undo, projects, full map with anchors and Day/Week/Month, Progress, per-person views with swipe, always-dark theme.
+- Redesign: done (all six stages).
+- Working: Climb home with map card and tiles, one log / edit panel (Kilter, video links) with Undo, Projects with a page per project and beta notes, Share → Climb Buddy from Google Photos, full map with anchors and Day/Week/Month, Progress (with Both), per-person views with swipe, always-dark theme.
 - Open: remove the old workers.dev Worker.
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-26: Redesign stage 6: Share → Climb Buddy from Google Photos adds the video link to a climb (or a new one); brief tidied, redesign done
 - 2026-10-26: Redesign stage 5: Projects list cards, + New, a page per project (quick log, beta notes per person, every try), Edit project panel with status
 - 2026-10-26: Anchors split per Gary (Small Wall 71–74, 88–91; rest Pit, also in Lists); overhead bridge drawn dashed, not a wall; anchor ranges no longer printed on the map
 - 2026-10-25: Map redrawn from Gary's new floor plan: Kilter Board box, Training, reshaped Pit and small wall with the bar, anchors placed where he drew them
 - 2026-10-25: Redesign stage 4: one log / edit climb panel, everything editable (category, result, grade, climber, date), Kilter angle and problem, Google Photos video links; new climbs saved only on Save
-- 2026-10-25: Redesign stage 3: Climb home (map card, Log a climb tiles with result + grade picker, Today's climbs, Undo on save); full map is always both with flags and a wall panel; grade rows removed
 
 ## Working efficiently
 - Find code with search first, then read only the relevant lines. Don't read index.html top to bottom.

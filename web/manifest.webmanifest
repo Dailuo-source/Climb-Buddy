@@ -2,13 +2,18 @@
   "id": "climb-buddy",
   "name": "Climb Buddy",
   "short_name": "Climb Buddy",
-  "description": "Log sends and falls by grade, keep your projects, and see your progress.",
+  "description": "Log your climbs, keep your projects, add Google Photos videos, and see your progress.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#100E22",
   "theme_color": "#0B1622",
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  },
   "icons": [
     {
       "src": "icon-192.png",

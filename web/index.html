@@ -856,39 +856,42 @@ const HUB_MAP={
     {id:"stage",area:"Stage 3",type:"Bouldering",pts:"12,732 98,732 98,815 125,815 125,957 98,957 98,1082 12,1082",lbl:[56,880],pin:[56,1010],lines:["Stage 3"],rot:true},
     {id:"aUB",area:"Upper Back",type:"Auto belay",pts:"362,18 478,18 478,67 362,67",lbl:[420,100],pin:[420,43],lines:["Auto belay","Upper Back"],fs:22},
     {id:"rUB",area:"Upper Back",type:"Top rope",pts:"478,18 807,18 807,64 775,97 720,97 690,68 582,68 540,107 503,107 492,67 478,67",lbl:[640,140],pin:[640,42],lines:["Upper Back"],fs:26},
-    {id:"aUL",area:"Upper Learners",type:"Auto belay",pts:"282,270 373,270 373,405 282,707 282,530 298,515 298,420 282,405",lbl:[190,470],pin:[322,330],lines:["Auto belay","Upper","Learners"],fs:22},
-    {id:"rPS",area:"Pit Small Wall",type:"Top rope",pts:"373,405 388,420 388,530 354,565 354,688 337,707 282,707",lbl:[440,600],pin:[345,600],lines:["Pit","Small Wall"],fs:24},
-    {id:"rPit",area:"Pit",type:"Top rope",pts:"595,270 706,380 706,1087 595,1207 595,1137 568,1110 568,1027 624,970 624,792 646,771 646,707 627,707 627,514 595,482",lbl:[515,690],pin:[660,620],lines:["The Pit"]},
+    {id:"aUL",area:"Upper Learners",type:"Auto belay",pts:"282,271 346,271 346,524 322,548 322,668 282,706 282,529 299,513 299,420 282,404",lbl:[200,470],pin:[314,330],lines:["Auto belay","Upper","Learners"],fs:22},
+    {id:"rPS",area:"Pit Small Wall",type:"Top rope",pts:"346,271 374,271 374,404 388,420 388,477 595,477 627,515 627,608 558,530 388,530 355,564 355,690 338,706 282,706 322,668 322,548 346,524",lbl:[455,600],pin:[338,610],lines:["Pit","Small Wall"],fs:24},
+    {id:"rPit",area:"Pit",type:"Top rope",pts:"595,271 595,477 627,515 627,668 613,709 621,751 613,837 613,908 623,967 593,1029 593,1108 609,1135 609,1206 705,1087 705,380",lbl:[530,780],pin:[660,620],lines:["The Pit"]},
     {id:"rUp",area:"Upper",type:"Top rope",pts:"595,270 807,270 872,335 872,433 774,531 774,793 820,838 820,920 769,970 769,1008 706,1008 706,380",lbl:[790,400],pin:[740,640],lines:["Upper"]},
     {id:"aUE",area:"Upper Entrance",type:"Auto belay",pts:"706,1008 769,1008 769,1087 706,1087",lbl:[860,1035],pin:[737,1047],lines:["Auto belay","Upper Entrance"],fs:22},
-    {id:"rUE",area:"Upper Entrance",type:"Top rope",pts:"706,1087 769,1087 769,1150 713,1207 595,1207",lbl:[870,1160],pin:[715,1160],lines:["Upper","Entrance"],fs:24}
+    {id:"kilter",area:"Kilter Board",type:"Kilter Board",any:true,pts:"12,18 239,18 239,91 12,91",lbl:[118,55],pin:[205,55],lines:["Kilter Board"],fs:26},
+    {id:"rUE",area:"Upper Entrance",type:"Top rope",pts:"706,1087 769,1087 769,1150 713,1207 609,1206",lbl:[870,1160],pin:[715,1160],lines:["Upper","Entrance"],fs:24}
   ],
-  /* Anchor numbers run along each rope wall's climbing face, spread evenly between `from` and `to`
-     (widened to any Anchors ranges in the Lists tab). `path` starts at the `from` end.
-     Estimates: Pit runs north → south down its west face (so #106 is near the south end).
-     Upper runs from the south end up its east face, then west along its north edge, so its last
-     numbers meet the top of the Pit. Reverse a path or change from/to if the gym's numbering differs. */
-  anchorWalls:[
-    {area:"Pit",type:"Top rope",from:77,to:109,path:"595,270 595,482 627,514 627,707 646,707 646,771 624,792 624,970 568,1027 568,1110 595,1137 595,1207"},
-    {area:"Upper",type:"Top rope",from:1,to:53,path:"769,1008 769,970 820,920 820,838 774,793 774,531 872,433 872,335 807,270 595,270"}
+  /* Anchor numbers as drawn on Gary's floor plan (Oct 25). Each run follows a wall face: [anchor #, x, y],
+     with null for corners in between. Numbers between two drawn ones are spread along the wall.
+     Labels sit on the left-hand side of the direction of travel (side:-1 = right-hand side).
+     Speed climb is 71-74. 106 to 107 crosses the gap with no anchors. */
+  anchorRuns:[
+    {side:-1,pts:[[71,374,278],[74,374,397],[null,374,404],[75,388,425],[null,388,477],[77,424,477],[78,487,477],[81,552,477],[82,585,477],[null,595,477],[87,595,278]]},
+    {pts:[[88,355,690],[null,355,564],[91,372,547],[null,388,530],[95,549,530],[null,558,530],[98,627,608],[null,627,668],[null,613,709],[102,621,751],[null,613,837],[null,613,908],[null,623,967],[106,606,1002],[null,593,1029],[107,593,1111],[null,609,1135],[109,609,1198]]},
+    {pts:[[1,617,1197],[null,705,1087],[null,705,380],[43,602,277]]}
   ],
+  /* Which wall an anchor number belongs to when the Lists tab doesn't say */
+  anchorAreas:[{area:"Upper",lo:1,hi:43},{area:"Pit Small Wall",lo:71,hi:82},{area:"Pit",lo:83,hi:109}],
   features:[
-    {name:"Boards & Training",pts:"12,18 282,18 282,132 98,132 98,618 12,618",lbl:[55,380],lines:["Boards & Training"],rot:true},
+    {name:"Training",pts:"12,132 100,132 100,671 12,671",lbl:[56,400],lines:["Training"],rot:true},
     {name:"Stadium seating",pts:"285,775 463,775 463,1203 285,1203",lbl:[374,990],lines:["Stadium","seating"]},
-    {name:"Speed climb",lbl:[428,330],lines:["Speed","climb"],fs:20}
+    {name:"Speed climb",lbl:[440,322],lines:["Speed climb","#71–74"],fs:20}
   ]
 };
-const MAP_LIGHT={edge:{},featEdge:"#2D3A34",wall:"#2D3A34",ink:"#2D3A34",floor:"#FBF8F1",feat:"#ECE8DE",off:"#F1EEE6",heat:"31,79,184",chip:"#fff",tint:{"Bouldering":"#FBE0CF","Top rope":"#D9E5FB","Auto belay":"#E7DFFB"}};
+const MAP_LIGHT={edge:{},featEdge:"#2D3A34",wall:"#2D3A34",ink:"#2D3A34",floor:"#FBF8F1",feat:"#ECE8DE",off:"#F1EEE6",heat:"31,79,184",chip:"#fff",tint:{"Bouldering":"#FBE0CF","Top rope":"#D9E5FB","Auto belay":"#E7DFFB","Kilter Board":"#D8F3EA"}};
 // dark map: black floor, walls drawn as glowing outlines in the palette (violet boulders, blue top rope, cyan auto belay)
 const MAP_DARK={ink:"#E8E8F4",floor:"#000000",feat:"#111117",featEdge:"#3A3A4C",wall:"#5E5E78",off:"#0A0A10",heat:"61,194,236",chip:"#000000",
-  tint:{"Bouldering":"rgba(124,105,242,.30)","Top rope":"rgba(75,112,245,.32)","Auto belay":"rgba(61,194,236,.26)"},
-  edge:{"Bouldering":"#A493FF","Top rope":"#7393FF","Auto belay":"#52D2F6"}};
+  tint:{"Bouldering":"rgba(124,105,242,.30)","Top rope":"rgba(75,112,245,.32)","Auto belay":"rgba(61,194,236,.26)","Kilter Board":"rgba(143,227,200,.24)"},
+  edge:{"Bouldering":"#A493FF","Top rope":"#7393FF","Auto belay":"#52D2F6","Kilter Board":"#8FE3C8"}};
 const MAPC=Object.assign({},MAP_LIGHT);
 const TYPE_TINT=new Proxy({},{get:(_,k)=>MAPC.tint[k]});
 let MAP_INK="#2D3A34";
 const gymMap=()=>eqi(GYM,HUB_MAP.gym)?HUB_MAP:null;
 const zoneById=id=>HUB_MAP.zones.find(z=>z.id===id);
-const inZone=(x,z)=>x.type===z.type&&(eqi(x.area,z.area)||(z.alias||[]).some(a=>eqi(x.area,a)));
+const inZone=(x,z)=>x.type===z.type&&(z.any||eqi(x.area,z.area)||(z.alias||[]).some(a=>eqi(x.area,a)));
 const zoneClimbs=z=>S.climbs.filter(c=>eqi(c.gym,HUB_MAP.gym)&&inZone(c,z));
 const zoneProjects=(z,w)=>S.projects.filter(p=>openFor(p,w||"*")&&eqi(p.gym,HUB_MAP.gym)&&inZone(p,z));
 
@@ -906,24 +909,25 @@ function areaForAnchor(type,num){
   const allowed=areaRows(type).map(r=>r.value);
   const hit=anchorRanges().find(r=>num>=r.lo&&num<=r.hi&&allowed.some(a=>eqi(a,r.area)));
   if(hit)return hit.area;
-  const w=HUB_MAP.anchorWalls.find(w=>num>=w.from&&num<=w.to&&allowed.some(a=>eqi(a,w.area)));
+  const w=HUB_MAP.anchorAreas.find(w=>num>=w.lo&&num<=w.hi&&allowed.some(a=>eqi(a,w.area)));
   return w?w.area:"";
 }
-/* Estimated spot on the map for an anchor number: walk along the wall's face in proportion */
+/* Spot on the map for an anchor number: found by number on the drawn runs, spread along the wall between drawn numbers */
 function anchorPoint(area,num){
   num=parseInt(num,10);if(!num)return null;
-  const w=HUB_MAP.anchorWalls.find(w=>eqi(w.area,area));if(!w)return null;
-  let lo=w.from,hi=w.to;
-  for(const r of anchorRanges())if(eqi(r.area,area)){lo=Math.min(lo,r.lo);hi=Math.max(hi,r.hi);}
-  const t=Math.max(0,Math.min(1,(num-lo)/Math.max(1,hi-lo)));
-  const P=w.path.split(" ").map(s=>s.split(",").map(Number));
-  const seg=[];let total=0;for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);seg.push(l);total+=l;}
-  let d=t*total,i=0;while(i<seg.length-1&&d>seg[i]){d-=seg[i];i++;}
-  const a=P[i],b=P[i+1],f=seg[i]?d/seg[i]:0;
-  const x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f;
-  // the number label sits out in front of the wall face (paths are drawn with the face on their left-hand normal)
-  const L=seg[i]||1,nx=-(b[1]-a[1])/L,ny=(b[0]-a[0])/L;
-  return{x,y,nx,ny,n:num};
+  for(const run of HUB_MAP.anchorRuns){
+    const P=run.pts,known=P.map((p,i)=>[p[0],i]).filter(k=>k[0]!=null);
+    if(num<known[0][0]||num>known[known.length-1][0])continue;
+    let k=0;while(k<known.length-2&&num>known[k+1][0])k++;
+    const[n0,i0]=known[k],[n1,i1]=known[k+1];
+    const seg=[];let total=0;for(let i=i0+1;i<=i1;i++){const l=Math.hypot(P[i][1]-P[i-1][1],P[i][2]-P[i-1][2]);seg.push(l);total+=l;}
+    let d=(n1===n0?0:(num-n0)/(n1-n0))*total,j=0;while(j<seg.length-1&&d>seg[j]){d-=seg[j];j++;}
+    const a=P[i0+j],b=P[i0+j+1],f=seg[j]?d/seg[j]:0;
+    const x=a[1]+(b[1]-a[1])*f,y=a[2]+(b[2]-a[2])*f,L=seg[j]||1,sd=run.side||1;
+    // the number label sits out in front of the wall face
+    return{x,y,nx:-sd*(b[2]-a[2])/L,ny:sd*(b[1]-a[1])/L,n:num};
+  }
+  return null;
 }
 function anchorPinSVG(pt,colour,big){
   const r=big?22:17,lx=pt.x+pt.nx*(r+30),ly=pt.y+pt.ny*(r+30);
@@ -1072,7 +1076,7 @@ function renderMap(){
     ${sheetLink()}`;
 }
 function zonePanel(z,P){
-  const rope=z.type!=="Bouldering",anchors=rope?anchorText(z.area):"";
+  const rope=!!typeOf(z.type).anchor,anchors=rope?anchorText(z.area):"";
   const cs=zoneClimbs(z),inP=P?cs.filter(P.inP):[],ps=zoneProjects(z);
   const cnt=(a,r)=>a.filter(c=>c.result===r).length;
   const parts=RES_KEYS.map(([r,k,l])=>({k,l:l.toLowerCase(),v:cnt(inP,r)}));
@@ -1082,12 +1086,12 @@ function zonePanel(z,P){
     ${rope&&!anchors?`<p class="hint">Anchor numbers not set yet. Add them in the Lists tab as <b>Anchors</b>, e.g. “${esc(z.area)}: 1-20”.</p>`:""}
     ${inP.length?`<span class="sbar" style="height:10px" role="img" aria-label="${parts.map(p=>p.v+" "+p.l).join(", ")}">${parts.filter(p=>p.v).map(p=>`<i style="flex:${p.v};background:${RES_HEX[p.k]}"></i>`).join("")}</span>
     <p class="hint" style="margin:0">${inP.length} ${inP.length===1?"climb":"climbs"} ${esc(P.word)} · ${parts[0].v} sent${top?" · hardest "+esc(top):""}</p>`:`<p class="hint" style="margin:0">No climbs here ${P?esc(P.word):"yet"}.</p>`}
-    <h3 class="sech">Open projects (${ps.length})</h3>
+    ${z.any?"":`<h3 class="sech">Open projects (${ps.length})</h3>
     ${ps.length?`<div class="wprojs">${ps.map(p=>{const tries=Object.values(projInfo(p).tries).reduce((a,b)=>a+b,0);
-      return`<button class="wrow" data-act="editProj" data-id="${p.id}">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(projName(p))}${p.anchor?" · #"+esc(p.anchor):""}</span><span class="hsm">${tries} ${tries===1?"try":"tries"}</span></button>`;}).join("")}</div>`:`<p class="hint" style="margin:0">None here right now.</p>`}
+      return`<button class="wrow" data-act="editProj" data-id="${p.id}">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(projName(p))}${p.anchor?" · #"+esc(p.anchor):""}</span><span class="hsm">${tries} ${tries===1?"try":"tries"}</span></button>`;}).join("")}</div>`:`<p class="hint" style="margin:0">None here right now.</p>`}`}
     <div class="foot"><button class="btn primary wide" data-act="logHere" data-z="${z.id}">Log a climb here</button><button class="btn" data-act="wallHist" aria-expanded="${wallHist}">Wall history</button></div>
     ${!wallHist?"":people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Fell</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
-    <button class="btn" data-act="zoneReset" data-z="${z.id}" ${ps.length?`data-confirm="Tap again: move ${ps.length} to Reset"`:"disabled"}>This wall was reset</button>
+    ${z.any?"":`<button class="btn" data-act="zoneReset" data-z="${z.id}" ${ps.length?`data-confirm="Tap again: move ${ps.length} to Reset"`:"disabled"}>This wall was reset</button>`}
   </section>`;
 }
 

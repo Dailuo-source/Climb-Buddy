@@ -598,7 +598,7 @@ let S={climbs:[],projects:[],notes:[],lists:[]};
 let ready=false,auth="ok",KEY=LS.get("key",""),API=API_URL||LS.get("api",""),sheetUrl=LS.get("sheet",""),lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null;
 let GYM=LS.get("gym",""),WHO=LS.get("who",""),DAY=todayKey(),TYPE=LS.get("type","Bouldering");
-let projId=LS.get("projid","");
+let projId=LS.get("projid",""),projSel="";
 let tab=LS.get("tab","session"),projFilter="All",pMonth=todayKey().slice(0,7),BOTH=LS.get("both","")==="1";
 function readLinkParams(){
   try{
@@ -871,6 +871,10 @@ function renderProjects(){
   const open=all.filter(p=>openFor(p,w)).sort((a,b)=>projInfo(b).last-projInfo(a).last);
   if(!PF.some(f=>f[0]===projFilter))projFilter="All";
   const list=open.filter(p=>pfMatch(p,projFilter));
+  // a wall picked on the map narrows the cards to that wall's projects
+  const zSel=projSel&&gymMap()?zoneById(projSel):null,onWall=zSel?list.filter(p=>inZone(p,zSel)):[];
+  if(zSel&&!onWall.length)projSel="";
+  const shown=projSel?onWall:list;
   const cutoff=Date.now()-60*864e5;
   // done for this person: they sent it, or the route is closed (sent by everyone or reset)
   const done=all.filter(p=>(p.updated||p.added)>=cutoff&&triedBy(p,w)&&(!isOpen(p)||p.sentBy.includes(w))).sort((a,b)=>(b.updated||0)-(a.updated||0));
@@ -879,7 +883,8 @@ function renderProjects(){
     <div class="shead"><h2 class="ph">${esc(w)}'s projects</h2><button class="btn send small" data-act="newProj">+ New</button></div>
     <div class="chips" role="group" aria-label="Filter projects">${PF.map(([k,l])=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${l} <span class="n">${open.filter(p=>pfMatch(p,k)).length}</span></button>`).join("")}</div>
     ${projMap(list)}
-    <div class="cards">${list.length?list.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":`No projects for ${esc(w)}`}</strong>${open.length?"Try another filter.":"Fall on a route and keep it as a project, or tap <b>+ New</b> to add one you want to try."}</div>`}</div>
+    ${projSel?`<div class="shead"><span class="atwall">${esc(zSel.area)} · ${onWall.length} ${onWall.length===1?"project":"projects"}<button data-act="projWall" data-z="" aria-label="Show all walls">×</button></span><button class="btn small ghost" data-act="projWall" data-z="">Show all</button></div>`:""}
+    <div class="cards">${shown.length?shown.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":`No projects for ${esc(w)}`}</strong>${open.length?"Try another filter.":"Fall on a route and keep it as a project, or tap <b>+ New</b> to add one you want to try."}</div>`}</div>
     ${done.length?`<h2 class="sech">Sent or reset recently</h2><div class="done">${done.map(p=>{const info=projInfo(p);const n=info.tries[w]||0;
       const what=p.status==="Reset"?"route was reset":p.sentBy.includes(w)?`sent${n?` after ${n} ${n===1?"try":"tries"}`:""}`:"closed";
       return`<div class="drow">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<button class="t dlink" data-act="openProj" data-id="${p.id}">${esc(projName(p))} · ${what}</button>${p.status==="Reset"?`<button class="btn small ghost" data-act="reopen" data-id="${p.id}">Reopen</button>`:`<span class="hsm">${fmtShort(dayKey(p.updated||info.last||Date.now()))}</span>`}</div>`;}).join("")}</div>`:""}
@@ -889,18 +894,18 @@ function renderProjects(){
    routes as a dot at the anchor with the grade beside it (on the wall when there's no anchor). Tap one to open it. */
 function projMap(list){
   const M=gymMap();if(!M||!list.length)return"";
-  const c=PCOL[themeFor(WHO)],o={act:"noop",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:meRGB(WHO),marks:[]};
+  const c=PCOL[themeFor(WHO)],o={act:"projWall",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:meRGB(WHO),marks:[],sel:projSel};
   for(const p of list){
     const z=M.zones.find(z=>inZone(p,z));if(!z)continue;
     o.heat[z.id]=(o.heat[z.id]||0)+1;o.heatMax=Math.max(o.heatMax,o.heat[z.id]);
     const col=gradeColour(p.type,p.grade),t=gradeLabel(p.grade);
     const pt=typeOf(p.type).anchor&&p.anchor?anchorPoint(p.area,p.anchor):null;
-    const m={t,act:"openProj",id:p.id,bg:col||c[1],fg:col?inkOn(col):"#ECEBFA",bd:col?"#000":c[0],fs:col?40:36};
+    const m={t,act:"projWall",z:z.id,bg:col||c[1],fg:col?inkOn(col):"#ECEBFA",bd:col?"#000":c[0],fs:col?40:36};
     if(pt)Object.assign(m,{x:pt.x+pt.nx*100,y:pt.y+pt.ny*100,dot:[pt.x,pt.y],dotCol:holdHex(p.hold)||"#C9C4B8"});else Object.assign(m,{x:z.lbl[0],y:z.lbl[1]});
     o.marks.push(m);
   }
   if(!o.marks.length)return"";
-  return`<section class="card mapcard"><div class="bigmap">${mapSVG(o)}</div><div class="mleg"><span><i class="lt" style="background:#F08A24"></i>Boulder: circuit colour</span><span><i class="ld"></i>Route: anchor + grade</span></div><p class="hint">Tap a grade to open that project.</p></section>`;
+  return`<section class="card mapcard"><div class="bigmap">${mapSVG(o)}</div><div class="mleg"><span><i class="lt" style="background:#F08A24"></i>Boulder: circuit colour</span><span><i class="ld"></i>Route: anchor + grade</span></div><p class="hint">Tap a wall to see its projects below.</p></section>`;
 }
 // One card: hold-colour strip, category, grade, name, where, a dot per try, last note, last tried, chevron
 function projCard(p){
@@ -1584,6 +1589,7 @@ document.addEventListener("click",e=>{
     case"homeWall":{const z=t.dataset.z;homeSel=!z||homeSel===z?"":z;LS.set("homesel",homeSel);render();break;}
     case"homeAll":homeAll=true;render();break;
     case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");newClimb(z.type,z.area);break;}
+    case"projWall":{const z=t.dataset.z;projSel=!z||projSel===z?"":z;render();if(projSel){const c=$("#view .cards");if(c)c.scrollIntoView({behavior:"smooth",block:"nearest"});}break;}
     case"progWall":{const z=t.dataset.z;progSel=progSel===z?"":z;render();break;}
     case"wallHist":wallHist=!wallHist;render();break;
     case"prevDay":DAY=shiftDay(DAY,-1);render();break;

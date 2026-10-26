@@ -68,8 +68,6 @@ body,.top{transition:background-color .25s ease}
 :root[data-dark] .types button[aria-pressed="true"]{border-bottom-color:var(--me)}
 :root[data-dark] .seg:not(.wseg) button[aria-pressed="true"],:root[data-dark] .chip[aria-pressed="true"],:root[data-dark] .pill input:checked+span{background:#4C3BCF;border-color:#4C3BCF;color:#fff}
 :root[data-dark] .btn.primary{background:#4B70F5;border-color:#4B70F5;color:#fff}
-:root[data-dark] .tbtn.sent{box-shadow:0 2px 10px rgba(0,0,0,.3)}
-:root[data-dark] .tbtn.fell{color:var(--fell-ink);background:var(--fell);border-color:var(--fell)}
 :root[data-dark] .badge{color:var(--fell-ink)}
 :root[data-dark] .check{accent-color:var(--me)}
 :root[data-dark] .minimap,:root[data-dark] .mapwrap{background:#000;border-color:#26263A}
@@ -164,49 +162,73 @@ legend{padding:0}
 @media (prefers-reduced-motion:reduce){.tapping{transform:none!important}.tapped{animation:tapFade .3s ease-out}@keyframes tapFade{0%{filter:brightness(1.3)}}}
 /* session summary: a ring for the whole day + a stacked bar per climb type (shared scale).
    Chart colours are deeper than the UI's soft fills so they pass contrast and colour-blind checks. */
-.dsum{--c-sent:#1F4FB8;--c-rest:#6C8CEB;--c-fell:#DD6B26;padding:14px 16px;display:flex;flex-direction:column;gap:14px}
-.dhero{display:flex;align-items:center;gap:18px}
-.ring{position:relative;width:112px;height:112px;flex:none}
-.ring svg{display:block;width:100%;height:100%;transform:rotate(-90deg)}
-.ring .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
-.ring .mid b{font-family:var(--f-display);font-size:32px;font-weight:700;font-variant-numeric:tabular-nums}
-.ring .mid span{font-size:12px;color:var(--muted);margin-top:3px}
-.dleg{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0}
-.dleg div{display:flex;align-items:center;gap:8px;font-size:14px}
-.dleg i{width:12px;height:12px;border-radius:4px;flex:none}
-.dleg b{margin-left:auto;font-family:var(--f-display);font-size:17px;font-variant-numeric:tabular-nums}
-.dleg .rate{font-size:12.5px;color:var(--muted);padding-top:2px;border-top:1px solid var(--line);margin-top:2px}
-.dtypes{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:8px}
-.dtype{appearance:none;border:0;background:none;padding:6px 8px;margin:0 -8px;border-radius:12px;width:calc(100% + 16px)!important;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;width:100%;color:inherit}
-.dtype .h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;min-height:24px}
-.dtype .h .k{flex:1}
-.dtype.on .h .k{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
-.dtype .h small{font-size:11.5px;font-weight:600;color:var(--muted)}
 .sbar{display:flex;gap:2px;height:22px}
 .sbar i{display:flex;align-items:center;justify-content:center;font:700 12.5px var(--f-body);font-style:normal;min-width:0;overflow:hidden;font-variant-numeric:tabular-nums}
 .sbar i:first-child{border-radius:6px 0 0 6px}
 .sbar i:last-child{border-radius:0 6px 6px 0}
 .sbar i:only-child{border-radius:6px}
 .sbar .none0{flex:1;height:6px;align-self:center;border-radius:3px;background:var(--sunk)}
-.dtype.zero .h{color:var(--muted);font-weight:500}
 
-/* grade rows */
-.grows{display:flex;flex-direction:column}
-.grow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
-.gcount{flex:1;font-size:13.5px;line-height:1.35;color:var(--muted);min-width:0;display:flex;flex-wrap:wrap;column-gap:8px}
-.gcount span{white-space:nowrap}
-.gcount b{font-weight:700}
-.gcount .s{color:var(--sent)} .gcount .f{color:var(--fell)} .gcount .r{color:var(--rest)}
-.gcount.zero{opacity:.7}
-.tbtn{appearance:none;height:44px;border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none}
-.tbtn svg{width:25px;height:25px}
-.tbtn.fell{width:48px;border:1.5px solid var(--fell-line);background:var(--fell-soft);color:var(--fell)}
-.tbtn.sent{width:58px;border:0;background:var(--sent);color:var(--sent-ink)}
-.tbtn.rest{width:50px;border:1.5px solid var(--rest-line);background:var(--rest-soft);color:var(--rest);font:700 13px var(--f-body)}
+/* Climb home */
+.hcard{padding:12px;display:flex;flex-direction:column;gap:10px}
+.hrow{display:flex;gap:12px}
+.hmap{width:50%;max-width:210px;flex:none;border-radius:14px;overflow:hidden;background:#000}
+.hmap svg{display:block;width:100%;height:auto}
+.hstats{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.hstats .k{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hstats .big{font:700 34px/1 var(--f-display)}
+.hstats .big small{font-size:16px;font-weight:600}
+.hstats .sbar{height:10px}
+.hleg{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.hleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.hsm{font-size:12.5px;color:var(--muted)}
+.hsm b{color:var(--ink)}
+.hfoot{display:flex;align-items:center;gap:8px}
+.hfoot .hsm{flex:1;min-width:0}
+.shead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.shead h2{margin:0;font:700 19px var(--f-display)}
+.atwall{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 4px 0 10px;border-radius:999px;background:#3A3016;border:1px solid #F5C451;color:#FBE3A6;font-size:12px;font-weight:600}
+.atwall button{width:24px;height:24px;border-radius:50%;border:0;background:#5A4A1E;color:#FBE3A6;cursor:pointer;font-size:15px;line-height:1}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{appearance:none;display:flex;align-items:center;gap:10px;height:84px;padding:0 12px;border-radius:20px;background:var(--surface);border:2px solid var(--line);color:var(--ink);text-align:left;cursor:pointer;font:inherit;min-width:0}
+.tile.hi{border-color:#F5C451;background:var(--me-soft)}
+.tile .nm{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.tile b{font-size:16px}
+.tile small{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile.hi small{color:#FBE3A6}
+.cicon.big{width:48px;height:48px}
+.cicon.md{width:30px;height:30px}
+.clist{display:flex;flex-direction:column;gap:8px}
+.crow2{display:flex;align-items:center;gap:10px;min-height:64px;padding:8px 12px;border-radius:16px;background:var(--surface)}
+.crow2 .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;appearance:none;border:0;background:none;padding:0;text-align:left;color:inherit;cursor:pointer;font:inherit}
+.crow2 .t b{display:flex;align-items:center;gap:6px;font-weight:600;min-width:0}
+.crow2 .t .w{font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow2 .t .d{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow2 .tm{font-size:12px;color:var(--muted);white-space:nowrap}
+.hd{width:10px;height:10px;border-radius:50%;flex:none}
+.vtile{width:44px;height:44px;border-radius:10px;background:var(--sunk);border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;color:var(--ink);flex:none}
+.btn.dashed{border-style:dashed;background:transparent;color:var(--muted)}
+/* new climb picker: the chosen result is solid with a white outline and a tick badge, the rest are faded outlines */
+.pickh{display:inline-flex;align-items:center;gap:8px}
+.resrow{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.rbtn{appearance:none;position:relative;height:58px;border-radius:16px;border:1px solid var(--line2);background:transparent;color:var(--muted);font:600 15px var(--f-body);display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:.7;cursor:pointer}
+.rbtn .ricon{width:22px;height:22px}
+.rbtn[aria-pressed="true"]{opacity:1;border:2px solid #fff;font-weight:700}
+.rbtn[aria-pressed="true"]::after{content:"✓";position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:#fff;color:#1E2235;font-size:12px;font-weight:800;display:grid;place-items:center}
+.rbtn[data-v="Sent"][aria-pressed="true"]{background:var(--me);color:var(--me-ink)}
+.rbtn[data-v="Rested"][aria-pressed="true"]{background:#4C3BCF;color:#fff}
+.rbtn[data-v="Fell"][aria-pressed="true"]{background:#CDBFFB;color:#2A1F5C}
+.gchips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.gchip{appearance:none;height:48px;border-radius:14px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font:700 15px var(--f-body);cursor:pointer;min-width:0;padding:0 4px}
+/* full map wall panel */
+.wprojs{display:flex;flex-direction:column}
+.wrow{appearance:none;display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.wrow .t{flex:1;min-width:0;font-size:14px}
+.mlegend .fl{display:inline-flex;align-items:center;gap:5px}
+
 .datebar{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px}
 .datepick{position:relative;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:40px;font-weight:600;font-size:15px;cursor:pointer;border-radius:10px;white-space:nowrap}
 .datepick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:0;padding:0;border:0;cursor:pointer}
-.tbtn:active{transform:scale(.96)}
 .tag{display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:700;white-space:nowrap;border-radius:10px;flex:none;font-variant-numeric:tabular-nums}
 .tag.lg{min-width:64px;height:40px;padding:0 10px;font-size:16px}
 .tag.md{height:30px;padding:0 10px;font-size:15px;border-radius:8px}
@@ -290,7 +312,7 @@ legend{padding:0}
 .sheet{position:relative;background:var(--surface);width:100%;max-width:600px;max-height:calc(100% - 28px - env(safe-area-inset-top,0px));overflow:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));animation:up .22s ease-out;box-shadow:var(--shadow)}
 @media (min-width:700px){.sheet-wrap{align-items:center}.sheet{border-radius:22px;max-height:88%}}
 @keyframes up{from{transform:translateY(28px);opacity:.5}}
-@media (prefers-reduced-motion:reduce){.sheet{animation:none}.tbtn:active{transform:none}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
 .sheet-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--surface);padding:18px 0 10px;z-index:1}
 .sheet-h h2{font-family:var(--f-display);font-size:25px;line-height:1.15;margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sheet-h .sub{margin:4px 0 0;font-size:14px;color:var(--muted)}
@@ -448,7 +470,8 @@ function whenFor(k){if(k===todayKey())return Date.now();backfillN++;return keyDa
 const TYPES=[
   {k:"Bouldering",grades:"Boulder grade",areas:["Boulder area"],anchor:false},
   {k:"Top rope",grades:"Rope grade",areas:["Rope area"],anchor:true},
-  {k:"Auto belay",grades:"Rope grade",areas:["Auto belay area","Rope area"],anchor:true}
+  {k:"Auto belay",grades:"Rope grade",areas:["Auto belay area","Rope area"],anchor:true},
+  {k:"Kilter Board",grades:"Kilter grade",areas:[],anchor:false}
 ];
 const typeOf=k=>TYPES.find(t=>t.k===k)||TYPES[0];
 function normType(v){const s=String(v||"").toLowerCase();if(/^boulder/.test(s))return"Bouldering";if(/^top/.test(s))return"Top rope";if(/^auto/.test(s))return"Auto belay";if(/^kilter/.test(s))return"Kilter Board";return String(v||"").trim()||"Bouldering";}
@@ -467,43 +490,12 @@ function tagHTML(type,g,size){const c=gradeColour(type,g);const lbl=esc(gradeLab
 const CSSCOL={red:"#D83A34",orange:"#F08A24",yellow:"#F5D02E",green:"#3DA35D",teal:"#2BA5A0",blue:"#2F6FD6",purple:"#8150C8",pink:"#EE7FB0",black:"#22262A",white:"#F7F7F4",grey:"#9AA0A6",gray:"#9AA0A6",brown:"#8A5A3B"};
 function holdHex(name){if(!name)return"";const r=holdRows().find(x=>eqi(x.value,name));if(r&&/^#[0-9a-f]{6}$/i.test(r.colour))return r.colour;return CSSCOL[String(name).trim().toLowerCase()]||"";}
 function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${cls||""}" style="background:${h}" aria-hidden="true"></span>`:`<span class="hdot none ${cls||""}" aria-hidden="true"></span>`;}
-/* Session summary, drawn: a ring of sent / rested / fell for the whole day, then a stacked bar per
-   climb type on one shared scale, with that type's top send. Tapping a type shows its grades below. */
 const RES_KEYS=[["Sent","sent","Sent"],["Rested","rest","Rested"],["Fell","fell","Fell"]];
 // both sets pass the colour-blind / contrast validator on their own backgrounds
 const RES_LIGHT={sent:"#1F4FB8",rest:"#6C8CEB",fell:"#DD6B26"},RES_DARK={sent:"#2A9FD0",rest:"#5B45D6",fell:"#CDBFFB"};
 // Charts keep sent / rested / fell apart by lightness: mid sent (per person), deep violet rested, light purple fell
 const CHART_SENT={green:"#2A9FD0",lav:"#D9609A",both:"#2A9FD0"};
 let RES_HEX=RES_LIGHT;
-function daySummary(list,isToday){
-  if(!list.length)return`<div class="card dsum"><p class="hint" style="margin:0">No climbs logged ${isToday?"yet today":"on this day"}. Tap ✓ or ✕ on a grade below.</p></div>`;
-  const cnt=(a,r)=>a.filter(c=>c.result===r).length;
-  const n=list.length,parts=RES_KEYS.map(([r,k,l])=>({k,l,v:cnt(list,r)}));
-  const shown=parts.filter(p=>p.v);
-  // ring: one arc per result, 2px gaps between arcs (none when there's only one)
-  const R=46,C=2*Math.PI*R,gap=shown.length>1?3:0;let off=0;
-  const arcs=shown.map(p=>{const len=Math.max(0,p.v/n*C-gap);const a=`<circle cx="56" cy="56" r="${R}" fill="none" stroke="${RES_HEX[p.k]}" stroke-width="14" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;off+=p.v/n*C;return a;}).join("");
-  const sent=parts[0].v,rested=parts[1].v;
-  const ropes=list.some(c=>c.type!=="Bouldering");
-  const legend=parts.filter(p=>p.k!=="rest"||ropes||p.v).map(p=>`<div><i style="background:${RES_HEX[p.k]}"></i>${p.l}<b>${p.v}</b></div>`).join("");
-  const max=Math.max(1,...TYPES.map(t=>list.filter(c=>c.type===t.k).length));
-  const top=(type,a)=>{let best=-2,bg="";for(const c of a){if(c.result!=="Sent")continue;const i=gradeIdx(type,c.grade);if(!bg||i>best){best=i;bg=c.grade;}}return bg;};
-  const bars=TYPES.map(t=>{
-    const a=list.filter(c=>c.type===t.k);const tg=top(t.k,a);
-    const segs=RES_KEYS.map(([r,k])=>({k,v:cnt(a,r)})).filter(x=>x.v);
-    const desc=a.length?`${t.k}: ${a.length} ${a.length===1?"climb":"climbs"}, ${segs.map(x=>x.v+" "+({sent:"sent",rest:"rested",fell:"fell"})[x.k]).join(", ")}${tg?", top send "+gradeLabel(tg):""}`:`${t.k}: none yet`;
-    const bar=a.length?`<span class="sbar" style="width:${(a.length/max*100).toFixed(1)}%">${segs.map(x=>`<i style="flex:${x.v};background:${RES_HEX[x.k]};color:${inkOn(RES_HEX[x.k])}">${x.v/a.length*(a.length/max)>.07?x.v:""}</i>`).join("")}</span>`:`<span class="sbar"><span class="none0"></span></span>`;
-    return`<button class="dtype${a.length?"":" zero"}${t.k===TYPE?" on":""}" data-act="type" data-v="${t.k}" aria-label="${esc(desc)}" aria-pressed="${t.k===TYPE}">
-      <span class="h"><span class="k">${t.k}</span>${tg?`<small>Top</small>${tagHTML(t.k,tg,"sm")}`:a.length?`<small>No sends yet</small>`:""}</span>${bar}</button>`;
-  }).join("");
-  return`<div class="card dsum">
-    <div class="dhero">
-      <div class="ring" role="img" aria-label="${n} climbs: ${parts.map(p=>p.v+" "+p.l.toLowerCase()).join(", ")}"><svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="${R}" fill="none" stroke="var(--sunk)" stroke-width="14"/>${arcs}</svg><span class="mid"><b>${n}</b><span>${n===1?"climb":"climbs"}</span></span></div>
-      <div class="dleg">${legend}<span class="rate">${Math.round(sent/n*100)}% sent${rested?` · ${Math.round((sent+rested)/n*100)}% finished`:""}</span></div>
-    </div>
-    <div class="dtypes">${bars}</div>
-  </div>`;
-}
 function hardest(list){const out=[];for(const t of TYPES){let best=-1,bg="";for(const c of list){if(c.type!==t.k||c.result!=="Sent")continue;const i=gradeIdx(t.k,c.grade);if(i>best){best=i;bg=c.grade;}else if(best<0&&!bg)bg=c.grade;}if(bg)out.push(gradeLabel(bg));}return out.join(" · ");}
 
 /* =====================================================================
@@ -585,10 +577,10 @@ function settleDefaults(){
 }
 
 /* ---------- whose view ----------
-   One person is picked for every tab. Only Progress (and the map, until it moves into Climb) can also show Both.
+   One person is picked for Climb and Projects; Progress can also show Both, and the full map is always both.
    Swipe left/right (or tap) to switch. */
-const canBoth=()=>(tab==="progress"||tab==="map")&&climbers().length>1;
-const cur=()=>BOTH&&canBoth()?"*":WHO;
+const canBoth=()=>tab==="progress"&&climbers().length>1;
+const cur=()=>tab==="map"?"*":BOTH&&canBoth()?"*":WHO;
 const whoOpts=()=>canBoth()?[...climbers(),"*"]:climbers();
 function themeFor(w){
   if(w==="*")return"both";
@@ -715,44 +707,65 @@ function render(msg){
 function onData(){if(auth!=="ok"||!ready)return;render();if(sheet&&sheet.type==="day")renderSheet();}
 
 /* Session */
+/* Climb home: date, a map card beside the day's stats (tap a wall to log there), four category tiles, then the day's climbs */
+let homeSel=LS.get("homesel",""),homeAll=false;
+const shortType=t=>t==="Bouldering"?"Boulder":t;
+const videoLinks=c=>String(c.video||"").split(/\s+/).filter(u=>/^https?:\/\//i.test(u));
+const homeWall=()=>gymMap()&&homeSel?zoneById(homeSel)||null:null;
+const meRGB=w=>themeFor(w)==="lav"?"247,161,196":"61,194,236";
 function renderSession(){
-  const today=todayKey();
-  $("#title").textContent=DAY===today?"Today":keyDate(DAY).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
-  const mine=dayClimbs(DAY,WHO);
-  const n=r=>mine.filter(c=>c.result===r).length;
-  const sent=n("Sent"),fell=n("Fell"),rested=n("Rested");
-  const rope=TYPE!=="Bouldering";
-  const rows=gradeRows(TYPE).map(r=>r.value);
-  for(const c of mine)if(c.type===TYPE&&!rows.some(g=>gkey(g)===gkey(c.grade)))rows.push(c.grade);
-  const cnt={};for(const c of mine){if(c.type!==TYPE)continue;const k=gkey(c.grade);cnt[k]=cnt[k]||{s:0,f:0,r:0};cnt[k][c.result==="Sent"?"s":c.result==="Rested"?"r":"f"]++;}
+  const today=todayKey(),isToday=DAY===today,M=gymMap(),sel=homeWall();
+  $("#title").textContent=isToday?"Today":keyDate(DAY).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
+  const mine=dayClimbs(DAY,WHO).sort((a,b)=>b.when-a.when);
+  const parts=RES_KEYS.map(([r,k,l])=>({k,l:l.toLowerCase(),v:mine.filter(c=>c.result===r).length}));
+  const myOpen=gymProjects().filter(p=>openFor(p,WHO));
+  let map="";
+  if(M){
+    // the person's walls glow for the day, flags mark their open projects, the picked wall is gold
+    const o={act:"homeWall",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:meRGB(WHO),flags:{},flagCol:PCOL[themeFor(WHO)][0]};
+    for(const z of M.zones){const n=mine.filter(c=>inZone(c,z)).length;if(n){o.heat[z.id]=n;o.heatMax=Math.max(o.heatMax,n);}if(myOpen.some(p=>inZone(p,z)))o.flags[z.id]=1;}
+    if(sel)o.sel=sel.id;
+    map=`<div class="hmap">${mapSVG(o)}</div>`;
+  }
+  const top=hardest(mine);
+  const stats=`<div class="hstats"><span class="k">${isToday?"Today":"That day"}</span><span class="big">${mine.length} <small>${mine.length===1?"climb":"climbs"}</small></span>
+    ${mine.length?`<span class="sbar" role="img" aria-label="${parts.map(p=>p.v+" "+p.l).join(", ")}">${parts.filter(p=>p.v).map(p=>`<i style="flex:${p.v};background:${RES_HEX[p.k]}"></i>`).join("")}</span>
+    <span class="hleg">${parts.filter(p=>p.v||p.k!=="rest").map(p=>`<span><i style="background:${RES_HEX[p.k]}"></i>${p.v} ${p.k==="rest"?"with rests":p.l}</span>`).join("")}</span>`:""}
+    ${top?`<span class="hsm">Hardest <b>${esc(top)}</b></span>`:""}
+    <span class="hsm">${myOpen.length} open ${myOpen.length===1?"project":"projects"}</span></div>`;
+  const tiles=TYPES.map(t=>{const n=mine.filter(c=>c.type===t.k).length,hi=!!sel&&sel.type===t.k;
+    return`<button class="tile${hi?" hi":""}" data-act="pick" data-v="${t.k}">${catIcon(t.k,"big")}<span class="nm"><b>${shortType(t.k)}</b><small>${n?`${n} ${isToday?"today":"that day"}`:"none yet"}${hi?" · "+esc(sel.area):""}</small></span></button>`;}).join("");
+  const shown=homeAll?mine:mine.slice(0,5);
   const dayLbl=keyDate(DAY).toLocaleDateString([],{weekday:"long",month:"short",day:"numeric"});
   $("#view").innerHTML=`
     ${whoSeg()}
     <div class="datebar">
       <button class="iconbtn" data-act="prevDay" aria-label="Previous day">${ICON.left}</button>
-      <label class="datepick"><span>${DAY===today?"Today · ":""}${esc(dayLbl)}</span>${ICON.down}<input type="date" id="dayInput" value="${DAY}" max="${today}" aria-label="Date you're logging for"></label>
+      <label class="datepick"><span>${isToday?"Today · ":""}${esc(dayLbl)}</span>${ICON.down}<input type="date" id="dayInput" value="${DAY}" max="${today}" aria-label="Date you're logging for"></label>
       <button class="iconbtn" data-act="nextDay" aria-label="Next day" ${DAY>=today?"disabled":""}>${ICON.right}</button>
     </div>
-    ${DAY!==today?`<div class="backfill"><span>Logging for an earlier day</span><button class="btn small" data-act="goToday">Back to today</button></div>`:""}
-    ${daySummary(mine,DAY===today)}
-    <button class="btn wide" data-tab="map">Full map ⤢</button>
-    <div class="types" role="group" aria-label="Climb type">${TYPES.map(t=>`<button data-act="type" data-v="${t.k}" aria-pressed="${t.k===TYPE}">${catIcon(t.k)}${t.k}</button>`).join("")}</div>
-    <div class="grows">${rows.length?rows.map(g=>{const k=gkey(g),c=cnt[k]||{s:0,f:0,r:0};const L=esc(gradeLabel(g));return`
-      <div class="grow">
-        ${tagHTML(TYPE,g,"lg")}
-        <div class="gcount${c.s+c.f+c.r?"":" zero"}"><span><b class="s">${c.s}</b> sent</span>${rope?`<span><b class="r">${c.r}</b> rest</span>`:""}<span><b class="f">${c.f}</b> fell</span></div>
-        <button class="tbtn fell" data-act="log" data-res="Fell" data-g="${esc(g)}" aria-label="Fell on ${L}">${ICON.x}</button>
-        ${rope?`<button class="tbtn rest" data-act="log" data-res="Rested" data-g="${esc(g)}" aria-label="Finished ${L} with rests">Rest</button>`:""}
-        <button class="tbtn sent" data-act="log" data-res="Sent" data-g="${esc(g)}" aria-label="Sent ${L}">${ICON.check}</button>
-      </div>`;}).join(""):`<div class="empty"><strong>No grades yet</strong>Add some to the Lists tab in your sheet (List: ${esc(typeOf(TYPE).grades)}).</div>`}</div>
-    <p class="hint">${rope?"Tap ✓ for a clean send, Rest if you finished with rests, ✕ for a fall.":"Tap ✓ for a send, ✕ for a fall."} Each one asks for its details.</p>
-    ${mine.length?`<button class="btn wide" data-act="openDay" data-k="${DAY}">See ${DAY===today?"today's":"this day's"} climbs</button>`:""}
+    ${isToday?"":`<div class="backfill"><span>Logging for an earlier day</span><button class="btn small" data-act="goToday">Back to today</button></div>`}
+    <section class="card hcard"><div class="hrow">${map}${stats}</div>
+      ${M?`<div class="hfoot"><span class="hsm">${sel?`<b>${esc(sel.area)}</b> picked · tap it again to clear`:"Tap a wall to log there"}</span><button class="btn small" data-tab="map">Full map ⤢</button></div>`:""}</section>
+    <div class="shead"><h2>Log a climb</h2>${sel?`<span class="atwall">at ${esc(sel.area)}<button data-act="homeWall" data-z="" aria-label="Clear wall">×</button></span>`:""}</div>
+    <div class="tiles">${tiles}</div>
+    <div class="shead"><h2>${isToday?"Today's climbs":"Climbs that day"}</h2>${mine.length?`<span class="hsm">Tap any climb to fix it</span>`:""}</div>
+    ${mine.length?`<div class="clist">${shown.map(climbRow).join("")}</div>${mine.length>shown.length?`<button class="btn dashed" data-act="homeAll">Show all ${mine.length}</button>`:""}`:`<p class="hint">Nothing logged ${isToday?"yet today":"on this day"}. Pick what you climbed above.</p>`}
     ${sheetLink()}`;
+}
+// One climb: result, category, grade, wall / anchor, hold dot, tries and note, and a play tile when it has a video
+function climbRow(c){
+  const kil=c.type==="Kilter Board";
+  const where=kil?["Kilter",c.angle?c.angle+"°":""].filter(Boolean).join(" "):[c.area,c.anchor?"#"+c.anchor:""].filter(Boolean).join(" ");
+  const det=[c.hold||"",kil&&c.problem?"“"+c.problem+"”":"",c.tries>1?c.tries+" tries":"",c.result==="Rested"&&c.rests?c.rests+(c.rests===1?" rest":" rests"):"",c.note||""].filter(Boolean).join(" · ");
+  const vids=videoLinks(c),h=holdHex(c.hold);
+  const tm=dayKey(c.when)===todayKey()?new Date(c.when).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"";
+  return`<div class="crow2">${resIcon(c.result)}<button class="t" data-act="openClimb" data-id="${c.id}"><b>${catIcon(c.type)}${tagHTML(c.type,c.grade,"sm")}${where?`<span class="w">· ${esc(where)}</span>`:""}</b><span class="d">${h?`<span class="hd" style="background:${h}"></span>`:""}${esc(det||"Tap to add details")}</span></button>${vids.length?`<a class="vtile" href="${esc(vids[0])}" target="_blank" rel="noopener" aria-label="Watch the video${vids.length>1?" (1 of "+vids.length+")":""}"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:tm?`<span class="tm">${tm}</span>`:""}</div>`;
 }
 const sheetLink=()=>sheetUrl?`<div class="sheetlink"><a href="${esc(sheetUrl)}" target="_blank" rel="noopener">Edit in Google Sheets ↗</a></div>`:"";
 
-function logClimb(res,grade){
-  const id=store.add("climbs",Object.assign({when:whenFor(DAY),climber:WHO,type:TYPE,grade,result:res,gym:GYM,tries:1},res==="Rested"?{rests:1}:{}));
+function logClimb(res,grade,area){
+  const id=store.add("climbs",Object.assign({when:whenFor(DAY),climber:WHO,type:TYPE,grade,result:res,gym:GYM,tries:1},res==="Rested"?{rests:1}:{},area?{area}:{}));
   // Every climb opens its details right away (Skip details keeps it as is)
   openSheet({type:"climb",id,fresh:true});
 }
@@ -771,7 +784,7 @@ function renderProjects(){
   $("#view").innerHTML=`
     ${whoSeg()}
     <p class="hint">${solo?`Routes ${esc(w)} fell on at ${esc(GYM)} and hasn't sent yet.`:`Routes either of you fell on at ${esc(GYM)} and haven't both sent yet.`}</p>
-    <div class="chips" role="group" aria-label="Filter projects">${["All",...TYPES.map(t=>t.k)].map(k=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${k} <span class="n">${counts[k]}</span></button>`).join("")}</div>
+    <div class="chips" role="group" aria-label="Filter projects">${["All",...TYPES.filter(t=>t.k!=="Kilter Board").map(t=>t.k)].map(k=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${k} <span class="n">${counts[k]}</span></button>`).join("")}</div>
     <div class="cards">${list.length?list.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":solo?`No projects for ${esc(w)}`:"No projects yet"}</strong>${open.length?"Try another filter.":"When you fall on a route, tap <b>Add details</b> and keep it here to come back to."}</div>`}</div>
     ${done.length?`<h2 class="sech">Sent or reset recently</h2><div class="done">${done.map(p=>{const info=projInfo(p);const total=Object.values(info.tries).reduce((a,b)=>a+b,0);
       const what=p.status==="Reset"?"Route was reset":`${esc(p.sentBy.join(" & ")||"Sent")} sent it${total?` after ${total} ${total===1?"try":"tries"}`:""}`;
@@ -930,19 +943,19 @@ function mapSVG(o){
     const active=!o.type||z.type===o.type;
     const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
     let fill=TYPE_TINT[z.type];
-    if(o.heat){const n=o.heat[z.id]||0;fill=n?`rgba(${MAPC.heat},${(.12+.42*n/o.heatMax).toFixed(2)})`:MAPC.off;}
+    if(o.heat){const n=o.heat[z.id]||0;fill=n?`rgba(${o.heatRGB||MAPC.heat},${(.12+.42*n/o.heatMax).toFixed(2)})`:MAPC.off;}
     const name=`${z.area} (${z.type})`;
-    s+=active?`<g class="zone${sel?" sel":""}" data-act="${o.type?"pickArea":"mapSel"}" data-z="${z.id}" data-area="${esc(z.area)}" tabindex="0" role="button" aria-label="${esc(name)}" aria-pressed="${!!sel}"><polygon points="${z.pts}" fill="${fill}" stroke="${MAPC.edge[z.type]||MAP_INK}" stroke-width="5" stroke-linejoin="round"/></g>`
+    s+=active?`<g class="zone${sel?" sel":""}" data-act="${o.act||(o.type?"pickArea":"mapSel")}" data-z="${z.id}" data-area="${esc(z.area)}" tabindex="0" role="button" aria-label="${esc(name)}" aria-pressed="${!!sel}"><polygon points="${z.pts}" fill="${fill}" stroke="${MAPC.edge[z.type]||MAP_INK}" stroke-width="5" stroke-linejoin="round"/></g>`
       :`<polygon points="${z.pts}" fill="${MAPC.off}" stroke="${MAPC.featEdge}" stroke-width="4" stroke-linejoin="round" opacity=".45" aria-hidden="true"/>`;
   }
   s+=`<rect x="12" y="18" width="1201" height="1377" fill="none" stroke="${MAPC.wall}" stroke-width="12"/>`;
-  for(const f of M.features)s+=label(f,false,!!o.type);
+  if(!o.noLabels){for(const f of M.features)s+=label(f,false,!!o.type);
   for(const z of M.zones){
     const active=!o.type||z.type===o.type;
     const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
     const anchors=z.type!=="Bouldering"&&!o.type?anchorText(z.area):"";
     s+=label(Object.assign({},z,{anchors:anchors?"#"+anchors:""}),sel,!active);
-  }
+  }}
   if(o.dots)for(const z of M.zones){
     const list=o.dots[z.id];if(!list||!list.length)continue;
     const show=list.slice(0,list.length>6?5:6),per=3,sp=44;
@@ -953,8 +966,11 @@ function mapSVG(o){
       s+=`<circle cx="${x}" cy="${y}" r="21" fill="${MAP_INK}" pointer-events="none"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="700" fill="${MAPC.chip}" pointer-events="none">+${list.length-5}</text>`;}
   }
   if(o.pins)for(const p of o.pins)s+=anchorPinSVG(p.pt,p.colour,p.big);
-  if(o.heat)for(const z of M.zones){const n=o.heat[z.id];if(!n)continue;
+  if(o.heat&&!o.noNums)for(const z of M.zones){const n=o.heat[z.id];if(!n)continue;
     s+=`<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="26" fill="${MAPC.chip}" stroke="${MAP_INK}" stroke-width="4" pointer-events="none"/><text x="${z.pin[0]}" y="${z.pin[1]}" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="700" fill="${MAP_INK}" pointer-events="none">${n}</text>`;}
+  // open-project flags sit on the wall, nudged off the climb count when both show
+  if(o.flags)for(const z of M.zones){if(!o.flags[z.id])continue;const off=o.heat&&o.heat[z.id]&&!o.noNums?50:0,x=z.pin[0]+off,y=z.pin[1]-off;
+    s+=`<g pointer-events="none"><circle cx="${x}" cy="${y}" r="36" fill="${o.flagCol||"#3DC2EC"}" stroke="${MAPC.floor}" stroke-width="7"/><path d="M${x-8} ${y+18}V${y-18}L${x+15} ${y-9}L${x-8} ${y}" fill="#08202C" stroke="#08202C" stroke-width="5" stroke-linejoin="round"/></g>`;}
   return s+`</svg>`;
 }
 /* Small map shown in a details panel: tap a wall to fill in Where */
@@ -974,9 +990,9 @@ function syncMini(){
 }
 
 /* Map tab */
-let mapSel=LS.get("mapsel",""),mapMode=LS.get("mapmode","activity"),mapPer=LS.get("mapper","day"),mapAnchor="",mapZoom=+LS.get("mapz","1")||1;
-// Opening the Map tab always lands on Activity, by day, at the latest session
-function mapLand(){mapMode="activity";mapPer="day";mapAnchor="";LS.set("mapmode",mapMode);LS.set("mapper",mapPer);}
+let wallHist=false,mapSel=LS.get("mapsel",""),mapPer=LS.get("mapper","day"),mapAnchor="",mapZoom=+LS.get("mapz","1")||1;
+// Opening the full map always lands on Day at the latest session
+function mapLand(){mapPer="day";mapAnchor="";wallHist=false;LS.set("mapper",mapPer);}
 if(tab==="map")mapLand();
 const weekStart=k=>shiftDay(k,-((keyDate(k).getDay()+6)%7));
 /* Activity period for whoever is shown: Day steps through session days only, Week is Monday to Sunday,
@@ -1006,71 +1022,60 @@ function mapPeriod(w){
   return{days,from,to,label,canPrev,canNext,word,isLast,inP,list:all.filter(inP),sessions:days.filter(k=>k>=from&&k<=to).length};
 }
 function mapStep(d){
-  const P=mapPeriod(cur());if(!P||!(d<0?P.canPrev:P.canNext))return;
+  const P=mapPeriod("*");if(!P||!(d<0?P.canPrev:P.canNext))return;
   if(mapPer==="day")mapAnchor=P.days[P.days.indexOf(mapAnchor)+d];
   else if(mapPer==="week")mapAnchor=shiftDay(mapAnchor,7*d);
   else{const m=keyDate(mapAnchor.slice(0,7)+"-01");m.setMonth(m.getMonth()+d);mapAnchor=dayKey(m.getTime());}
   render();
 }
 function setMapPer(v){
-  const P=mapPeriod(cur());
+  const P=mapPeriod("*");
   // back to Day: the latest session inside the period being looked at, else the first one
   if(v==="day"&&P&&mapPer!=="day")mapAnchor=P.days.filter(k=>k<=P.to).pop()||P.days[0];
   mapPer=v;LS.set("mapper",v);render();
 }
-// Thin sent / rested / fell bar plus counts and top sends for the period
-function periodSummary(P){
-  const cs=P.list;if(!cs.length)return`<p class="hint">No climbs ${esc(P.word)}.</p>`;
-  const parts=RES_KEYS.map(([r,k,l])=>({k,l:l.toLowerCase(),v:cs.filter(c=>c.result===r).length}));
-  const ropes=cs.some(c=>c.type!=="Bouldering"),top=hardest(cs);
-  const txt=parts.filter(p=>p.k!=="rest"||ropes||p.v).map(p=>p.v+" "+p.l).join(" · ");
-  return`<div class="psum"><span class="sbar" role="img" aria-label="${cs.length} ${cs.length===1?"climb":"climbs"}: ${txt}">${parts.filter(p=>p.v).map(p=>`<i style="flex:${p.v};background:${RES_HEX[p.k]}"></i>`).join("")}</span>
-    <p>${txt}</p>${top?`<p class="hint">Top: ${esc(top)}</p>`:""}</div>`;
-}
+const FLAG_SVG=`<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#3DC2EC"/><path d="M9 18V6l8 3-8 3" fill="#08202C" stroke="#08202C" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+/* Full map: always both climbers. Walls glow with the period's climbs, flags mark open projects; tap a wall for its panel */
 function renderMap(){
   $("#title").textContent="Full map";
-  const M=gymMap();
-  if(!M){$("#view").innerHTML=`${whoSeg()}<div class="empty"><strong>No map for ${esc(GYM)} yet</strong>The map is drawn for The Hub Mississauga. Switch gyms from the top of the screen.</div>`;return;}
-  const w=cur();
-  const o={};
-  // Projects with an anchor number sit at that spot on the wall; the rest cluster in the middle of their wall
-  if(mapMode==="projects"){o.dots={};o.pins=[];for(const z of M.zones){const loose=[];for(const p of zoneProjects(z,w)){const pt=z.type!=="Bouldering"&&p.anchor?anchorPoint(z.area,p.anchor):null;if(pt)o.pins.push({pt,colour:holdHex(p.hold)});else loose.push(holdHex(p.hold));}if(loose.length)o.dots[z.id]=loose;}}
-  const P=mapPeriod(w);
-  if(mapMode==="activity"){o.heat={};let mx=1;if(P)for(const z of M.zones){const n=zoneClimbs(z).filter(c=>P.inP(c)&&(w==="*"||c.climber===w)).length;if(n){o.heat[z.id]=n;mx=Math.max(mx,n);}}o.heatMax=mx;}
-  if(mapSel&&zoneById(mapSel))o.sel=mapSel;
-  const openN=M.zones.reduce((a,z)=>a+zoneProjects(z,w).length,0);
+  const M=gymMap(),back=`<button class="btn ghost" data-tab="session">${ICON.left}Climb</button>`;
+  if(!M){$("#view").innerHTML=`${back}<div class="empty"><strong>No map for ${esc(GYM)} yet</strong>The map is drawn for The Hub Mississauga. Switch gyms from the top of the screen.</div>`;return;}
+  const P=mapPeriod("*");
+  const o={heat:{},heatMax:1,flags:{}};
+  if(P)for(const z of M.zones){const n=zoneClimbs(z).filter(P.inP).length;if(n){o.heat[z.id]=n;o.heatMax=Math.max(o.heatMax,n);}}
+  for(const z of M.zones)if(zoneProjects(z).length)o.flags[z.id]=1;
+  const sel=mapSel?zoneById(mapSel):null;
+  if(sel)o.sel=sel.id;
   $("#view").innerHTML=`
-    <button class="btn ghost" data-tab="session">${ICON.left}Back to Climb</button>
-    ${whoSeg()}
-    <div class="types" role="group" aria-label="Show on map"><button data-act="mapMode" data-v="activity" aria-pressed="${mapMode==="activity"}">Activity</button><button data-act="mapMode" data-v="projects" aria-pressed="${mapMode==="projects"}">Projects${openN?` (${openN})`:""}</button></div>
-    ${mapMode!=="activity"?"":!P?`<div class="empty"><strong>No climbs here yet</strong>Log a session and ${w==="*"?"your":esc(w)+"'s"} climbs will light up the walls.</div>`:`
+    ${back}
+    ${!P?`<div class="empty"><strong>No climbs here yet</strong>Log a session and your climbs will light up the walls.</div>`:`
     <div class="chips" role="group" aria-label="Period">${[["day","Day"],["week","Week"],["month","Month"]].map(([v,l])=>`<button class="chip" data-act="mapPer" data-v="${v}" aria-pressed="${mapPer===v}">${l}</button>`).join("")}</div>
-    <div class="pnav"><button class="iconbtn" data-act="mapStep" data-d="-1" aria-label="Previous ${mapPer}" ${P.canPrev?"":"disabled"}>${ICON.left}</button><div class="pl"><b>${esc(P.label)}</b><small>${mapPer==="day"?(P.isLast?"Last session · ":""):P.sessions?`${P.sessions} ${P.sessions===1?"session":"sessions"} · `:""}${P.list.length} ${P.list.length===1?"climb":"climbs"}</small></div><button class="iconbtn" data-act="mapStep" data-d="1" aria-label="Next ${mapPer}" ${P.canNext?"":"disabled"}>${ICON.right}</button></div>
-    ${periodSummary(P)}`}
+    <div class="pnav"><button class="iconbtn" data-act="mapStep" data-d="-1" aria-label="Previous ${mapPer}" ${P.canPrev?"":"disabled"}>${ICON.left}</button><div class="pl"><b>${esc(P.label)}</b><small>${mapPer==="day"?(P.isLast?"Last session · ":""):P.sessions?`${P.sessions} ${P.sessions===1?"session":"sessions"} · `:""}${P.list.length} ${P.list.length===1?"climb":"climbs"}</small></div><button class="iconbtn" data-act="mapStep" data-d="1" aria-label="Next ${mapPer}" ${P.canNext?"":"disabled"}>${ICON.right}</button></div>`}
+    <div class="maprow"><div class="mlegend">${P?`<span><i style="background:rgba(${MAPC.heat},.5)"></i>Glow = climbs ${esc(P.word)}</span>`:""}<span class="fl">${FLAG_SVG}Flag = open project</span></div>
+      <div class="zoombtns"><button data-act="mapZoom" data-d="-1" aria-label="Zoom out" ${mapZoom<=1?"disabled":""}>−</button><button data-act="mapZoom" data-d="1" aria-label="Zoom in" ${mapZoom>=3?"disabled":""}>+</button></div></div>
     <div class="mapwrap">
       <div class="mapbox" id="mapbox" style="--mz:${mapZoom}">${mapSVG(o)}</div>
     </div>
-    <div class="maprow"><div class="mlegend"><span><i style="background:${TYPE_TINT["Bouldering"]}"></i>Bouldering</span><span><i style="background:${TYPE_TINT["Top rope"]}"></i>Top rope</span><span><i style="background:${TYPE_TINT["Auto belay"]}"></i>Auto belay</span>${mapMode==="projects"?`<span><i class="dot"></i>Project (hold colour)</span>`:""}</div>
-      <div class="zoombtns"><button data-act="mapZoom" data-d="-1" aria-label="Zoom out" ${mapZoom<=1?"disabled":""}>−</button><button data-act="mapZoom" data-d="1" aria-label="Zoom in" ${mapZoom>=3?"disabled":""}>+</button></div></div>
-    ${mapSel&&zoneById(mapSel)?zonePanel(zoneById(mapSel),P):`<p class="hint">${mapMode==="activity"?"Brighter walls = more climbs. Tap a wall for its stats.":"Tap a wall to see its projects and stats."}</p>`}
+    ${sel?zonePanel(sel,P):`<p class="hint">Tap a wall for its climbs and projects.</p>`}
     ${sheetLink()}`;
 }
 function zonePanel(z,P){
-  const who=cur();
-  const cs=zoneClimbs(z).filter(c=>who==="*"||c.climber===who),ps=zoneProjects(z,who),rope=z.type!=="Bouldering";
-  const allPs=zoneProjects(z);
-  const recent=P?cs.filter(P.inP).length:0;
+  const rope=z.type!=="Bouldering",anchors=rope?anchorText(z.area):"";
+  const cs=zoneClimbs(z),inP=P?cs.filter(P.inP):[],ps=zoneProjects(z);
   const cnt=(a,r)=>a.filter(c=>c.result===r).length;
-  const anchors=rope?anchorText(z.area):"";
-  const people=climbers().filter(w=>cs.some(c=>c.climber===w));
+  const parts=RES_KEYS.map(([r,k,l])=>({k,l:l.toLowerCase(),v:cnt(inP,r)}));
+  const top=hardest(inP),people=climbers().filter(w=>cs.some(c=>c.climber===w));
   return`<section class="panel" aria-labelledby="zoneTitle">
-    <div class="phead2"><h2 id="zoneTitle" style="font-family:var(--f-display);font-size:21px">${esc(z.area)}</h2><span class="ztype" style="background:${TYPE_TINT[z.type]}">${z.type}</span></div>
-    ${rope?`<p class="hint">${anchors?`Anchors #${esc(anchors)}`:`Anchor numbers not set yet. Add them in the Lists tab as <b>Anchors</b>, e.g. “${esc(z.area)}: 1-20”.`}</p>`:""}
-    ${people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Fell</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>
-    ${P?`<p class="hint">${recent} ${recent===1?"climb":"climbs"} here ${esc(P.word)}${who==="*"?"":" by "+esc(who)}.</p>`:""}`:`<p class="hint">${who==="*"?"No climbs logged on this wall yet.":esc(who)+" hasn't logged a climb on this wall yet."}</p>`}
-    <h3 class="sech">${who==="*"?"Open projects":esc(who)+"'s open projects"} (${ps.length})</h3>
-    ${ps.length?`<div class="cards">${ps.map(projCard).join("")}</div>`:`<p class="hint">None here right now.</p>`}
-    <button class="btn" data-act="zoneReset" data-z="${z.id}" ${allPs.length?`data-confirm="Tap again: move ${allPs.length} to Reset${who!=="*"&&allPs.length!==ps.length?" (both of you)":""}"`:"disabled"}>This wall was reset</button>
+    <div class="phead2"><h2 id="zoneTitle" style="font-family:var(--f-display);font-size:21px">${esc(z.area)}</h2><span class="hsm">${z.type}${anchors?" · anchors "+esc(anchors):""}</span></div>
+    ${rope&&!anchors?`<p class="hint">Anchor numbers not set yet. Add them in the Lists tab as <b>Anchors</b>, e.g. “${esc(z.area)}: 1-20”.</p>`:""}
+    ${inP.length?`<span class="sbar" style="height:10px" role="img" aria-label="${parts.map(p=>p.v+" "+p.l).join(", ")}">${parts.filter(p=>p.v).map(p=>`<i style="flex:${p.v};background:${RES_HEX[p.k]}"></i>`).join("")}</span>
+    <p class="hint" style="margin:0">${inP.length} ${inP.length===1?"climb":"climbs"} ${esc(P.word)} · ${parts[0].v} sent${top?" · hardest "+esc(top):""}</p>`:`<p class="hint" style="margin:0">No climbs here ${P?esc(P.word):"yet"}.</p>`}
+    <h3 class="sech">Open projects (${ps.length})</h3>
+    ${ps.length?`<div class="wprojs">${ps.map(p=>{const tries=Object.values(projInfo(p).tries).reduce((a,b)=>a+b,0);
+      return`<button class="wrow" data-act="editProj" data-id="${p.id}">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(projName(p))}${p.anchor?" · #"+esc(p.anchor):""}</span><span class="hsm">${tries} ${tries===1?"try":"tries"}</span></button>`;}).join("")}</div>`:`<p class="hint" style="margin:0">None here right now.</p>`}
+    <div class="foot"><button class="btn primary wide" data-act="logHere" data-z="${z.id}">Log a climb here</button><button class="btn" data-act="wallHist" aria-expanded="${wallHist}">Wall history</button></div>
+    ${!wallHist?"":people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Fell</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
+    <button class="btn" data-act="zoneReset" data-z="${z.id}" ${ps.length?`data-confirm="Tap again: move ${ps.length} to Reset"`:"disabled"}>This wall was reset</button>
   </section>`;
 }
 
@@ -1132,6 +1137,7 @@ function renderSheet(){
   else if(sheet.type==="project"){const p=S.projects.find(x=>x.id===sheet.id);if(!p){closeSheet();return;}b.innerHTML=projSheet(p);}
   else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
   else if(sheet.type==="gym")b.innerHTML=gymSheet();
+  else if(sheet.type==="pick")b.innerHTML=pickSheet();
   replayTap();
 }
 function areaField(type,val){
@@ -1149,6 +1155,17 @@ const RES_TITLE={Sent:"Sent a",Fell:"Fell on a",Rested:"Rested on a"};
 const resVerb=c=>c.result==="Sent"?"sent":c.result==="Rested"?"finished with rests on":"fell on";
 function stepField(id,label,val,min,what){
   return`<div class="inrow"><span class="flabel" style="margin:0" id="${id}L">${label}</span><div class="stepper" role="group" aria-labelledby="${id}L"><button type="button" data-act="step" data-o="${id}" data-min="${min}" data-d="-1" aria-label="One fewer ${what}">−</button><output id="${id}">${val}</output><button type="button" data-act="step" data-o="${id}" data-min="${min}" data-d="1" aria-label="One more ${what}">+</button></div></div>`;
+}
+/* New climb, step one: result and grade. Tapping a grade logs it and opens the details */
+function pickSheet(){
+  const t=sheet.t,results=t==="Top rope"?["Sent","Rested","Fell"]:["Sent","Fell"];
+  if(!results.includes(sheet.res))sheet.res="Sent";
+  const sel=homeWall(),at=sel&&sel.type===t?sel.area:"",grades=gradeRows(t);
+  const sub=[WHO,at?"at "+at:"",DAY!==todayKey()?fmtShort(DAY):""].filter(Boolean).map(esc).join(" · ");
+  return head(`<span class="pickh">${catIcon(t,"md")}${esc(shortType(t))}</span>`,sub)+`<div class="stack">
+    <fieldset><legend class="flabel">Result</legend><div class="resrow">${results.map(r=>`<button type="button" class="rbtn" data-act="pickRes" data-v="${r}" aria-pressed="${r===sheet.res}">${resIcon(r)}${r}</button>`).join("")}</div></fieldset>
+    <fieldset><legend class="flabel">Grade</legend>${grades.length?`<div class="gchips">${grades.map(r=>{const c=gradeColour(t,r.value);return`<button type="button" class="gchip" data-act="pickGrade" data-g="${esc(r.value)}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(r.value))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet (List: ${esc(typeOf(t).grades)}).</p>`}</fieldset>
+    <p class="hint">Tap the grade to log it. Wall, holds, tries and notes come next.</p></div>`;
 }
 function climbSheet(c){
   const res=c.result;
@@ -1170,7 +1187,7 @@ function climbSheet(c){
     ${res==="Rested"?stepField("restsOut","Rests needed",c.rests||1,1,"rest"):""}
     ${stepField("triesOut",res==="Sent"?"Tries it took":"Tries on it",c.tries||1,1,"try")}
     <label class="field">Note<input name="note" value="${esc(c.note||"")}" placeholder="${place}"></label>
-    ${linked?`<p class="hint">Part of your project: ${esc(projName(linked))}${linked.area?" · "+esc(linked.area):""}.</p>`:res!=="Sent"?`<label class="check" id="projCheck" ${sheet.link!=="new"?"hidden":""}><input type="checkbox" name="addProj" ${res==="Fell"?"checked":""}>${res==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
+    ${linked?`<p class="hint">Part of your project: ${esc(projName(linked))}${linked.area?" · "+esc(linked.area):""}.</p>`:res!=="Sent"&&c.type!=="Kilter Board"?`<label class="check" id="projCheck" ${sheet.link!=="new"?"hidden":""}><input type="checkbox" name="addProj" ${res==="Fell"?"checked":""}>${res==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
     <div class="foot"><button type="button" class="btn" data-act="${sheet.fresh?"skipDetails":"close"}">${sheet.fresh?"Skip details":"Cancel"}</button><button type="submit" class="btn primary">Save</button></div>
     <button type="button" class="linkbtn" data-act="delClimb" data-id="${c.id}" data-confirm="Tap again to delete">Delete this climb</button>
   </form>`;
@@ -1180,8 +1197,17 @@ function markProjectSent(p,who){
   const all=Object.keys(projInfo(p).tries).every(w=>sentBy.includes(w));
   store.update("projects",p.id,{sentBy,status:all?"Sent":"Open"});
 }
+// Undo after saving: a new climb goes away; an edited one gets its old values back, and so does any project it touched
+function undoSave(c,prev,fresh,keys,proj){
+  return[{label:"Undo",fn:()=>{
+    if(fresh)store.del("climbs",c.id);
+    else{const back={};for(const k of keys)back[k]=prev[k]==null?"":prev[k];store.update("climbs",c.id,back);}
+    if(proj&&proj.created)store.del("projects",proj.id);else if(proj&&proj.prev)store.update("projects",proj.id,proj.prev);
+  }}];
+}
 function saveClimb(form){
   const c=S.climbs.find(x=>x.id===form.dataset.id);if(!c)return closeSheet();
+  const prev=Object.assign({},c),fresh=!!(sheet&&sheet.fresh),lbl=gradeLabel(c.grade);
   const f=new FormData(form);
   const base={tries:Math.max(1,+$("#triesOut").textContent||1),note:String(f.get("note")||"").trim()};
   const ro=$("#restsOut");if(ro)base.rests=Math.max(1,+ro.textContent||1);
@@ -1190,17 +1216,21 @@ function saveClimb(form){
   const link=f.get("link")||"new";
   if(link!=="new"){
     const p=S.projects.find(x=>x.id===link)||{};
-    store.update("climbs",c.id,Object.assign(base,{project:link,area:p.area||"",anchor:p.anchor||"",hold:p.hold||""}));
+    const upd=Object.assign(base,{project:link,area:p.area||"",anchor:p.anchor||"",hold:p.hold||""});
+    const proj=p.id?{id:p.id,prev:{sentBy:p.sentBy.slice(),status:p.status}}:null;
+    store.update("climbs",c.id,upd);
     if(c.result==="Sent"&&p.id)markProjectSent(p,c.climber);else store.update("projects",link,{});
-    closeSheet();toast(c.result==="Sent"?"Project sent!":"Added to your project");return;
+    closeSheet();toast(c.result==="Sent"?`Saved ${lbl}: project sent!`:`Saved ${lbl} to your project`,undoSave(c,prev,fresh,Object.keys(upd),proj));return;
   }
   const d=Object.assign(base,{area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||"")});
-  if(c.project){store.update("projects",c.project,{area:d.area,anchor:d.anchor,hold:d.hold});}
+  let proj=null;
+  if(c.project){const p=S.projects.find(x=>x.id===c.project);if(p)proj={id:p.id,prev:{area:p.area||"",anchor:p.anchor||"",hold:p.hold||""}};store.update("projects",c.project,{area:d.area,anchor:d.anchor,hold:d.hold});}
   else if(c.result!=="Sent"&&f.get("addProj")){
     d.project=store.add("projects",{type:c.type,grade:c.grade,hold:d.hold,area:d.area,anchor:d.anchor,gym:c.gym||GYM,note:d.note,status:"Open",sentBy:[],added:d.when||c.when||Date.now()});
+    proj={id:d.project,created:true};
   }
   store.update("climbs",c.id,d);
-  closeSheet();toast(d.project?"Saved to Projects":"Saved");
+  closeSheet();toast(d.project&&!c.project?`Saved ${lbl} to Projects`:`Saved ${lbl}`,undoSave(c,prev,fresh,Object.keys(d),proj));
 }
 function projSheet(p){
   const grades=gradeRows(p.type);const has=grades.some(r=>gkey(r.value)===gkey(p.grade));
@@ -1257,8 +1287,13 @@ document.addEventListener("click",e=>{
     case"close":closeSheet();break;
     case"skipDetails":{const cid=sheet&&sheet.id;const c=S.climbs.find(x=>x.id===cid);closeSheet();if(c)toast(`${c.climber} ${resVerb(c)} a ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);break;}
     case"who":tapWho(t.dataset.v);break;
-    case"type":TYPE=t.dataset.v;LS.set("type",TYPE);render();break;
-    case"log":logClimb(t.dataset.res,t.dataset.g);break;
+    case"pick":openSheet({type:"pick",t:t.dataset.v,res:"Sent"});break;
+    case"pickRes":if(sheet){sheet.res=t.dataset.v;renderSheet();}break;
+    case"pickGrade":{if(!sheet)break;const s=sheet,w=homeWall();TYPE=s.t;LS.set("type",TYPE);logClimb(s.res||"Sent",t.dataset.g,w&&w.type===s.t?w.area:"");break;}
+    case"homeWall":{const z=t.dataset.z;homeSel=!z||homeSel===z?"":z;LS.set("homesel",homeSel);render();break;}
+    case"homeAll":homeAll=true;render();break;
+    case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");openSheet({type:"pick",t:z.type,res:"Sent"});break;}
+    case"wallHist":wallHist=!wallHist;render();break;
     case"prevDay":DAY=shiftDay(DAY,-1);render();break;
     case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();break;
     case"goToday":DAY=todayKey();render();break;
@@ -1275,7 +1310,6 @@ document.addEventListener("click",e=>{
     case"reopen":if(P){store.update("projects",P.id,{status:"Open"});toast("Back in your projects");}break;
     case"delProj":if(P){for(const c of S.climbs.filter(c=>c.project===P.id))store.update("climbs",c.id,{project:""});store.del("projects",P.id);closeSheet();toast("Project deleted");}break;
     case"month":{const d=keyDate(pMonth+"-01");d.setMonth(d.getMonth()+ +t.dataset.d);pMonth=dayKey(d.getTime()).slice(0,7);render();break;}
-    case"mapMode":mapMode=t.dataset.v;LS.set("mapmode",mapMode);render();break;
     case"mapPer":setMapPer(t.dataset.v);break;
     case"mapStep":mapStep(+t.dataset.d);break;
     case"mapZoom":mapZoom=Math.max(1,Math.min(3,mapZoom+ +t.dataset.d));LS.set("mapz",mapZoom);render();break;
@@ -1330,7 +1364,7 @@ function scrollsSideways(el){
 const dragP=dx=>Math.min(1,Math.abs(dx)/(Math.min(innerWidth,600)*.7));
 document.addEventListener("touchstart",e=>{
   swipe=null;
-  if(e.touches.length!==1||sheet||!ready||auth!=="ok"||whoOpts().length<2)return;
+  if(e.touches.length!==1||sheet||!ready||auth!=="ok"||tab==="map"||whoOpts().length<2)return;
   if(e.target.closest("#sheetWrap,#toast,.tabs,input,select,textarea")||scrollsSideways(e.target))return;
   cancelAnimationFrame(switchAnim);
   const p=e.touches[0];swipe={x:p.clientX,y:p.clientY,t:Date.now(),mode:"",dx:0};
@@ -1358,7 +1392,7 @@ document.addEventListener("touchcancel",()=>{if(swipe&&swipe.dir)animateSwitch(n
 
 /* ---------- press feedback ----------
    Most taps redraw the screen, so the ring is replayed on the redrawn copy of the same button. */
-const TAP_SEL="button,.chip,label.pill,label.sw,.zone,.srow,.dtype,.phead";
+const TAP_SEL="button,.chip,label.pill,label.sw,.zone,.srow,.phead";
 const TAP_KEYS=["act","tab","v","id","res","g","z","d","k"];
 let lastTap=null;
 const tapTarget=el=>el.matches("label.pill,label.sw")?el.querySelector("span")||el:el;

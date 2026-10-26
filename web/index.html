@@ -457,6 +457,19 @@ legend{padding:0}
 .shrow small{font-size:11px;color:var(--muted);white-space:nowrap}
 .shrow input:checked+span{border:2px solid #fff;background:var(--me-soft)}
 .shrow input:focus-visible+span{outline:2px solid var(--me)}
+.mapcard{display:flex;flex-direction:column;gap:8px;padding:10px}
+.bigmap{border-radius:14px;overflow:hidden;background:#000}
+.bigmap svg{display:block;width:100%;height:auto}
+.mark{cursor:pointer;outline:none}
+.mark:focus-visible rect{stroke:#fff}
+.mleg{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;font-size:12px;color:var(--muted)}
+.mleg span{display:inline-flex;align-items:center;gap:6px}
+.mleg i{display:inline-block}
+.mleg .lt{width:28px;height:13px;border-radius:7px}
+.mleg .ld{width:12px;height:12px;border-radius:50%;background:#2F6FD6;border:2px solid #fff}
+.mleg .lg{width:36px;height:10px;border-radius:3px;background:linear-gradient(90deg,rgba(var(--me-rgb,61,194,236),.2),rgba(var(--me-rgb,61,194,236),.8))}
+.mleg .ls{width:18px;height:18px;border-radius:50%;background:#F5C451;color:#3A2A00;font-style:normal;font-size:11px;display:grid;place-items:center}
+.pline{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:14px;background:var(--sunk)}
 </style>
 </head>
 <body>
@@ -805,8 +818,9 @@ function renderSession(){
   let map="";
   if(M){
     // the person's walls glow for the day, flags mark their open projects, the picked wall is gold
-    const o={act:"homeWall",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:meRGB(WHO),flags:{},flagCol:PCOL[themeFor(WHO)][0]};
-    for(const z of M.zones){const n=mine.filter(c=>inZone(c,z)).length;if(n){o.heat[z.id]=n;o.heatMax=Math.max(o.heatMax,n);}if(myOpen.some(p=>inZone(p,z)))o.flags[z.id]=1;}
+    // the person's walls glow for the day with a count on each; projects have their own map on the Projects tab
+    const o={act:"homeWall",noLabels:true,heat:{},heatMax:1,heatRGB:meRGB(WHO),numFill:PCOL[themeFor(WHO)][0],numInk:"#08202C",numR:44};
+    for(const z of M.zones){const n=mine.filter(c=>inZone(c,z)).length;if(n){o.heat[z.id]=n;o.heatMax=Math.max(o.heatMax,n);}}
     if(sel)o.sel=sel.id;
     map=`<div class="hmap">${mapSVG(o)}</div>`;
   }
@@ -864,11 +878,29 @@ function renderProjects(){
     ${whoSeg()}
     <div class="shead"><h2 class="ph">${esc(w)}'s projects</h2><button class="btn send small" data-act="newProj">+ New</button></div>
     <div class="chips" role="group" aria-label="Filter projects">${PF.map(([k,l])=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${l} <span class="n">${open.filter(p=>pfMatch(p,k)).length}</span></button>`).join("")}</div>
+    ${projMap(list)}
     <div class="cards">${list.length?list.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":`No projects for ${esc(w)}`}</strong>${open.length?"Try another filter.":"Fall on a route and keep it as a project, or tap <b>+ New</b> to add one you want to try."}</div>`}</div>
     ${done.length?`<h2 class="sech">Sent or reset recently</h2><div class="done">${done.map(p=>{const info=projInfo(p);const n=info.tries[w]||0;
       const what=p.status==="Reset"?"route was reset":p.sentBy.includes(w)?`sent${n?` after ${n} ${n===1?"try":"tries"}`:""}`:"closed";
       return`<div class="drow">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<button class="t dlink" data-act="openProj" data-id="${p.id}">${esc(projName(p))} · ${what}</button>${p.status==="Reset"?`<button class="btn small ghost" data-act="reopen" data-id="${p.id}">Reopen</button>`:`<span class="hsm">${fmtShort(dayKey(p.updated||info.last||Date.now()))}</span>`}</div>`;}).join("")}</div>`:""}
     ${sheetLink()}`;
+}
+/* Projects map: each open project where it is. Boulders as a tag in the circuit's grade colour on their wall;
+   routes as a dot at the anchor with the grade beside it (on the wall when there's no anchor). Tap one to open it. */
+function projMap(list){
+  const M=gymMap();if(!M||!list.length)return"";
+  const c=PCOL[themeFor(WHO)],o={act:"noop",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:meRGB(WHO),marks:[]};
+  for(const p of list){
+    const z=M.zones.find(z=>inZone(p,z));if(!z)continue;
+    o.heat[z.id]=(o.heat[z.id]||0)+1;o.heatMax=Math.max(o.heatMax,o.heat[z.id]);
+    const col=gradeColour(p.type,p.grade),t=gradeLabel(p.grade);
+    const pt=typeOf(p.type).anchor&&p.anchor?anchorPoint(p.area,p.anchor):null;
+    const m={t,act:"openProj",id:p.id,bg:col||c[1],fg:col?inkOn(col):"#ECEBFA",bd:col?"#000":c[0],fs:col?40:36};
+    if(pt)Object.assign(m,{x:pt.x+pt.nx*100,y:pt.y+pt.ny*100,dot:[pt.x,pt.y],dotCol:holdHex(p.hold)||"#C9C4B8"});else Object.assign(m,{x:z.lbl[0],y:z.lbl[1]});
+    o.marks.push(m);
+  }
+  if(!o.marks.length)return"";
+  return`<section class="card mapcard"><div class="bigmap">${mapSVG(o)}</div><div class="mleg"><span><i class="lt" style="background:#F08A24"></i>Boulder: circuit colour</span><span><i class="ld"></i>Route: anchor + grade</span></div><p class="hint">Tap a grade to open that project.</p></section>`;
 }
 // One card: hold-colour strip, category, grade, name, where, a dot per try, last note, last tried, chevron
 function projCard(p){
@@ -1019,6 +1051,24 @@ function anchorPoint(area,num){
   }
   return null;
 }
+/* Grade tags on the map (Projects and Progress): {x,y,t,bg,fg,bd,fs,dot:[x,y],dotCol,star,act,id,z}.
+   Kept inside the gym and nudged down so two tags don't sit on top of each other. */
+function marksSVG(marks){
+  const placed=[];let s="";
+  for(const m of marks){
+    const fs=m.fs||36,w=Math.max(60,String(m.t).length*fs*.62+30),h=fs*1.5;
+    let x=Math.max(w/2+16,Math.min(1211-w/2,m.x)),y=Math.max(h/2+20,Math.min(1393-h/2,m.y));
+    for(let k=0;k<8&&placed.some(q=>Math.abs(q.x-x)<(q.w+w)/2+6&&Math.abs(q.y-y)<h+6);k++)y+=h+8;
+    placed.push({x,y,w});
+    const act=m.act?` data-act="${m.act}"${m.id?` data-id="${m.id}"`:""}${m.z?` data-z="${m.z}"`:""} role="button" tabindex="0" class="mark"`:` pointer-events="none"`;
+    s+=`<g${act}>`;
+    if(m.dot)s+=`<line x1="${m.dot[0]}" y1="${m.dot[1]}" x2="${x}" y2="${y}" stroke="${m.bd||"#fff"}" stroke-width="4" opacity=".6"/><circle cx="${m.dot[0]}" cy="${m.dot[1]}" r="22" fill="${m.dotCol||"#C9C4B8"}" stroke="#fff" stroke-width="6"/>`;
+    s+=`<rect x="${(x-w/2).toFixed(1)}" y="${(y-h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="${h/2}" fill="${m.bg}" stroke="${m.bd||"#000"}" stroke-width="6"/><text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="800" fill="${m.fg}">${esc(m.t)}</text>`;
+    if(m.star)s+=`<circle cx="${(x+w/2+10).toFixed(1)}" cy="${(y-h/2).toFixed(1)}" r="22" fill="#F5C451" stroke="#000" stroke-width="5"/><text x="${(x+w/2+10).toFixed(1)}" y="${(y-h/2+1).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="30" fill="#3A2A00">★</text>`;
+    s+=`</g>`;
+  }
+  return s;
+}
 function anchorPinSVG(pt,colour,big){
   const r=big?22:17,lx=pt.x+pt.nx*(r+30),ly=pt.y+pt.ny*(r+30);
   return`<g pointer-events="none"><circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${r}" fill="${colour||"#C9C4B8"}" stroke="${MAP_INK}" stroke-width="5"/>`+
@@ -1072,8 +1122,9 @@ function mapSVG(o){
       s+=`<circle cx="${x}" cy="${y}" r="21" fill="${MAP_INK}" pointer-events="none"/><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="700" fill="${MAPC.chip}" pointer-events="none">+${list.length-5}</text>`;}
   }
   if(o.pins)for(const p of o.pins)s+=anchorPinSVG(p.pt,p.colour,p.big);
-  if(o.heat&&!o.noNums)for(const z of M.zones){const n=o.heat[z.id];if(!n)continue;
-    s+=`<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="26" fill="${MAPC.chip}" stroke="${MAP_INK}" stroke-width="4" pointer-events="none"/><text x="${z.pin[0]}" y="${z.pin[1]}" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="700" fill="${MAP_INK}" pointer-events="none">${n}</text>`;}
+  if(o.heat&&!o.noNums)for(const z of M.zones){const n=o.heat[z.id];if(!n)continue;const r=o.numR||26;
+    s+=`<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="${r}" fill="${o.numFill||MAPC.chip}" stroke="${o.numFill?"#000":MAP_INK}" stroke-width="${o.numFill?8:4}" pointer-events="none"/><text x="${z.pin[0]}" y="${z.pin[1]}" text-anchor="middle" dominant-baseline="central" font-size="${r}" font-weight="800" fill="${o.numInk||MAP_INK}" pointer-events="none">${n}</text>`;}
+  if(o.marks)s+=marksSVG(o.marks);
   // open-project flags sit on the wall, nudged off the climb count when both show
   if(o.flags)for(const z of M.zones){if(!o.flags[z.id])continue;const off=o.heat&&o.heat[z.id]&&!o.noNums?50:0,x=z.pin[0]+off,y=z.pin[1]-off;
     s+=`<g pointer-events="none"><circle cx="${x}" cy="${y}" r="36" fill="${o.flagCol||"#3DC2EC"}" stroke="${MAPC.floor}" stroke-width="7"/><path d="M${x-8} ${y+18}V${y-18}L${x+15} ${y-9}L${x-8} ${y}" fill="#08202C" stroke="#08202C" stroke-width="5" stroke-linejoin="round"/></g>`;}
@@ -1213,6 +1264,7 @@ function renderProgress(){
       <div class="kpi"><b class="small">${esc(hardest(data)||"—")}</b><span>hardest sends</span></div>
     </div>`;
   }
+  html+=progressMap(data,pWho,mLabel);
   html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--chart-sent,var(--sent))"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rested</span>`:""}<span><i style="background:var(--fell-bar)"></i>Fell</span></div></div>
     <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.r?`<i style="height:${Math.round(x.r/max*H)}px;background:var(--rest-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--chart-sent,var(--sent))"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
   // sends by grade, per type
@@ -1222,6 +1274,32 @@ function renderProgress(){
   html+=`<section class="panel"><h2>Sends by grade</h2><div class="gbars">${gb}</div></section>`;
   html+=`<section><h2 class="sech">Sessions</h2><div class="slist">${per.slice().reverse().map(x=>`<button class="srow" data-act="openDay" data-k="${x.k}"><span class="dd"><small>${esc(fmtDow(x.k))}</small><b>${keyDate(x.k).getDate()}</b></span><span class="tx"><b>${x.t} ${x.t===1?"climb":"climbs"} · ${x.s} sent</b><span>${x.top?"Top "+esc(x.top):"No sends yet"}</span></span>${ICON.right}</button>`).join("")}</div></section>`+sheetLink();
   $("#view").innerHTML=html;
+}
+/* Progress map: walls shaded by sends this month, a tag with the hardest send on each wall,
+   and a gold star when that beats everything sent on the wall before this month. Tap a wall for its line. */
+let progSel="";
+function progressMap(data,pWho,mLabel){
+  const M=gymMap();if(!M)return"";
+  const who=pWho==="*"?null:pWho,start=pMonth+"-01";
+  const before=S.climbs.filter(c=>atGym(c)&&c.result==="Sent"&&dayKey(c.when)<start&&(!who||c.climber===who));
+  const o={act:"progWall",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:pWho==="*"?"161,147,250":meRGB(pWho),marks:[],sel:progSel};
+  const info={};let total=0,walls=0;
+  for(const z of M.zones){
+    const zc=data.filter(c=>inZone(c,z));if(!zc.length)continue;
+    const sends=zc.filter(c=>c.result==="Sent").sort((a,b)=>gradeIdx(z.type,b.grade)-gradeIdx(z.type,a.grade));
+    const top=sends[0],prev=before.filter(c=>inZone(c,z));
+    const nb=!!top&&prev.length>0&&gradeIdx(z.type,top.grade)>Math.max(...prev.map(c=>gradeIdx(z.type,c.grade)));
+    info[z.id]={z,n:sends.length,fell:zc.filter(c=>c.result==="Fell").length,rest:zc.filter(c=>c.result==="Rested").length,top:top&&top.grade,nb};
+    if(sends.length){o.heat[z.id]=sends.length;o.heatMax=Math.max(o.heatMax,sends.length);total+=sends.length;walls++;}
+    if(top){const col=gradeColour(z.type,top.grade);o.marks.push({x:z.lbl[0],y:z.lbl[1],t:gradeLabel(top.grade),bg:col||"#132235",fg:col?inkOn(col):"#ECEBFA",bd:col?"#000":"#6FD6F6",fs:36,star:nb,act:"progWall",z:z.id});}
+  }
+  if(!Object.keys(info).length)return"";
+  const sel=info[progSel];
+  const line=sel?`<div class="pline"><b>${esc(sel.z.area)} · ${esc(mLabel)}</b><span class="hsm">${sel.n} ${sel.n===1?"send":"sends"}${sel.top?` · hardest ${esc(gradeLabel(sel.top))}${sel.nb?" (new best!)":""}`:""}${sel.rest?` · ${sel.rest} rested`:""}${sel.fell?` · ${sel.fell} ${sel.fell===1?"fall":"falls"}`:""}</span></div>`
+    :`<p class="hint">Tap a wall for its month.</p>`;
+  return`<section class="panel"><div class="phead2"><h2>Where you sent</h2><span class="hsm">${total} ${total===1?"send":"sends"} · ${walls} ${walls===1?"wall":"walls"}</span></div>
+    <div class="bigmap">${mapSVG(o)}</div>
+    <div class="mleg"><span><i class="lg"></i>Fewer → more sends</span><span><i class="lt" style="background:#F08A24"></i>Hardest send there</span><span><i class="ls">★</i>New best this month</span></div>${line}</section>`;
 }
 function gradeCounts(type,data){
   const d=data.filter(c=>c.type===type);if(!d.length)return[];
@@ -1506,6 +1584,7 @@ document.addEventListener("click",e=>{
     case"homeWall":{const z=t.dataset.z;homeSel=!z||homeSel===z?"":z;LS.set("homesel",homeSel);render();break;}
     case"homeAll":homeAll=true;render();break;
     case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");newClimb(z.type,z.area);break;}
+    case"progWall":{const z=t.dataset.z;progSel=progSel===z?"":z;render();break;}
     case"wallHist":wallHist=!wallHist;render();break;
     case"prevDay":DAY=shiftDay(DAY,-1);render();break;
     case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();break;
@@ -1566,7 +1645,7 @@ document.addEventListener("submit",e=>{
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape"&&sheet)closeSheet();
   // Map walls are SVG groups: let Enter and Space press them like buttons
-  if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("zone")){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}));}
+  if((e.key==="Enter"||e.key===" ")&&e.target.classList&&(e.target.classList.contains("zone")||e.target.classList.contains("mark"))){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}));}
 });
 
 /* ---------- swipe left/right to switch person ----------

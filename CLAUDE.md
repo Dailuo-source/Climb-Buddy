@@ -29,12 +29,12 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 
 ## App design rules (`index.html`, one file)
 
-- Tabs: **Session** (date picker, `daySummary` drawn as a ring + stacked bar per type, since Gary prefers visuals; tapping a type switches the grade list; per-grade ✓/Rest/✕), **Projects**, **Map**, **Progress**.
-- **Whose view**: one switcher on every tab (`whoSeg`, `cb.who`, `cb.both`). Map, Projects, Progress also offer **Both**; Session logs for one person. Swiping switches with a finger-following animation (`paintSwitch`, commit past 35% or a flick via `animateSwitch`); ignored with a panel open or on sideways-scrolling content. A person's projects = open ones they tried and haven't sent (`openFor`).
-- The switcher buttons must stay transparent (`.seg.wseg button`); a plain `.wseg button` rule loses to `.seg button[aria-pressed]`.
+- Tabs: **Climb** (internally `session`: date picker, `daySummary` drawn as a ring + stacked bar per type, since Gary prefers visuals; **Full map ⤢** button; tapping a type switches the grade list; per-grade ✓/Rest/✕), **Projects**, **Progress**. Kawaii tab icons. The map is no longer a tab: it opens from Full map ⤢ (`setTab("map")`, with Back to Climb) until stage 3 moves it into Climb.
+- **Whose view**: one switcher on every tab (`whoSeg`, `cb.who`, `cb.both`): a big button per climber with a kawaii avatar (`AVATAR` by theme key) and "N sent today"; the picked one gets the person's colour (`PCOL`: Gary cyan #3DC2EC, Cecilia pink #F7A1C4). **Both** only on Progress (and the map for now, `canBoth`). Swiping switches with a finger-following animation (`paintSwitch`, commit past 35% or a flick via `animateSwitch`); ignored with a panel open or on sideways-scrolling content. A person's projects = open ones they tried and haven't sent (`openFor`).
+- Icons: `catIcon(type)` (Bouldering, Top rope, Auto belay, Kilter Board) and `resIcon(result)` (Sent in `--sent`, Rested deep violet, Fell light purple), SVGs from `design/`. Shown on type buttons, project cards and the day's climb rows.
 - **Map**: `HUB_MAP` (1227×1402); each zone's `area` + `type` must match a Lists value. `HUB_MAP.anchorWalls` spreads anchor numbers along each rope wall path (`anchorPoint`), widened by Lists ranges (numbering is Claude's estimate, Gary to confirm). Toggle is **Activity** then **Projects**; opening the tab always lands on Activity by Day at the latest session (`mapLand` in `setTab`). Activity has Day / Week / Month chips (`cb.mapper`) and ‹ › stepping (`mapPeriod`, `mapStep`): Day steps through session days only, Week is Mon–Sun, Month is calendar. A thin sent/rested/fell bar + Top (`periodSummary`), heat map and the wall panel's recent line all follow the period.
-- **Always dark** (`isDark()` true, `<html data-dark="1">`). Palette: indigo #402E7A, violet #4C3BCF, blue #4B70F5, cyan #3DC2EC. Background tone shows whose stats: teal-navy Gary (`data-who="green"`), plum Cecilia (`"lav"`), midnight indigo Both; also sets `theme-color`. ✕ buttons and fell counts stay coral. Light tokens (`THEME_LIGHT`, `RES_LIGHT`, `MAP_LIGHT`) are kept in case light returns.
-- Charts use only blue/purple shades separated by brightness (colour-blind safe): sent #6FD6F6, rested #5B7BF3, fell #6236C9 (`RES_DARK`, `--chart-sent`, `--rest-bar`, `--fell-bar`).
+- **Always dark** (`isDark()` true, `<html data-dark="1">`). Palette: indigo #402E7A, violet #4C3BCF, blue #4B70F5, cyan #3DC2EC. Background tone shows whose stats: teal-navy Gary (`data-who="green"`), plum Cecilia (`"lav"`), midnight indigo Both; also sets `theme-color`. `--me` is the person's colour (cyan / pink); `--sent` and `--accent` follow it. Fell is light purple #CDBFFB everywhere (`--fell`, dark text `--fell-ink`); no coral left. Light tokens (`THEME_LIGHT`, `RES_LIGHT`, `MAP_LIGHT`) are kept in case light returns.
+- Charts separate sent / rested / fell by lightness (colour-blind safe): sent mid (Gary #2A9FD0, Cecilia #D9609A, `CHART_SENT` / `--chart-sent`), rested deep violet #5B45D6, fell light #CDBFFB (`RES_DARK`, `--rest-bar`, `--fell-bar`).
 - Map in dark: black floor, palette outlines with faint fills (`MAP_DARK`), tapped wall gold, anchor pin cyan.
 - Press feedback: `TAP_SEL` dips while held (`.tapping`), then a cyan ring (`.tapped`); `replayTap()` at the end of `render`/`renderSheet`.
 - **Back button** (`armBack`, `popstate`): a spare `{cbTrap:1}` entry keeps Back in the app; closes a panel (a just-logged climb's panel acts like Skip details, with Undo), then goes to Session, then "Press Back again to close" (2.5 s). Chrome skips entries added without a tap, so the trap is re-added on every `pointerdown`.
@@ -43,7 +43,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Tap ✓ / R
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v18`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v19`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome: sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Sheet edits via the Google Sheets connector are fine; insert rows in Lists rather than rewriting blocks (colour cells are painted).
 - Commits use author `Claude <noreply@anthropic.com>`. Push to `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -64,7 +64,7 @@ API: op-batched like Pantry Pal (`{key, ops: [{op: add|update|del, coll, id, dat
 | File | Lines | What's in it |
 |---|---|---|
 | `Code.gs` | 523 | `doGet`/`doPost`/`api`; read/write (`readAll_`, `applyOp_`, `table_`, `headerMap_`, `fromCell_`/`toCell_`); menu (`onOpen`, `setup`, `showKey`, `setWebAppUrl`, `resetKey`); tabs (`buildTab_`, `seedLists_`, `paintSwatch_`/`paintAllSwatches_`) |
-| `web/index.html` | 1364 | CSS (~15–346), markup (~348–373), one `<script>` (~374–1362) |
+| `web/index.html` | 1411 | CSS (~15–346), markup (~348–373), one `<script>` (~374–1362) |
 | `web/sw.js`, `manifest.webmanifest` | small | offline cache (`CACHE`), PWA manifest |
 
 Inside the `index.html` script, search for:
@@ -100,24 +100,24 @@ Gary's problems with the current app: logging is clunky and hard to fix; project
 
 **Build plan (one stage per session)**
 1. ~~Backend~~: Code.gs columns (Video links, Angle, Problem name, project Name), Notes tab, Kilter Board type and grades. *Done 2026-10-24; Gary deploys with clasp and runs Set up / repair sheets.*
-2. **Shell + person switch + icons:** 3 tabs, new person switcher (no Both outside Progress), kawaii category and result icons, Fell colour change. Bump `CACHE`.
+2. ~~Shell + person switch + icons~~: 3 tabs, new person switcher (no Both outside Progress), kawaii category and result icons, Fell colour change. *Done 2026-10-25; the map stays reachable from Full map ⤢ on Climb (with Both) until stage 3.*
 3. **Climb home:** map card on home (wall tap selects), Log a climb tiles, Today's climbs list; remove grade rows and the Map tab; full-map panel.
 4. **Log / edit panel:** the new climb panel (all fields editable, Rested only for Top rope, Kilter fields, video links).
 5. **Projects:** list redesign, + New, project page, edit project, beta notes (Notes tab).
 6. **Video share target** (manifest + handler), polish, update this brief (design rules, code map) and remove the redesign notice.
 
 ## Status
-- Redesign: stage 1 (backend) done; next is stage 2.
+- Redesign: stages 1 (backend) and 2 (shell, switcher, icons) done; next is stage 3 (Climb home).
 - Working: logging with details, projects, Hub map with anchors and Day/Week/Month activity, Progress, per-person views with swipe, always-dark theme.
 - Open: Gary to confirm anchor numbering and add the remaining anchors (whiteboard hints: Upper 49–53, Pit 77/80/83); remove the old workers.dev Worker.
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-25: Redesign stage 2: Climb / Projects / Progress tabs, avatar person switcher (Both only on Progress), kawaii category and result icons, Fell light purple
 - 2026-10-24: Redesign approved (`design/`); backend for Kilter Board, video links, project names and beta notes
 - 2026-10-22: Map Activity by Day / Week / Month with ‹ › stepping; Map opens on Activity at the latest session
 - 2026-10-21: Moved the site files into `web/`; only that folder is published
 - 2026-10-18: Phone Back button stays in the app; double Back to exit
-- 2026-10-17: Always-dark theme in Gary's palette, black map, blue/purple charts, press feedback
 
 ## Working efficiently
 - Find code with search first, then read only the relevant lines. Don't read index.html top to bottom.

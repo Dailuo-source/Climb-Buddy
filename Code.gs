@@ -50,6 +50,7 @@ const SCHEMA = {
     cols: [
       ['id', 'ID', 'id', 95],
       ['name', 'Name', 'text', 130],
+      ['owner', 'Added by', 'text', 95],   // who added a project before trying it (+ New)
       ['type', 'Type', 'type', 95],
       ['grade', 'Grade', 'text', 65],
       ['hold', 'Hold colour', 'text', 95],

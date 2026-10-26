@@ -209,17 +209,35 @@ legend{padding:0}
 .vtile{width:44px;height:44px;border-radius:10px;background:var(--sunk);border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;color:var(--ink);flex:none}
 .btn.dashed{border-style:dashed;background:transparent;color:var(--muted)}
 /* new climb picker: the chosen result is solid with a white outline and a tick badge, the rest are faded outlines */
-.pickh{display:inline-flex;align-items:center;gap:8px}
 .resrow{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
 .rbtn{appearance:none;position:relative;height:58px;border-radius:16px;border:1px solid var(--line2);background:transparent;color:var(--muted);font:600 15px var(--f-body);display:inline-flex;align-items:center;justify-content:center;gap:6px;opacity:.7;cursor:pointer}
 .rbtn .ricon{width:22px;height:22px}
 .rbtn[aria-pressed="true"]{opacity:1;border:2px solid #fff;font-weight:700}
-.rbtn[aria-pressed="true"]::after{content:"✓";position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:#fff;color:#1E2235;font-size:12px;font-weight:800;display:grid;place-items:center}
+.rbtn[aria-pressed="true"]::after,.gchip[aria-pressed="true"]::after{content:"✓";position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:#fff;color:#1E2235;font-size:12px;font-weight:800;display:grid;place-items:center}
 .rbtn[data-v="Sent"][aria-pressed="true"]{background:var(--me);color:var(--me-ink)}
 .rbtn[data-v="Rested"][aria-pressed="true"]{background:#4C3BCF;color:#fff}
 .rbtn[data-v="Fell"][aria-pressed="true"]{background:#CDBFFB;color:#2A1F5C}
 .gchips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .gchip{appearance:none;height:48px;border-radius:14px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font:700 15px var(--f-body);cursor:pointer;min-width:0;padding:0 4px}
+/* log / edit panel: category buttons, chosen grade outlined in white with a tick, the rest fade */
+.ccat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.cbtn{appearance:none;height:72px;border-radius:16px;border:1px solid var(--line2);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 12px var(--f-body);color:var(--muted);opacity:.7;cursor:pointer;min-width:0}
+.cbtn .cicon{width:36px;height:36px}
+.cbtn[aria-pressed="true"]{opacity:1;border:2px solid var(--me);background:var(--me-soft);color:var(--ink);box-shadow:0 0 12px rgba(0,0,0,.35)}
+.gchip{position:relative}
+.gchips.picked .gchip:not([aria-pressed="true"]){opacity:.5}
+.gchip[aria-pressed="true"]{border:3px solid #fff;box-shadow:0 0 12px rgba(255,255,255,.3)}
+.gchip[aria-pressed="true"]:not([style]){background:#4C3BCF;color:#fff}
+:root[data-dark] .seg.cwho button[aria-pressed="true"]{background:var(--pcs);box-shadow:inset 0 0 0 2px var(--pc);border-color:transparent;color:var(--ink);font-weight:700}
+:root[data-dark] .sw input:checked+span{box-shadow:0 0 0 3px var(--me);border-color:#fff}
+.kgrid{display:grid;grid-template-columns:110px 1fr;gap:10px}
+.vlist{display:flex;flex-direction:column;gap:8px}
+.vrow{display:flex;align-items:center;gap:8px}
+.vrow input{flex:1;min-width:0}
+.vlist .btn{align-self:flex-start}
+.plink{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--sunk)}
+.plink .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.plink small{font-size:12.5px;color:var(--muted)}
 /* full map wall panel */
 .wprojs{display:flex;flex-direction:column}
 .wrow{appearance:none;display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -764,12 +782,6 @@ function climbRow(c){
 }
 const sheetLink=()=>sheetUrl?`<div class="sheetlink"><a href="${esc(sheetUrl)}" target="_blank" rel="noopener">Edit in Google Sheets ↗</a></div>`:"";
 
-function logClimb(res,grade,area){
-  const id=store.add("climbs",Object.assign({when:whenFor(DAY),climber:WHO,type:TYPE,grade,result:res,gym:GYM,tries:1},res==="Rested"?{rests:1}:{},area?{area}:{}));
-  // Every climb opens its details right away (Skip details keeps it as is)
-  openSheet({type:"climb",id,fresh:true});
-}
-
 /* Projects */
 function renderProjects(){
   $("#title").textContent="Projects";
@@ -1133,11 +1145,10 @@ function closeSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style
 const head=(title,sub)=>`<div class="sheet-h"><div><h2 id="sheetTitle">${title}</h2>${sub?`<p class="sub">${sub}</p>`:""}</div><button class="close" data-act="close" aria-label="Close">×</button></div>`;
 function renderSheet(){
   if(!sheet)return;const b=$("#sheetBody");
-  if(sheet.type==="climb"){const c=S.climbs.find(x=>x.id===sheet.id);if(!c){closeSheet();return;}b.innerHTML=climbSheet(c);}
+  if(sheet.type==="climb"){if(sheet.id&&!S.climbs.some(x=>x.id===sheet.id)){closeSheet();return;}b.innerHTML=climbSheet();}
   else if(sheet.type==="project"){const p=S.projects.find(x=>x.id===sheet.id);if(!p){closeSheet();return;}b.innerHTML=projSheet(p);}
   else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
   else if(sheet.type==="gym")b.innerHTML=gymSheet();
-  else if(sheet.type==="pick")b.innerHTML=pickSheet();
   replayTap();
 }
 function areaField(type,val){
@@ -1151,45 +1162,78 @@ function holdField(val){
   return`<fieldset><legend class="flabel">Hold colour</legend><div class="swatches">${rows.map(r=>{const h=/^#[0-9a-f]{6}$/i.test(r.colour)?r.colour:(CSSCOL[r.value.toLowerCase()]||"#ccc");return`<label class="sw" title="${esc(r.value)}"><input type="radio" name="hold" value="${esc(r.value)}" ${eqi(r.value,val)?"checked":""} aria-label="${esc(r.value)}"><span style="background:${h}"></span></label>`;}).join("")}</div></fieldset>`;
 }
 const anchorField=(type,val)=>typeOf(type).anchor?`<div class="inrow"><label for="fAnchor" class="flabel" style="margin:0">Anchor #</label><input id="fAnchor" name="anchor" inputmode="numeric" value="${esc(val||"")}" placeholder="—"></div>`:"";
-const RES_TITLE={Sent:"Sent a",Fell:"Fell on a",Rested:"Rested on a"};
-const resVerb=c=>c.result==="Sent"?"sent":c.result==="Rested"?"finished with rests on":"fell on";
-function stepField(id,label,val,min,what){
-  return`<div class="inrow"><span class="flabel" style="margin:0" id="${id}L">${label}</span><div class="stepper" role="group" aria-labelledby="${id}L"><button type="button" data-act="step" data-o="${id}" data-min="${min}" data-d="-1" aria-label="One fewer ${what}">−</button><output id="${id}">${val}</output><button type="button" data-act="step" data-o="${id}" data-min="${min}" data-d="1" aria-label="One more ${what}">+</button></div></div>`;
+/* One panel logs a new climb and edits an existing one; every field can change.
+   The form lives in sheet.d (a draft) so tapping a button can redraw the panel without losing what was typed.
+   A new climb is only stored on Save. */
+function newClimb(type,area){
+  TYPE=type;LS.set("type",type);
+  openSheet({type:"climb",id:null,d:{type,result:"Sent",grade:"",climber:WHO,area:area||"",anchor:"",hold:"",tries:1,rests:1,videos:[],note:"",day:DAY,angle:"",problem:"",link:"",addProj:true}});
 }
-/* New climb, step one: result and grade. Tapping a grade logs it and opens the details */
-function pickSheet(){
-  const t=sheet.t,results=t==="Top rope"?["Sent","Rested","Fell"]:["Sent","Fell"];
-  if(!results.includes(sheet.res))sheet.res="Sent";
-  const sel=homeWall(),at=sel&&sel.type===t?sel.area:"",grades=gradeRows(t);
-  const sub=[WHO,at?"at "+at:"",DAY!==todayKey()?fmtShort(DAY):""].filter(Boolean).map(esc).join(" · ");
-  return head(`<span class="pickh">${catIcon(t,"md")}${esc(shortType(t))}</span>`,sub)+`<div class="stack">
-    <fieldset><legend class="flabel">Result</legend><div class="resrow">${results.map(r=>`<button type="button" class="rbtn" data-act="pickRes" data-v="${r}" aria-pressed="${r===sheet.res}">${resIcon(r)}${r}</button>`).join("")}</div></fieldset>
-    <fieldset><legend class="flabel">Grade</legend>${grades.length?`<div class="gchips">${grades.map(r=>{const c=gradeColour(t,r.value);return`<button type="button" class="gchip" data-act="pickGrade" data-g="${esc(r.value)}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(r.value))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet (List: ${esc(typeOf(t).grades)}).</p>`}</fieldset>
-    <p class="hint">Tap the grade to log it. Wall, holds, tries and notes come next.</p></div>`;
+function editClimb(c){
+  openSheet({type:"climb",id:c.id,d:{type:c.type,result:c.result,grade:c.grade,climber:c.climber,area:c.area||"",anchor:c.anchor==null?"":String(c.anchor),hold:c.hold||"",tries:c.tries||1,rests:c.rests||1,videos:videoLinks(c),note:c.note||"",day:dayKey(c.when),angle:c.angle==null?"":String(c.angle),problem:c.problem||"",link:c.project||"",addProj:false}});
 }
-function climbSheet(c){
-  const res=c.result;
-  const matches=!c.project?gymProjects().filter(p=>isOpen(p)&&p.type===c.type&&gkey(p.grade)===gkey(c.grade)):[];
-  if(sheet.link==null)sheet.link="new";
-  const linked=c.project?S.projects.find(p=>p.id===c.project):null;
-  const sub=[c.type,c.climber,c.gym].filter(Boolean).map(esc).join(" · ");
-  const place={Fell:"What stopped you?",Rested:"Where did you rest?",Sent:"Anything to remember?"}[res];
-  return head(`${RES_TITLE[res]} ${tagHTML(c.type,c.grade,"md")}`,sub)+`
-  <form id="climbForm" data-id="${c.id}" autocomplete="off">
-    <div class="inrow"><label for="fDay" class="flabel" style="margin:0">Date</label><input id="fDay" name="day" type="date" value="${dayKey(c.when)}" max="${todayKey()}" style="width:auto"></div>
-    ${matches.length?`<fieldset><legend class="flabel">${res==="Sent"?"Did you send one of your projects?":"Is it one of your projects?"}</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}" ${sheet.link===p.id?"checked":""}><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="new" ${sheet.link==="new"?"checked":""}><span>${res==="Sent"?"No, another route":"A new route"}</span></label></div></fieldset>`:""}
-    <div id="newFields" class="stack" ${sheet.link!=="new"?"hidden":""}>
-      ${miniMap(c.type,c.gym||GYM,c.area,c.anchor)}
-      ${areaField(c.type,c.area)}
-      ${anchorField(c.type,c.anchor)}
-      ${holdField(c.hold)}
-    </div>
-    ${res==="Rested"?stepField("restsOut","Rests needed",c.rests||1,1,"rest"):""}
-    ${stepField("triesOut",res==="Sent"?"Tries it took":"Tries on it",c.tries||1,1,"try")}
-    <label class="field">Note<input name="note" value="${esc(c.note||"")}" placeholder="${place}"></label>
-    ${linked?`<p class="hint">Part of your project: ${esc(projName(linked))}${linked.area?" · "+esc(linked.area):""}.</p>`:res!=="Sent"&&c.type!=="Kilter Board"?`<label class="check" id="projCheck" ${sheet.link!=="new"?"hidden":""}><input type="checkbox" name="addProj" ${res==="Fell"?"checked":""}>${res==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
-    <div class="foot"><button type="button" class="btn" data-act="${sheet.fresh?"skipDetails":"close"}">${sheet.fresh?"Skip details":"Cancel"}</button><button type="submit" class="btn primary">Save</button></div>
-    <button type="button" class="linkbtn" data-act="delClimb" data-id="${c.id}" data-confirm="Tap again to delete">Delete this climb</button>
+// Copy what's typed into the draft (text fields, checked radios, video links, the project checkbox)
+function readForm(){
+  const f=$("#climbForm");if(!f||!sheet||!sheet.d)return;
+  const d=sheet.d,fd=new FormData(f);
+  for(const k of["area","anchor","hold","note","day","angle","problem","link"])if(f.querySelector(`[name="${k}"]`))d[k]=String(fd.get(k)||"").trim();
+  d.videos=fd.getAll("video").map(v=>String(v).trim());
+  if(f.querySelector('[name="addProj"]'))d.addProj=!!fd.get("addProj");
+}
+function setField(f,v,step){
+  const d=sheet.d;
+  if(f==="tries"||f==="rests"){d[f]=Math.max(1,(+d[f]||1)+(+step||0));return;}
+  if(f==="type"){
+    if(v===d.type)return;d.type=v;
+    if(gradeIdx(v,d.grade)<0)d.grade="";
+    if(d.result==="Rested"&&v!=="Top rope")d.result="Sent";
+    if(v==="Kilter Board"){d.area="";d.anchor="";}
+    else if(areaRows(v).length&&!areaRows(v).some(r=>eqi(r.value,d.area)))d.area="";
+    if(!typeOf(v).anchor)d.anchor="";
+    const p=d.link&&S.projects.find(x=>x.id===d.link);if(p&&p.type!==v)d.link="";
+    return;
+  }
+  if(f==="result"&&v==="Rested"&&d.type!=="Top rope")return;
+  if(f==="grade"){sheet.err="";const p=d.link&&S.projects.find(x=>x.id===d.link);if(p&&gkey(p.grade)!==gkey(v))d.link="";}
+  if(f==="link")linkProject(v);
+  d[f]=v;
+}
+// Linking a project fills in its wall and holds when the climb has none yet
+function linkProject(id){
+  const d=sheet.d,p=id&&S.projects.find(x=>x.id===id);d.link=id||"";
+  if(p){if(!d.area&&p.area)d.area=p.area;if(!d.anchor&&p.anchor)d.anchor=String(p.anchor);if(!d.hold&&p.hold)d.hold=p.hold;}
+}
+const climbStep=(f,label,val,what)=>`<div class="inrow"><span class="flabel" style="margin:0">${label}</span><div class="stepper" role="group" aria-label="${label}"><button type="button" data-act="cf" data-f="${f}" data-d="-1" aria-label="One fewer ${what}">−</button><output>${val}</output><button type="button" data-act="cf" data-f="${f}" data-d="1" aria-label="One more ${what}">+</button></div></div>`;
+function climbSheet(){
+  const d=sheet.d,kil=d.type==="Kilter Board",isNew=!sheet.id;
+  // Rested is for top rope; an older climb that was saved as Rested keeps the option
+  const results=d.type==="Top rope"||d.result==="Rested"?["Sent","Rested","Fell"]:["Sent","Fell"];
+  const grades=gradeRows(d.type).map(r=>r.value);if(d.grade&&!grades.some(g=>gkey(g)===gkey(d.grade)))grades.push(d.grade);
+  const linked=d.link?S.projects.find(p=>p.id===d.link):null;
+  const matches=!kil&&d.grade&&!linked?gymProjects().filter(p=>isOpen(p)&&p.type===d.type&&gkey(p.grade)===gkey(d.grade)):[];
+  const who=climbers();
+  const vids=d.videos;
+  const sub=[d.day===todayKey()?"Today":fmtShort(d.day),d.climber,GYM].filter(Boolean).map(esc).join(" · ");
+  const place={Fell:"What stopped you?",Rested:"Where did you rest?",Sent:"Anything to remember?"}[d.result];
+  return head(isNew?"Log a climb":"Edit climb",sub)+`
+  <form id="climbForm" autocomplete="off">
+    <div class="ccat" role="group" aria-label="What you climbed">${TYPES.map(t=>`<button type="button" class="cbtn" data-act="cf" data-f="type" data-v="${t.k}" aria-pressed="${t.k===d.type}">${catIcon(t.k)}${t.k==="Kilter Board"?"Kilter":esc(shortType(t.k))}</button>`).join("")}</div>
+    <fieldset><legend class="flabel">Result</legend><div class="resrow">${results.map(r=>`<button type="button" class="rbtn" data-act="cf" data-f="result" data-v="${r}" aria-pressed="${r===d.result}">${resIcon(r)}${r}</button>`).join("")}</div></fieldset>
+    <fieldset><legend class="flabel">Grade</legend>${sheet.err==="grade"?`<p class="err" role="alert" style="margin:0 0 8px">Pick a grade first.</p>`:""}${grades.length?`<div class="gchips${d.grade?" picked":""}">${grades.map(g=>{const c=gradeColour(d.type,g),on=gkey(g)===gkey(d.grade);return`<button type="button" class="gchip" data-act="cf" data-f="grade" data-v="${esc(g)}" aria-pressed="${on}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(g))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet (List: ${esc(typeOf(d.type).grades)}).</p>`}</fieldset>
+    ${kil?`<div class="kgrid"><label class="field">Angle °<input name="angle" type="number" inputmode="numeric" min="0" max="70" step="5" value="${esc(d.angle)}" placeholder="40"></label><label class="field">Problem name<input name="problem" value="${esc(d.problem)}" placeholder="From the Kilter app"></label></div>`
+      :`${miniMap(d.type,GYM,d.area,d.anchor)}${areaField(d.type,d.area)}${anchorField(d.type,d.anchor)}`}
+    ${holdField(d.hold)}
+    ${climbStep("tries",d.result==="Sent"?"Tries it took":"Tries on it",d.tries,"try")}
+    ${d.result==="Rested"?climbStep("rests","Rests needed",d.rests,"rest"):""}
+    ${who.length>1?`<fieldset><legend class="flabel">Who climbed it</legend><div class="seg cwho" role="group">${who.map(w=>{const c=PCOL[themeFor(w)];return`<button type="button" data-act="cf" data-f="climber" data-v="${esc(w)}" aria-pressed="${w===d.climber}" style="--pc:${c[0]};--pcs:${c[1]}">${esc(w)}</button>`;}).join("")}</div></fieldset>`:""}
+    <fieldset><legend class="flabel">Video · Google Photos link</legend><div class="vlist">${vids.map((u,i)=>`<div class="vrow">${/^https?:\/\//i.test(u)?`<a class="vtile" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Open the video"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}<input name="video" type="url" inputmode="url" value="${esc(u)}" placeholder="Paste a share link from Google Photos" aria-label="Video link ${i+1}"><button type="button" class="x" data-act="cvDel" data-i="${i}" aria-label="Remove this link">×</button></div>`).join("")}
+      <button type="button" class="btn small dashed" data-act="cvAdd">+ ${vids.length?"Add another link":"Add a video link"}</button></div></fieldset>
+    ${linked?`<div class="plink">${holdDot(linked.hold,"sm")}<span class="t"><b>${esc(projName(linked))} ${esc(gradeLabel(linked.grade))} project</b><small>${d.result==="Sent"?"Marks it sent for "+esc(d.climber):"Counts as a try on it"}</small></span><button type="button" class="btn small" data-act="cf" data-f="link" data-v="">Change</button></div>`
+      :matches.length?`<fieldset><legend class="flabel">${d.result==="Sent"?"Did you send one of your projects?":"Is it one of your projects?"}</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}"><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="" checked><span>${d.result==="Sent"?"No, another route":"No, a new route"}</span></label></div></fieldset>`:""}
+    ${!linked&&!kil&&d.result!=="Sent"?`<label class="check"><input type="checkbox" name="addProj" ${d.addProj?"checked":""}>${d.result==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
+    <label class="field">Note<input name="note" value="${esc(d.note)}" placeholder="${place}"></label>
+    <div class="inrow"><label for="fDay" class="flabel" style="margin:0">Date</label><input id="fDay" name="day" type="date" value="${d.day}" max="${todayKey()}" style="width:auto"></div>
+    <div class="foot">${isNew?`<button type="button" class="btn" data-act="close">Cancel</button>`:`<button type="button" class="btn danger" data-act="delClimb" data-id="${sheet.id}" data-confirm="Tap again to delete">Delete</button>`}<button type="submit" class="btn primary">Save</button></div>
   </form>`;
 }
 function markProjectSent(p,who){
@@ -1205,32 +1249,32 @@ function undoSave(c,prev,fresh,keys,proj){
     if(proj&&proj.created)store.del("projects",proj.id);else if(proj&&proj.prev)store.update("projects",proj.id,proj.prev);
   }}];
 }
-function saveClimb(form){
-  const c=S.climbs.find(x=>x.id===form.dataset.id);if(!c)return closeSheet();
-  const prev=Object.assign({},c),fresh=!!(sheet&&sheet.fresh),lbl=gradeLabel(c.grade);
-  const f=new FormData(form);
-  const base={tries:Math.max(1,+$("#triesOut").textContent||1),note:String(f.get("note")||"").trim()};
-  const ro=$("#restsOut");if(ro)base.rests=Math.max(1,+ro.textContent||1);
-  const day=String(f.get("day")||"");
-  if(day&&day!==dayKey(c.when)&&day<=todayKey())base.when=whenFor(day);
-  const link=f.get("link")||"new";
-  if(link!=="new"){
-    const p=S.projects.find(x=>x.id===link)||{};
-    const upd=Object.assign(base,{project:link,area:p.area||"",anchor:p.anchor||"",hold:p.hold||""});
-    const proj=p.id?{id:p.id,prev:{sentBy:p.sentBy.slice(),status:p.status}}:null;
-    store.update("climbs",c.id,upd);
-    if(c.result==="Sent"&&p.id)markProjectSent(p,c.climber);else store.update("projects",link,{});
-    closeSheet();toast(c.result==="Sent"?`Saved ${lbl}: project sent!`:`Saved ${lbl} to your project`,undoSave(c,prev,fresh,Object.keys(upd),proj));return;
+function saveClimb(){
+  readForm();
+  const d=sheet.d,old=sheet.id?S.climbs.find(x=>x.id===sheet.id):null;
+  if(sheet.id&&!old)return closeSheet();
+  if(!d.grade){sheet.err="grade";renderSheet();const e=$("#sheetBody .err");if(e)e.scrollIntoView({block:"center",behavior:"smooth"});return;}
+  const kil=d.type==="Kilter Board",rope=typeOf(d.type).anchor;
+  const data={type:d.type,result:d.result,grade:d.grade,climber:d.climber,
+    area:kil?"":d.area,anchor:kil||!rope?"":d.anchor,hold:d.hold,tries:Math.max(1,+d.tries||1),rests:d.result==="Rested"?Math.max(1,+d.rests||1):"",
+    note:d.note,video:d.videos.filter(u=>u).join("\n"),angle:kil?d.angle:"",problem:kil?d.problem:"",project:d.link||""};
+  if(!old)data.when=whenFor(d.day&&d.day<=todayKey()?d.day:DAY);
+  else if(d.day&&d.day!==dayKey(old.when)&&d.day<=todayKey())data.when=whenFor(d.day);
+  // projects: a linked one gets the send or a try; a new fall can start one
+  let proj=null;const p=d.link?S.projects.find(x=>x.id===d.link):null;
+  if(p){
+    proj={id:p.id,prev:{sentBy:p.sentBy.slice(),status:p.status,area:p.area||"",anchor:p.anchor||"",hold:p.hold||""}};
+    if(!kil&&(data.area||data.anchor||data.hold))store.update("projects",p.id,{area:data.area||p.area||"",anchor:data.anchor||p.anchor||"",hold:data.hold||p.hold||""});
+    if(d.result==="Sent")markProjectSent(p,d.climber);else store.update("projects",p.id,{});
+  }else if(!kil&&d.result!=="Sent"&&d.addProj){
+    data.project=store.add("projects",{type:d.type,grade:d.grade,hold:data.hold,area:data.area,anchor:data.anchor,gym:GYM,note:data.note,status:"Open",sentBy:[],added:data.when||(old&&old.when)||Date.now()});
+    proj={id:data.project,created:true};
   }
-  const d=Object.assign(base,{area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||"")});
-  let proj=null;
-  if(c.project){const p=S.projects.find(x=>x.id===c.project);if(p)proj={id:p.id,prev:{area:p.area||"",anchor:p.anchor||"",hold:p.hold||""}};store.update("projects",c.project,{area:d.area,anchor:d.anchor,hold:d.hold});}
-  else if(c.result!=="Sent"&&f.get("addProj")){
-    d.project=store.add("projects",{type:c.type,grade:c.grade,hold:d.hold,area:d.area,anchor:d.anchor,gym:c.gym||GYM,note:d.note,status:"Open",sentBy:[],added:d.when||c.when||Date.now()});
-    proj={id:d.project,created:true};
-  }
-  store.update("climbs",c.id,d);
-  closeSheet();toast(d.project&&!c.project?`Saved ${lbl} to Projects`:`Saved ${lbl}`,undoSave(c,prev,fresh,Object.keys(d),proj));
+  const lbl=gradeLabel(d.grade);
+  const msg=p&&d.result==="Sent"?`Saved ${lbl}: project sent!`:p?`Saved ${lbl} to your project`:proj?`Saved ${lbl} to Projects`:`Saved ${lbl}`;
+  TYPE=d.type;LS.set("type",TYPE);
+  if(old){const prev=Object.assign({},old);store.update("climbs",old.id,data);closeSheet();toast(msg,undoSave(old,prev,false,Object.keys(data),proj));}
+  else{const id=store.add("climbs",Object.assign({gym:GYM},data));closeSheet();toast(msg,undoSave({id},null,true,[],proj));}
 }
 function projSheet(p){
   const grades=gradeRows(p.type);const has=grades.some(r=>gkey(r.value)===gkey(p.grade));
@@ -1285,23 +1329,22 @@ document.addEventListener("click",e=>{
   switch(a){
     case"refreshNow":if(auth==="ok")flush();break;
     case"close":closeSheet();break;
-    case"skipDetails":{const cid=sheet&&sheet.id;const c=S.climbs.find(x=>x.id===cid);closeSheet();if(c)toast(`${c.climber} ${resVerb(c)} a ${gradeLabel(c.grade)}`,[{label:"Undo",fn:()=>store.del("climbs",cid)}]);break;}
     case"who":tapWho(t.dataset.v);break;
-    case"pick":openSheet({type:"pick",t:t.dataset.v,res:"Sent"});break;
-    case"pickRes":if(sheet){sheet.res=t.dataset.v;renderSheet();}break;
-    case"pickGrade":{if(!sheet)break;const s=sheet,w=homeWall();TYPE=s.t;LS.set("type",TYPE);logClimb(s.res||"Sent",t.dataset.g,w&&w.type===s.t?w.area:"");break;}
+    case"pick":newClimb(t.dataset.v,(w=>w&&w.type===t.dataset.v?w.area:"")(homeWall()));break;
+    case"cf":if(sheet&&sheet.d){readForm();setField(t.dataset.f,t.dataset.v,t.dataset.d);renderSheet();}break;
+    case"cvAdd":if(sheet&&sheet.d){readForm();sheet.d.videos.push("");renderSheet();const v=document.querySelectorAll("#sheetBody input[name=video]");if(v.length)v[v.length-1].focus();}break;
+    case"cvDel":if(sheet&&sheet.d){readForm();sheet.d.videos.splice(+t.dataset.i,1);renderSheet();}break;
     case"homeWall":{const z=t.dataset.z;homeSel=!z||homeSel===z?"":z;LS.set("homesel",homeSel);render();break;}
     case"homeAll":homeAll=true;render();break;
-    case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");openSheet({type:"pick",t:z.type,res:"Sent"});break;}
+    case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");newClimb(z.type,z.area);break;}
     case"wallHist":wallHist=!wallHist;render();break;
     case"prevDay":DAY=shiftDay(DAY,-1);render();break;
     case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();break;
     case"goToday":DAY=todayKey();render();break;
     case"openDay":openSheet({type:"day",k:t.dataset.k});break;
-    case"openClimb":openSheet({type:"climb",id});break;
+    case"openClimb":{const c=S.climbs.find(x=>x.id===id);if(c)editClimb(c);break;}
     case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
     case"delClimb":{const c=S.climbs.find(x=>x.id===id);if(!c)break;const keep=Object.assign({},c);delete keep.id;store.del("climbs",id);if(sheet&&sheet.type==="climb")closeSheet();toast("Climb deleted",[{label:"Undo",fn:()=>enqueue({op:"add",coll:"climbs",id,data:keep})}]);break;}
-    case"step":{const o=document.getElementById(t.dataset.o);if(o)o.textContent=Math.max(+t.dataset.min||0,(+o.textContent||0)+ +t.dataset.d);break;}
     case"pf":projFilter=t.dataset.v;render();break;
     case"editProj":openSheet({type:"project",id});break;
     case"projSent":if(P)projSent(P);break;
@@ -1326,22 +1369,22 @@ document.addEventListener("click",e=>{if(e.target.id==="dayInput"&&e.target.show
 document.addEventListener("input",e=>{
   // Typing an anchor number picks the wall it belongs to and pins roughly where it is on the map
   if(e.target.id==="fAnchor"){const n=parseInt(e.target.value,10);const form=e.target.form;if(!form)return;
-    const c=form.id==="climbForm"?S.climbs.find(x=>x.id===form.dataset.id):S.projects.find(x=>x.id===form.dataset.id);
-    const a=n&&c?areaForAnchor(c.type,n):"";
+    const type=form.id==="climbForm"?sheet&&sheet.d&&sheet.d.type:(S.projects.find(x=>x.id===form.dataset.id)||{}).type;
+    const a=n&&type?areaForAnchor(type,n):"";
     const r=a?[...form.querySelectorAll('input[name=area][type=radio]')].find(i=>eqi(i.value,a)):null;if(r)r.checked=true;
     syncMini();}
 });
 document.addEventListener("change",e=>{
   if(e.target.name==="area"){syncMini();}
   if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){DAY=v;render();}return;}
-  if(e.target.name==="link"&&sheet&&sheet.type==="climb"){sheet.link=e.target.value;const nf=$("#newFields");if(nf)nf.hidden=sheet.link!=="new";const pc=$("#projCheck");if(pc)pc.hidden=sheet.link!=="new";}
+  if(e.target.name==="link"&&sheet&&sheet.d){readForm();linkProject(e.target.value);renderSheet();}
 });
 document.addEventListener("submit",e=>{
   const id=e.target.id;e.preventDefault();
   if(id==="keyForm"){const k=$("#keyInput").value.trim();const u=API_URL||$("#apiInput").value.trim();
     if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u.split(/[?#]/)[0])){render("That web app link doesn't look right. It starts with https://script.google.com and ends with /exec.");return;}
     if(!k)return;API=u.split(/[?#]/)[0];LS.set("api",API);KEY=k;LS.set("key",KEY);auth="ok";ready=false;render();flush();return;}
-  if(id==="climbForm")saveClimb(e.target);
+  if(id==="climbForm")saveClimb();
   if(id==="projForm"){const f=new FormData(e.target);store.update("projects",e.target.dataset.id,{grade:String(f.get("grade")||""),area:String(f.get("area")||"").trim(),anchor:String(f.get("anchor")||"").trim(),hold:String(f.get("hold")||""),note:String(f.get("note")||"").trim()});closeSheet();toast("Project saved");}
   if(id==="gymForm"){const v=$("#gymInput").value.trim();if(!v)return;if(!gyms().some(g=>eqi(g,v)))store.add("lists",{list:"Gym",value:v,colour:"",gym:""});GYM=v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+v);}
 });
@@ -1393,7 +1436,7 @@ document.addEventListener("touchcancel",()=>{if(swipe&&swipe.dir)animateSwitch(n
 /* ---------- press feedback ----------
    Most taps redraw the screen, so the ring is replayed on the redrawn copy of the same button. */
 const TAP_SEL="button,.chip,label.pill,label.sw,.zone,.srow,.phead";
-const TAP_KEYS=["act","tab","v","id","res","g","z","d","k"];
+const TAP_KEYS=["act","tab","f","v","id","res","g","z","d","k"];
 let lastTap=null;
 const tapTarget=el=>el.matches("label.pill,label.sw")?el.querySelector("span")||el:el;
 function tapKey(el){const parts=TAP_KEYS.filter(k=>el.dataset[k]!=null).map(k=>`[data-${k}="${CSS.escape(el.dataset[k])}"]`);return parts.length?parts.join(""):null;}
@@ -1422,7 +1465,7 @@ const trapped=()=>!!(history.state&&history.state.cbTrap);
 function armBack(){if(!trapped())try{history.pushState({cbTrap:1},"");}catch(e){}}
 window.addEventListener("popstate",()=>{
   if(trapped())return;
-  if(sheet){if(sheet.fresh&&sheet.type==="climb")$("#sheetBody [data-act=skipDetails]")?.click();else closeSheet();armBack();return;}
+  if(sheet){closeSheet();armBack();return;}
   if(tab!=="session"){setTab("session");armBack();return;}
   if(Date.now()-exitArmed<2500)return;
   exitArmed=Date.now();toast("Press Back again to close Climb Buddy");

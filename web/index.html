@@ -673,7 +673,7 @@ function settleDefaults(){
    One person is picked for Climb and Projects; Progress can also show Both, and the full map is always both.
    Swipe left/right (or tap) to switch. */
 const canBoth=()=>tab==="progress"&&climbers().length>1;
-const cur=()=>tab==="map"?"*":BOTH&&canBoth()?"*":WHO;
+const cur=()=>BOTH&&canBoth()?"*":WHO;
 const whoOpts=()=>canBoth()?[...climbers(),"*"]:climbers();
 function themeFor(w){
   if(w==="*")return"both";
@@ -1152,73 +1152,40 @@ function syncMini(){
 }
 
 /* Map tab */
-let wallHist=false,mapSel=LS.get("mapsel",""),mapPer=LS.get("mapper","day"),mapAnchor="",mapZoom=+LS.get("mapz","1")||1;
+let wallHist=false,mapSel=LS.get("mapsel",""),mapZoom=+LS.get("mapz","1")||1;
 // Opening the full map always lands on Day at the latest session
-function mapLand(){mapPer="day";mapAnchor="";wallHist=false;LS.set("mapper",mapPer);}
-if(tab==="map")mapLand();
-const weekStart=k=>shiftDay(k,-((keyDate(k).getDay()+6)%7));
-/* Activity period for whoever is shown: Day steps through session days only, Week is Monday to Sunday,
-   Month is a calendar month. mapAnchor is a day key inside the period. null when they've never climbed here. */
-function mapPeriod(w){
-  const all=S.climbs.filter(c=>atGym(c)&&(w==="*"||c.climber===w));
-  const days=[...new Set(all.map(c=>dayKey(c.when)))].sort();
-  if(!days.length)return null;
-  const today=todayKey(),first=days[0],last=days[days.length-1],thisYr=k=>k.slice(0,4)===today.slice(0,4);
-  if(!mapAnchor||(mapPer==="day"&&!days.includes(mapAnchor)))mapAnchor=last;
-  const a=mapAnchor;let from,to,label,canPrev,canNext,word,isLast=false;
-  if(mapPer==="week"){
-    from=weekStart(a);to=shiftDay(from,6);const f=keyDate(from),t=keyDate(to);
-    label=fmtShort(from)+" – "+(f.getMonth()===t.getMonth()?t.getDate():fmtShort(to))+(thisYr(to)?"":", "+to.slice(0,4));
-    canPrev=first<from;canNext=to<today;word=from<=today&&today<=to?"this week":"that week";
-  }else if(mapPer==="month"){
-    const m=a.slice(0,7),nx=keyDate(m+"-01");nx.setMonth(nx.getMonth()+1);
-    from=m+"-01";to=shiftDay(dayKey(nx.getTime()),-1);
-    label=keyDate(from).toLocaleDateString([],{month:"long",year:thisYr(from)?undefined:"numeric"});
-    canPrev=first<from;canNext=m<today.slice(0,7);word="in "+label;
-  }else{
-    const i=days.indexOf(a);from=to=a;isLast=i===days.length-1;
-    label=keyDate(a).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric",year:thisYr(a)?undefined:"numeric"});
-    canPrev=i>0;canNext=!isLast;word=a===today?"today":"that day";
-  }
-  const inP=c=>{const k=dayKey(c.when);return k>=from&&k<=to;};
-  return{days,from,to,label,canPrev,canNext,word,isLast,inP,list:all.filter(inP),sessions:days.filter(k=>k>=from&&k<=to).length};
+function mapLand(){wallHist=false;}
+/* The full map shows one session: the picked person's climbs on the day the Climb tab is on (DAY).
+   ‹ › step through that person's session days and move DAY with them, so Climb follows. */
+function mapSession(){
+  const mine=S.climbs.filter(c=>atGym(c)&&c.climber===WHO);
+  const days=[...new Set(mine.map(c=>dayKey(c.when)))].sort(),k=DAY,today=todayKey();
+  const inP=c=>c.climber===WHO&&dayKey(c.when)===k;
+  const label=keyDate(k).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric",year:k.slice(0,4)===today.slice(0,4)?undefined:"numeric"});
+  return{days,label,word:k===today?"today":"that session",inP,list:mine.filter(inP),prev:days.filter(d=>d<k).pop()||"",next:days.find(d=>d>k)||""};
 }
-function mapStep(d){
-  const P=mapPeriod("*");if(!P||!(d<0?P.canPrev:P.canNext))return;
-  if(mapPer==="day")mapAnchor=P.days[P.days.indexOf(mapAnchor)+d];
-  else if(mapPer==="week")mapAnchor=shiftDay(mapAnchor,7*d);
-  else{const m=keyDate(mapAnchor.slice(0,7)+"-01");m.setMonth(m.getMonth()+d);mapAnchor=dayKey(m.getTime());}
-  render();
-}
-function setMapPer(v){
-  const P=mapPeriod("*");
-  // back to Day: the latest session inside the period being looked at, else the first one
-  if(v==="day"&&P&&mapPer!=="day")mapAnchor=P.days.filter(k=>k<=P.to).pop()||P.days[0];
-  mapPer=v;LS.set("mapper",v);render();
-}
+function mapStep(d){const P=mapSession(),k=d<0?P.prev:P.next;if(!k)return;DAY=k;render();}
 const FLAG_SVG=`<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#3DC2EC"/><path d="M9 18V6l8 3-8 3" fill="#08202C" stroke="#08202C" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
-/* Full map: always both climbers. Walls glow with the period's climbs, flags mark open projects; tap a wall for its panel */
+/* Full map: one session for the picked person. Walls glow with that session's climbs and a count each; no project flags. Tap a wall for its panel */
 function renderMap(){
   $("#title").textContent="Full map";
   const M=gymMap(),back=`<button class="btn ghost" data-tab="session">${ICON.left}Climb</button>`;
   if(!M){$("#view").innerHTML=`${back}<div class="empty"><strong>No map for ${esc(GYM)} yet</strong>The map is drawn for The Hub Mississauga. Switch gyms from the top of the screen.</div>`;return;}
-  const P=mapPeriod("*");
-  const o={heat:{},heatMax:1,flags:{}};
-  if(P)for(const z of M.zones){const n=zoneClimbs(z).filter(P.inP).length;if(n){o.heat[z.id]=n;o.heatMax=Math.max(o.heatMax,n);}}
-  for(const z of M.zones)if(zoneProjects(z).length)o.flags[z.id]=1;
+  const P=mapSession(),c=PCOL[themeFor(WHO)];
+  const o={heat:{},heatMax:1,heatRGB:meRGB(WHO),numFill:c[0],numInk:"#08202C",numR:34};
+  for(const z of M.zones){const n=P.list.filter(x=>inZone(x,z)).length;if(n){o.heat[z.id]=n;o.heatMax=Math.max(o.heatMax,n);}}
   const sel=mapSel?zoneById(mapSel):null;
   if(sel)o.sel=sel.id;
   $("#view").innerHTML=`
     ${back}
-    ${!P?`<div class="empty"><strong>No climbs here yet</strong>Log a session and your climbs will light up the walls.</div>`:`
-    <div class="chips" role="group" aria-label="Period">${[["day","Day"],["week","Week"],["month","Month"]].map(([v,l])=>`<button class="chip" data-act="mapPer" data-v="${v}" aria-pressed="${mapPer===v}">${l}</button>`).join("")}</div>
-    <div class="pnav"><button class="iconbtn" data-act="mapStep" data-d="-1" aria-label="Previous ${mapPer}" ${P.canPrev?"":"disabled"}>${ICON.left}</button><div class="pl"><b>${esc(P.label)}</b><small>${mapPer==="day"?(P.isLast?"Last session · ":""):P.sessions?`${P.sessions} ${P.sessions===1?"session":"sessions"} · `:""}${P.list.length} ${P.list.length===1?"climb":"climbs"}</small></div><button class="iconbtn" data-act="mapStep" data-d="1" aria-label="Next ${mapPer}" ${P.canNext?"":"disabled"}>${ICON.right}</button></div>`}
-    <div class="maprow"><div class="mlegend">${P?`<span><i style="background:rgba(${MAPC.heat},.5)"></i>Glow = climbs ${esc(P.word)}</span>`:""}<span class="fl">${FLAG_SVG}Flag = open project</span></div>
+    <div class="pnav"><button class="iconbtn" data-act="mapStep" data-d="-1" aria-label="Previous session" ${P.prev?"":"disabled"}>${ICON.left}</button><div class="pl"><b>${esc(WHO)} · ${esc(P.label)}</b><small>${P.list.length} ${P.list.length===1?"climb":"climbs"} ${esc(P.word)}</small></div><button class="iconbtn" data-act="mapStep" data-d="1" aria-label="Next session" ${P.next?"":"disabled"}>${ICON.right}</button></div>
+    <div class="maprow"><div class="mlegend"><span><i style="background:rgba(${meRGB(WHO)},.5)"></i>Lit walls = climbs ${esc(P.word)}, with a count</span></div>
       <div class="zoombtns"><button data-act="mapZoom" data-d="-1" aria-label="Zoom out" ${mapZoom<=1?"disabled":""}>−</button><button data-act="mapZoom" data-d="1" aria-label="Zoom in" ${mapZoom>=3?"disabled":""}>+</button></div></div>
     <div class="mapwrap">
       <div class="mapbox" id="mapbox" style="--mz:${mapZoom}">${mapSVG(o)}</div>
     </div>
-    ${sel?zonePanel(sel,P):`<p class="hint">Tap a wall for its climbs and projects.</p>`}
+    ${P.list.length?"":`<p class="hint">No climbs logged ${esc(P.word==="today"?"yet today":"on this day")}.${P.prev?" Use ‹ for your last session.":""}</p>`}
+    ${sel?zonePanel(sel,P):`<p class="hint">Tap a wall for its climbs.</p>`}
     ${sheetLink()}`;
 }
 function zonePanel(z,P){
@@ -1611,7 +1578,6 @@ document.addEventListener("click",e=>{
     case"reopen":if(P){store.update("projects",P.id,{status:"Open"});toast("Back in your projects");}break;
     case"delProj":if(P){for(const c of S.climbs.filter(c=>c.project===P.id))store.update("climbs",c.id,{project:""});for(const n of S.notes.filter(n=>n.project===P.id))store.del("notes",n.id);store.del("projects",P.id);if(sheet)closeSheet();if(tab==="proj")setTab("projects");toast("Project deleted (your logged climbs stay)");}break;
     case"month":{const d=keyDate(pMonth+"-01");d.setMonth(d.getMonth()+ +t.dataset.d);pMonth=dayKey(d.getTime()).slice(0,7);render();break;}
-    case"mapPer":setMapPer(t.dataset.v);break;
     case"mapStep":mapStep(+t.dataset.d);break;
     case"mapZoom":mapZoom=Math.max(1,Math.min(3,mapZoom+ +t.dataset.d));LS.set("mapz",mapZoom);render();break;
     case"mapSel":{mapSel=mapSel===t.dataset.z?"":t.dataset.z;LS.set("mapsel",mapSel);const box=$("#mapbox"),sx=box?box.scrollLeft:0,sy=box?box.scrollTop:0;render();const nb=$("#mapbox");if(nb){nb.scrollLeft=sx;nb.scrollTop=sy;}const h=$("#zoneTitle");if(h)h.scrollIntoView({behavior:"smooth",block:"nearest"});break;}

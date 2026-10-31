@@ -413,6 +413,71 @@ legend{padding:0}
 .tdots small{margin-left:4px;font-size:12px;color:var(--muted)}
 .tdot{width:12px;height:12px;border-radius:50%;display:inline-block}
 .tdot.f{background:#CDBFFB}.tdot.r{background:#5B45D6}.tdot.s{background:var(--me)}
+/* project ID badges: grade · holds · wall (each labels itself, so colour is never the only cue) */
+.idb{display:flex;align-items:center;gap:6px;flex:none}
+.idg{flex:none;width:52px;height:48px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
+.idg b{font:800 15px var(--f-body);white-space:nowrap}.idg small{font-size:9px;font-weight:700;opacity:.85;white-space:nowrap}
+.idh{flex:none;width:44px;height:48px;border-radius:12px;background:var(--sunk);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;gap:1px}
+.idh svg{width:30px;height:30px}.idh small{font-size:9px;font-weight:700;color:var(--muted);max-width:42px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.idm{flex:none;width:42px;height:48px;border-radius:12px;background:#08111B;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.idm svg{width:34px;height:40px;display:block}.idm span{font-size:9px;font-weight:700;color:var(--muted);text-align:center;padding:2px}
+/* compact project cards */
+.pcards{display:flex;flex-direction:column;gap:6px}
+.pc3{display:flex;flex-direction:column;border-radius:14px;border:1px solid var(--line);background:var(--surface);overflow:hidden}
+.pc3.twin{border:1.5px solid #FFC98A}
+.pc3 .pmain{appearance:none;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 4px 6px 6px;width:100%;min-height:60px}
+.pc3 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding-left:4px}
+.pc3 .tx b{font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc3 .tm{display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden}
+.pc3 .tm .tdot{width:8px;height:8px;flex:none}
+.pc3 .tm small{font-size:11px;color:var(--muted);margin-left:3px;overflow:hidden;text-overflow:ellipsis}
+.pc3 .chev{width:22px;height:22px}
+.twinbar{appearance:none;border:0;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:0 12px;background:#43301A;color:#FFC98A;font:700 12px var(--f-body);cursor:pointer;text-align:left}
+.pgh{display:flex;align-items:center;gap:8px;padding:8px 2px 0}
+.pgh i{width:12px;height:12px;border-radius:4px;border:1.5px solid rgba(255,255,255,.35);flex:none}
+.pgh b{font-size:15px;font-weight:800}.pgh small{font-size:12px;color:var(--muted)}
+.pgh .ln{flex:1;height:1px;background:var(--line)}
+.pctl{display:flex;flex-direction:column;gap:8px}
+.pctl .row{display:flex;align-items:center;gap:8px}
+.pctl .lb{flex:none;width:34px;font-size:12px;font-weight:700;color:var(--muted)}
+.pctl .chips{gap:5px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0}.pctl .chips::-webkit-scrollbar{display:none}
+.pctl .chip{height:36px;padding:0 9px;font-size:12.5px;font-weight:700;flex:none}
+.psort{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:3px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.psort button{appearance:none;height:36px;border:0;border-radius:9px;background:transparent;color:var(--muted);font:700 13px var(--f-body);cursor:pointer}
+.psort button[aria-pressed="true"]{background:var(--sunk);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--me)}
+.pdir{flex:none;display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 10px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--ink);font:700 12px var(--f-body);cursor:pointer}
+.pdir svg{width:14px;height:14px}
+/* log panel: which project is it? */
+.pmatches{display:flex;flex-direction:column;gap:8px}
+.pmatch{position:relative;display:block;cursor:pointer}
+.pmatch input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;margin:0;pointer-events:none}
+.pmatch .pm{display:flex;flex-direction:column;gap:6px;padding:9px;border-radius:16px;border:1px solid var(--line2);background:var(--sunk)}
+.pmatch .row{display:flex;align-items:center;gap:6px}
+.pmatch .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-left:4px}
+.pmatch .tx b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pmatch .tx small{font-size:11.5px;color:var(--muted)}
+.pmatch .idh{background:var(--surface)}
+.pmatch .why{align-self:flex-start;padding:2px 8px;border-radius:999px;background:#2A383C;color:#C9D6D2;font-size:12px;font-weight:700}
+.pmatch .why.ok{background:#1E3A32;color:#8FE3C8}
+.pmatch .nt{font-size:12.5px;font-style:italic;color:var(--muted)}
+.pmatch input:checked+.pm{border:2px solid #F5C84B;background:var(--me-soft)}
+.pmatch input:checked+.pm::after{content:"✓";position:absolute;top:-8px;right:-6px;width:26px;height:26px;border-radius:50%;background:#F5C84B;color:#2A1E00;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+.pmatch input:focus-visible+.pm{outline:2px solid var(--me);outline-offset:2px}
+.pmatches.picked .pmatch input:not(:checked)+.pm{opacity:.72}
+.pmatch.none .pm{flex-direction:row;align-items:center;min-height:48px;padding:0 14px;border-style:dashed;background:transparent;font-size:14px;font-weight:700}
+.pmatch.none small{font-size:12px;color:var(--muted);font-weight:500}
+/* duplicate warning + merge */
+.dupw{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:18px;background:#43301A;border:1.5px solid #FFC98A}
+.dupw h3{margin:0;font-size:16px;color:#FFE3BF}
+.dupw .row{display:flex;align-items:center;gap:6px;padding:8px;border-radius:14px;background:var(--surface)}
+.dupw .row .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-left:4px}
+.dupw .row .tx small{font-size:11.5px;color:var(--muted)}
+.dupw .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dupw .acts .btn{background:#FFC98A;border-color:#FFC98A;color:#2A1A05}
+.dupw .acts .btn.ghost2{background:transparent;color:#FFE3BF}
+.dupw.ok{background:var(--sunk);border-color:var(--line2)}
+.mafter{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:16px;background:var(--sunk);font-size:13px}
+.mafter span{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.mafter i{width:10px;height:10px;border-radius:50%;flex:none}
 .dlink{appearance:none;border:0;background:none;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer;flex:1;min-width:0}
 .ptop{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pwho{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--me);font-size:14px}
@@ -599,7 +664,7 @@ let ready=false,auth="ok",KEY=LS.get("key",""),API=API_URL||LS.get("api",""),she
 let queue=[],inflight=false,flushT=null,retryT=null;
 let GYM=LS.get("gym",""),WHO=LS.get("who",""),DAY=todayKey(),TYPE=LS.get("type","Bouldering");
 let projId=LS.get("projid",""),projSel="";
-let tab=LS.get("tab","session"),projFilter="All",pMonth=todayKey().slice(0,7),BOTH=LS.get("both","")==="1";
+let tab=LS.get("tab","session"),projFilter=LS.get("pf","All"),projSort=LS.get("psort","Recent"),projHard=LS.get("phard","1")==="1",pMonth=todayKey().slice(0,7),BOTH=LS.get("both","")==="1";
 function readLinkParams(){
   try{
     const h=new URLSearchParams((location.hash||"").replace(/^#/,""));const q=new URLSearchParams(location.search);
@@ -861,65 +926,120 @@ function climbRow(c){
 }
 const sheetLink=()=>sheetUrl?`<div class="sheetlink"><a href="${esc(sheetUrl)}" target="_blank" rel="noopener">Edit in Google Sheets ↗</a></div>`:"";
 
-/* Projects: one person's list (filter All / Boulder / Rope), + New, and recently sent or reset */
-const PF=[["All","All"],["Bouldering","Boulder"],["Rope","Rope"]];
-const pfMatch=(p,f)=>f==="All"||(f==="Rope"?p.type!=="Bouldering":p.type===f);
+/* Projects: one person's list. Map first (tap a wall to narrow the list), then Show (category) and Sort (Recent / Grade / Type),
+   then compact cards: grade badge · kawaii hold · mini map of the wall, so each one is easy to tell apart while scrolling. */
+const PF=[["All","All"],["Bouldering","Boulder"],["Top rope","Top rope"],["Auto belay","Auto"]];
+const PSORT=["Recent","Grade","Type"];
+const pfMatch=(p,f)=>f==="All"||p.type===f;
 const CHEV=`<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// Rope grades get a light-to-dark ramp (The Hub doesn't colour them); boulders keep their circuit colour
+const ROPE_RAMP=["#CFF3FF","#9FE6FF","#5FD0F2","#4B8DF5","#4B70F5","#4C3BCF","#402E7A","#2E2266","#1E164A"];
+function gradeFill(type,g){
+  const c=gradeColour(type,g);if(c)return c;
+  if(!typeOf(type).anchor)return"#34506E";
+  const i=gradeIdx(type,g),n=gradeRows(type).length;
+  return i<0?"#34506E":ROPE_RAMP[Math.round(i*(ROPE_RAMP.length-1)/Math.max(1,n-1))];
+}
+const lumOf=hex=>{const f=c=>{c=parseInt(c,16)/255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4);};return .2126*f(hex.slice(1,3))+.7152*f(hex.slice(3,5))+.0722*f(hex.slice(5,7));};
+const shortKind=t=>t==="Bouldering"?"Boulder":t;
+// A kawaii hold in the hold colour (dashed when no colour was saved)
+const BLOB="M6 26C3 18 8 9 17 8c8-1 16 3 17 11 1 7-3 13-11 14-8 1-15 0-17-7z";
+function holdBlob(name){
+  const h=holdHex(name),dark=h&&lumOf(h)<.05,eye=!h?"#5C7896":dark?"#ECEBFA":"#1E2235";
+  return`<svg viewBox="0 0 40 40" aria-hidden="true"><path d="${BLOB}" fill="${h||"none"}" stroke="${!h?"#5C7896":dark?"#9DB2C8":"#0B1622"}" stroke-width="1.8"${h?"":' stroke-dasharray="4 3"'} stroke-linejoin="round"/><circle cx="15.5" cy="20" r="1.6" fill="${eye}"/><circle cx="24.5" cy="20" r="1.6" fill="${eye}"/><ellipse cx="12.5" cy="23.4" rx="1.8" ry="1.1" fill="#F4A6B5"/><ellipse cx="27.5" cy="23.4" rx="1.8" ry="1.1" fill="#F4A6B5"/><path d="M18.6 23 Q20 24.4 21.4 23" fill="none" stroke="${eye}" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+}
+// Tiny map of the gym with the project's wall lit (and its anchor when there is one)
+function wallThumb(p){
+  const M=gymMap(),z=M&&M.zones.find(z=>!z.any&&inZone(p,z));
+  if(!z)return`<span>${esc(p.area||"?")}</span>`;
+  const pt=typeOf(p.type).anchor&&p.anchor?anchorPoint(p.area,p.anchor):null;
+  return`<svg viewBox="0 0 ${M.w} ${M.h}" aria-hidden="true"><rect x="12" y="18" width="1201" height="1377" fill="#050B12" stroke="#34506E" stroke-width="22"/><circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="240" fill="rgba(61,194,236,.4)"/>${M.zones.map(q=>q===z?"":`<polygon points="${q.pts}" fill="#1E3249"/>`).join("")}<polygon points="${z.pts}" fill="#3DC2EC" stroke="#3DC2EC" stroke-width="70" stroke-linejoin="round"/>${pt?`<circle cx="${pt.x.toFixed(0)}" cy="${pt.y.toFixed(0)}" r="70" fill="#F5C84B" stroke="#0B1622" stroke-width="16"/>`:""}</svg>`;
+}
+// The three badges that identify a project at a glance: grade · holds · wall
+function idBadges(p){
+  const g=gradeFill(p.type,p.grade);
+  return`<span class="idb"><span class="idg" style="background:${g};color:${inkOn(g)}"><b>${esc(gradeLabel(p.grade))}</b><small>${esc(shortKind(p.type))}</small></span><span class="idh">${holdBlob(p.hold)}<small>${esc(p.hold||"None")}</small></span><span class="idm" title="${esc(p.area||"")}">${wallThumb(p)}</span></span>`;
+}
+const projWallText=p=>(p.area||"Wall not set")+(p.anchor?" · #"+p.anchor:"");
+/* Twins: another project (open or sent, not reset) that looks like the same route: same category, grade and wall,
+   and the same hold colour and anchor when both have one. "They're different" hides the pair on this phone. */
+const notTwins=()=>{try{return JSON.parse(LS.get("nottwins","[]"))||[];}catch(e){return[];}};
+const pairKey=(a,b)=>[a,b].sort().join("|");
+function sameRoute(a,b){
+  return a.id!==b.id&&a.type===b.type&&a.type!=="Kilter Board"&&eqi(a.gym,b.gym)&&gkey(a.grade)===gkey(b.grade)&&!!a.area&&eqi(a.area,b.area)
+    &&(!a.hold||!b.hold||eqi(a.hold,b.hold))&&(!a.anchor||!b.anchor||String(a.anchor)===String(b.anchor));
+}
+function twinOf(p){
+  const no=notTwins();
+  return S.projects.find(q=>q.status!=="Reset"&&sameRoute(p,q)&&!no.includes(pairKey(p.id,q.id)))||null;
+}
+const triers=p=>Object.keys(projInfo(p).tries);
 function renderProjects(){
   $("#title").textContent="Projects";
   const w=WHO,all=gymProjects().filter(p=>p.type!=="Kilter Board");
-  const open=all.filter(p=>openFor(p,w)).sort((a,b)=>projInfo(b).last-projInfo(a).last);
+  const open=all.filter(p=>openFor(p,w));
   if(!PF.some(f=>f[0]===projFilter))projFilter="All";
+  if(!PSORT.includes(projSort))projSort="Recent";
   const list=open.filter(p=>pfMatch(p,projFilter));
   // a wall picked on the map narrows the cards to that wall's projects
   const zSel=projSel&&gymMap()?zoneById(projSel):null,onWall=zSel?list.filter(p=>inZone(p,zSel)):[];
   if(zSel&&!onWall.length)projSel="";
   const shown=projSel?onWall:list;
+  const last=p=>projInfo(p).last,rank=p=>gradeIdx(p.type,p.grade);
+  const byRecent=(a,b)=>last(b)-last(a),byGrade=(a,b)=>(projHard?rank(b)-rank(a):rank(a)-rank(b))||byRecent(a,b);
+  let groups;
+  if(projSort==="Grade"){
+    const m={};for(const p of shown){const k=(p.type==="Bouldering"?"B":"R")+"|"+gkey(p.grade);(m[k]=m[k]||[]).push(p);}
+    groups=Object.values(m).map(it=>{const p=it[0],r=rank(p);return{items:it.sort(byRecent),title:gradeLabel(p.grade),sub:(p.type==="Bouldering"?"Boulder":"Rope")+" · "+it.length,sw:gradeFill(p.type,p.grade),k:(p.type==="Bouldering"?0:1000)+(projHard?-r:r)};}).sort((a,b)=>a.k-b.k);
+  }else if(projSort==="Type"){
+    groups=["Bouldering","Top rope","Auto belay"].map(t=>{const it=shown.filter(p=>p.type===t).sort(byGrade);return{items:it,title:shortKind(t),sub:it.length+(it.length===1?" project":" projects")};}).filter(g=>g.items.length);
+  }else groups=[{items:shown.slice().sort(byRecent)}];
   const cutoff=Date.now()-60*864e5;
   // done for this person: they sent it, or the route is closed (sent by everyone or reset)
   const done=all.filter(p=>(p.updated||p.added)>=cutoff&&triedBy(p,w)&&(!isOpen(p)||p.sentBy.includes(w))).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  const ctl=`<div class="pctl">
+    <div class="row"><span class="lb">Show</span><div class="chips" role="group" aria-label="Show">${PF.map(([k,l])=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${l} <span class="n">${open.filter(p=>pfMatch(p,k)).length}</span></button>`).join("")}</div></div>
+    <div class="row"><span class="lb">Sort</span><div class="psort" role="group" aria-label="Sort by">${PSORT.map(k=>`<button data-act="psort" data-v="${k}" aria-pressed="${projSort===k}">${k}</button>`).join("")}</div>${projSort!=="Recent"?`<button class="pdir" data-act="pdir" aria-label="Flip grade order"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2v12M5 14l-3-3M5 14l3-3M11 14V2M11 2l-3 3M11 2l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${projHard?"Hardest":"Easiest"}</button>`:""}</div>
+  </div>`;
   $("#view").innerHTML=`
     ${whoSeg()}
     <div class="shead"><h2 class="ph">${esc(w)}'s projects</h2><button class="btn send small" data-act="newProj">+ New</button></div>
-    <div class="chips" role="group" aria-label="Filter projects">${PF.map(([k,l])=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${l} <span class="n">${open.filter(p=>pfMatch(p,k)).length}</span></button>`).join("")}</div>
     ${projMap(list)}
-    ${projSel?`<div class="shead"><span class="atwall">${esc(zSel.area)} · ${onWall.length} ${onWall.length===1?"project":"projects"}<button data-act="projWall" data-z="" aria-label="Show all walls">×</button></span><button class="btn small ghost" data-act="projWall" data-z="">Show all</button></div>`:""}
-    <div class="cards">${shown.length?shown.map(projCard).join(""):`<div class="empty"><strong>${open.length?"Nothing here":`No projects for ${esc(w)}`}</strong>${open.length?"Try another filter.":"Fall on a route and keep it as a project, or tap <b>+ New</b> to add one you want to try."}</div>`}</div>
+    ${projSel?`<div class="shead" style="justify-content:flex-start"><span class="lb" style="font-size:12px;font-weight:700;color:var(--muted)">Wall</span><span class="atwall">${esc(zSel.area)} · ${onWall.length} ${onWall.length===1?"project":"projects"}<button data-act="projWall" data-z="" aria-label="Show all walls">×</button></span></div>`:""}
+    ${open.length?ctl:""}
+    <div class="pcards" id="pcards">${shown.length?groups.map(g=>(g.title?`<div class="pgh">${g.sw?`<i style="background:${g.sw}"></i>`:""}<b>${esc(g.title)}</b><small>${esc(g.sub)}</small><span class="ln"></span></div>`:"")+g.items.map(projCard).join("")).join(""):`<div class="empty"><strong>${open.length?"Nothing here":`No projects for ${esc(w)}`}</strong>${open.length?"Try another filter.":"Fall on a route and keep it as a project, or tap <b>+ New</b> to add one you want to try."}</div>`}</div>
     ${done.length?`<h2 class="sech">Sent or reset recently</h2><div class="done">${done.map(p=>{const info=projInfo(p);const n=info.tries[w]||0;
       const what=p.status==="Reset"?"route was reset":p.sentBy.includes(w)?`sent${n?` after ${n} ${n===1?"try":"tries"}`:""}`:"closed";
       return`<div class="drow">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<button class="t dlink" data-act="openProj" data-id="${p.id}">${esc(projName(p))} · ${what}</button>${p.status==="Reset"?`<button class="btn small ghost" data-act="reopen" data-id="${p.id}">Reopen</button>`:`<span class="hsm">${fmtShort(dayKey(p.updated||info.last||Date.now()))}</span>`}</div>`;}).join("")}</div>`:""}
     ${sheetLink()}`;
 }
-/* Projects map: each open project where it is. Boulders as a tag in the circuit's grade colour on their wall;
-   routes as a dot at the anchor with the grade beside it (on the wall when there's no anchor). Tap one to open it. */
+/* Projects map: each open project where it is, as a tag in its grade colour with a hold-colour dot.
+   Routes with an anchor also get a dot at the anchor. Tapping a wall or a tag picks that wall and narrows the cards. */
 function projMap(list){
   const M=gymMap();if(!M||!list.length)return"";
+  const show=list.filter(p=>pfMatch(p,projFilter));
   const c=PCOL[themeFor(WHO)],o={act:"projWall",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:meRGB(WHO),marks:[],sel:projSel};
-  for(const p of list){
+  for(const p of show){
     const z=M.zones.find(z=>inZone(p,z));if(!z)continue;
     o.heat[z.id]=(o.heat[z.id]||0)+1;o.heatMax=Math.max(o.heatMax,o.heat[z.id]);
-    const col=gradeColour(p.type,p.grade),t=gradeLabel(p.grade);
-    const pt=typeOf(p.type).anchor&&p.anchor?anchorPoint(p.area,p.anchor):null;
-    const m={t,act:"projWall",z:z.id,bg:col||c[1],fg:col?inkOn(col):"#ECEBFA",bd:col?"#000":c[0],fs:col?40:36};
-    if(pt)Object.assign(m,{x:pt.x+pt.nx*100,y:pt.y+pt.ny*100,dot:[pt.x,pt.y],dotCol:holdHex(p.hold)||"#C9C4B8"});else Object.assign(m,{x:z.lbl[0],y:z.lbl[1]});
+    const bg=gradeFill(p.type,p.grade),rope=typeOf(p.type).anchor;
+    const pt=rope&&p.anchor?anchorPoint(p.area,p.anchor):null;
+    const m={t:gradeLabel(p.grade),act:"projWall",z:z.id,bg,fg:inkOn(bg),bd:projSel===z.id?"#F5C84B":"#000",fs:rope?36:40,hd:holdHex(p.hold),op:projSel&&projSel!==z.id?.3:1};
+    if(pt)Object.assign(m,{x:pt.x+pt.nx*110,y:pt.y+pt.ny*110,dot:[pt.x,pt.y],dotCol:holdHex(p.hold)||"#C9C4B8"});else Object.assign(m,{x:z.lbl[0],y:z.lbl[1]});
     o.marks.push(m);
   }
   if(!o.marks.length)return"";
-  return`<section class="card mapcard"><div class="bigmap">${mapSVG(o)}</div><div class="mleg"><span><i class="lt" style="background:#F08A24"></i>Boulder: circuit colour</span><span><i class="ld"></i>Route: anchor + grade</span></div><p class="hint">Tap a wall to see its projects below.</p></section>`;
+  return`<section class="card mapcard"><div class="bigmap">${mapSVG(o)}</div><div class="mleg"><span><i class="lt" style="background:#F08A24;width:auto;height:auto;padding:1px 6px 1px 3px;border-radius:8px;font-size:10px;font-weight:800;color:#1D2422;display:inline-flex;align-items:center;gap:3px"><i style="width:9px;height:9px;border-radius:50%;background:#EE7FB0;border:1.5px solid #fff"></i>V4–5</i>grade colour + hold dot</span><span><i class="ld"></i>route anchor</span></div><p class="hint" style="margin:0">Tap a wall or a tag to see just that wall's projects.</p></section>`;
 }
-// One card: hold-colour strip, category, grade, name, where, a dot per try, last note, last tried, chevron
+// One compact card: grade · holds · wall badges, the wall in words, a dot per try and when; a strip when it has a twin
 function projCard(p){
   const info=projInfo(p),mine=info.climbs.filter(c=>c.climber===WHO).sort((a,b)=>a.when-b.when);
-  const n=info.tries[WHO]||0,lastC=mine[mine.length-1];
-  const dots=mine.slice(-10).map(c=>`<i class="tdot ${c.result==="Sent"?"s":c.result==="Rested"?"r":"f"}"></i>`).join("");
-  const meta=n?`${n} ${n===1?"try":"tries"}${lastC&&lastC.result==="Rested"?` · rested ${lastC.rests||1} last time`:""}`:"Not tried yet";
-  const note=(myNotes(p,WHO)[0]||{}).note||p.note||"";
-  return`<button class="pc2" data-act="openProj" data-id="${p.id}"><span class="strip" style="background:${holdHex(p.hold)||"var(--line2)"}"></span>
-    <span class="body"><span class="l1">${catIcon(p.type)}${tagHTML(p.type,p.grade,"md")}<b class="name">${esc(projName(p))}</b></span>
-    <span class="sub">${esc(projWhere(p))}</span>
-    <span class="tdots">${dots}<small>${meta}</small></span>
-    ${note?`<span class="note">“${esc(note)}”</span>`:""}
-    <span class="when">${mine.length?"Last tried "+esc(relDay(dayKey(info.last))):"Added "+esc(relDay(dayKey(p.added||Date.now())))}</span></span>${CHEV}</button>`;
+  const n=info.tries[WHO]||0;
+  const dots=mine.slice(-8).map(c=>`<i class="tdot ${c.result==="Sent"?"s":c.result==="Rested"?"r":"f"}"></i>`).join("");
+  const meta=n?`${n} ${n===1?"try":"tries"} · ${relDay(dayKey(info.last))}`:`Not tried · added ${relDay(dayKey(p.added||Date.now()))}`;
+  const tw=twinOf(p),others=tw?triers(tw).filter(x=>x!==WHO):[];
+  const twTxt=tw?(others.length?`${others.join(" & ")} has one just like this`:"You have another one just like this"):"";
+  return`<div class="pc3${tw?" twin":""}"><button class="pmain" data-act="openProj" data-id="${p.id}">${idBadges(p)}<span class="tx"><b>${esc(p.name?p.name+" · ":"")}${esc(projWallText(p))}</b><span class="tm">${dots}<small>${esc(meta)}</small></span></span>${CHEV}</button>${tw?`<button class="twinbar" data-act="merge" data-id="${p.id}" data-v="${tw.id}"><span>${esc(twTxt)}</span><span>Merge? ›</span></button>`:""}</div>`;
 }
 /* A project's own page: hero with mini map, stats, quick log, this climber's beta notes, every try */
 function renderProject(){
@@ -1061,14 +1181,17 @@ function anchorPoint(area,num){
 function marksSVG(marks){
   const placed=[];let s="";
   for(const m of marks){
-    const fs=m.fs||36,w=Math.max(60,String(m.t).length*fs*.62+30),h=fs*1.5;
+    const hasHd="hd" in m,fs=m.fs||36,w=Math.max(60,String(m.t).length*fs*.62+30)+(hasHd?46:0),h=fs*1.5;
     let x=Math.max(w/2+16,Math.min(1211-w/2,m.x)),y=Math.max(h/2+20,Math.min(1393-h/2,m.y));
     for(let k=0;k<8&&placed.some(q=>Math.abs(q.x-x)<(q.w+w)/2+6&&Math.abs(q.y-y)<h+6);k++)y+=h+8;
     placed.push({x,y,w});
     const act=m.act?` data-act="${m.act}"${m.id?` data-id="${m.id}"`:""}${m.z?` data-z="${m.z}"`:""} role="button" tabindex="0" class="mark"`:` pointer-events="none"`;
-    s+=`<g${act}>`;
+    s+=`<g${act}${m.op!=null&&m.op!==1?` opacity="${m.op}"`:""}>`;
     if(m.dot)s+=`<line x1="${m.dot[0]}" y1="${m.dot[1]}" x2="${x}" y2="${y}" stroke="${m.bd||"#fff"}" stroke-width="4" opacity=".6"/><circle cx="${m.dot[0]}" cy="${m.dot[1]}" r="22" fill="${m.dotCol||"#C9C4B8"}" stroke="#fff" stroke-width="6"/>`;
-    s+=`<rect x="${(x-w/2).toFixed(1)}" y="${(y-h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="${h/2}" fill="${m.bg}" stroke="${m.bd||"#000"}" stroke-width="6"/><text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="800" fill="${m.fg}">${esc(m.t)}</text>`;
+    s+=`<rect x="${(x-w/2).toFixed(1)}" y="${(y-h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="${h/2}" fill="${m.bg}" stroke="${m.bd||"#000"}" stroke-width="${m.bd==="#F5C84B"?9:6}"/>`;
+    // hold-colour dot inside the tag (dashed ring when no colour was saved)
+    if(hasHd)s+=m.hd?`<circle cx="${(x-w/2+30).toFixed(1)}" cy="${y.toFixed(1)}" r="17" fill="${m.hd}" stroke="#fff" stroke-width="6"/>`:`<circle cx="${(x-w/2+30).toFixed(1)}" cy="${y.toFixed(1)}" r="15" fill="#0B1622" stroke="#9DB2C8" stroke-width="5" stroke-dasharray="8 6"/>`;
+    s+=`<text x="${(x+(hasHd?23:0)).toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="800" fill="${m.fg}">${esc(m.t)}</text>`;
     if(m.star)s+=`<circle cx="${(x+w/2+10).toFixed(1)}" cy="${(y-h/2).toFixed(1)}" r="22" fill="#F5C451" stroke="#000" stroke-width="5"/><text x="${(x+w/2+10).toFixed(1)}" y="${(y-h/2+1).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="30" fill="#3A2A00">★</text>`;
     s+=`</g>`;
   }
@@ -1294,6 +1417,7 @@ function renderSheet(){
   else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
   else if(sheet.type==="share")b.innerHTML=shareSheet();
   else if(sheet.type==="gym")b.innerHTML=gymSheet();
+  else if(sheet.type==="merge"){const h=mergeSheet();if(h==null){closeSheet();return;}b.innerHTML=h;}
   replayTap();
 }
 function areaField(type,val){
@@ -1354,8 +1478,16 @@ function climbSheet(){
   // Rested is for top rope; an older climb that was saved as Rested keeps the option
   const results=d.type==="Top rope"||d.result==="Rested"?["Sent","Rested","Fell"]:["Sent","Fell"];
   const grades=gradeRows(d.type).map(r=>r.value);if(d.grade&&!grades.some(g=>gkey(g)===gkey(d.grade)))grades.push(d.grade);
+  // Projects this could be, best match first. A new climb whose grade, wall and holds all match one is linked to it for you;
+  // once you pick something else (or "No"), it stays your choice.
+  const ms=kil?[]:projMatches(d);
+  if(!sheet.id&&!d.noAuto){
+    if(d.autoLink&&d.link!==d.autoLink){if(ms.some(m=>m.p.id===d.autoLink))d.noAuto=true;else d.autoLink="";}
+    const top=ms[0]&&ms[0].strong?ms[0].p.id:"";
+    if(!d.noAuto&&top&&d.link!==top&&(!d.link||d.link===d.autoLink)){linkProject(top);d.autoLink=top;}
+  }
   const linked=d.link?S.projects.find(p=>p.id===d.link):null;
-  const matches=!kil&&d.grade&&!linked?gymProjects().filter(p=>isOpen(p)&&p.type===d.type&&gkey(p.grade)===gkey(d.grade)):[];
+  const inList=!linked||ms.some(m=>m.p.id===linked.id);
   const who=climbers();
   const vids=d.videos;
   const sub=[d.day===todayKey()?"Today":fmtShort(d.day),d.climber,GYM].filter(Boolean).map(esc).join(" · ");
@@ -1373,13 +1505,31 @@ function climbSheet(){
     ${who.length>1?`<fieldset><legend class="flabel">Who climbed it</legend><div class="seg cwho" role="group">${who.map(w=>{const c=PCOL[themeFor(w)];return`<button type="button" data-act="cf" data-f="climber" data-v="${esc(w)}" aria-pressed="${w===d.climber}" style="--pc:${c[0]};--pcs:${c[1]}">${esc(w)}</button>`;}).join("")}</div></fieldset>`:""}
     <fieldset><legend class="flabel">Video · Google Photos link</legend><div class="vlist">${vids.map((u,i)=>`<div class="vrow">${/^https?:\/\//i.test(u)?`<a class="vtile" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Open the video"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}<input name="video" type="url" inputmode="url" value="${esc(u)}" placeholder="Paste a share link from Google Photos" aria-label="Video link ${i+1}"><button type="button" class="x" data-act="cvDel" data-i="${i}" aria-label="Remove this link">×</button></div>`).join("")}
       <button type="button" class="btn small dashed" data-act="cvAdd">+ ${vids.length?"Add another link":"Add a video link"}</button></div></fieldset>
-    ${linked?`<div class="plink">${holdDot(linked.hold,"sm")}<span class="t"><b>${esc(projName(linked))} ${esc(gradeLabel(linked.grade))} project</b><small>${d.result==="Sent"?"Marks it sent for "+esc(d.climber):"Counts as a try on it"}</small></span><button type="button" class="btn small" data-act="cf" data-f="link" data-v="">Change</button></div>`
-      :matches.length?`<fieldset><legend class="flabel">${d.result==="Sent"?"Did you send one of your projects?":"Is it one of your projects?"}</legend><div class="pills">${matches.map(p=>`<label class="pill"><input type="radio" name="link" value="${p.id}"><span>${holdDot(p.hold,"sm")}${esc(projName(p))}${p.area?" · "+esc(p.area):""}${p.anchor?" · #"+esc(p.anchor):""}</span></label>`).join("")}<label class="pill"><input type="radio" name="link" value="" checked><span>${d.result==="Sent"?"No, another route":"No, a new route"}</span></label></div></fieldset>`:""}
+    ${ms.length&&inList?matchList(d,ms):linked?`<div class="plink">${holdDot(linked.hold,"sm")}<span class="t"><b>${esc(projName(linked))} ${esc(gradeLabel(linked.grade))} project</b><small>${d.result==="Sent"?"Marks it sent for "+esc(d.climber):"Counts as a try on it"}</small></span><button type="button" class="btn small" data-act="cf" data-f="link" data-v="">Change</button></div>`:""}
     ${!linked&&!kil&&d.result!=="Sent"?`<label class="check"><input type="checkbox" name="addProj" ${d.addProj?"checked":""}>${d.result==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
     <label class="field">Note<input name="note" value="${esc(d.note)}" placeholder="${place}"></label>
     <div class="inrow"><label for="fDay" class="flabel" style="margin:0">Date</label><input id="fDay" name="day" type="date" value="${d.day}" max="${todayKey()}" style="width:auto"></div>
     <div class="foot">${isNew?`<button type="button" class="btn" data-act="close">Cancel</button>`:`<button type="button" class="btn danger" data-act="delClimb" data-id="${sheet.id}" data-confirm="Tap again to delete">Delete</button>`}<button type="submit" class="btn primary">Save</button></div>
   </form>`;
+}
+// Open projects at this gym with the same category and grade, ranked by how much else matches
+function projMatches(d){
+  if(d.type==="Kilter Board"||!d.grade)return[];
+  return gymProjects().filter(p=>(isOpen(p)||p.id===d.link)&&p.type===d.type&&gkey(p.grade)===gkey(d.grade)).map(p=>{
+    const area=!!d.area&&eqi(p.area,d.area),hold=!!d.hold&&eqi(p.hold,d.hold);
+    const anc=!!d.anchor&&!!p.anchor&&String(p.anchor)===String(d.anchor),clash=!!d.anchor&&!!p.anchor&&!anc;
+    return{p,area,hold,clash,strong:area&&hold&&!clash,last:projInfo(p).last,
+      score:(area?4:0)+(hold?3:0)+(anc?2:0)-(clash?3:0)+(triedBy(p,d.climber)?1:0)};
+  }).sort((a,b)=>b.score-a.score||b.last-a.last).slice(0,5);
+}
+function matchList(d,ms){
+  const whose=p=>{const t=triers(p);return t.includes(d.climber)?"Yours":t.length?t.join(" & ")+"'s":p.owner&&p.owner!==d.climber?p.owner+"'s":"Yours";};
+  const why=m=>m.strong?"Probably a repeat · same grade, wall and holds":m.area&&m.hold?"Same grade, wall and holds · other anchor":m.area?"Same grade and wall":m.hold?"Same grade and holds":"Same grade only";
+  return`<fieldset><legend class="flabel">${d.result==="Sent"?"Did you send one of the projects?":"Is it one of the projects?"}</legend><div class="pmatches${d.link?" picked":""}">${ms.map(m=>{
+    const p=m.p,info=projInfo(p),n=Object.values(info.tries).reduce((a,b)=>a+b,0),nt=(myNotes(p,d.climber)[0]||{}).note||p.note||"";
+    return`<label class="pmatch"><input type="radio" name="link" value="${p.id}" ${p.id===d.link?"checked":""}><span class="pm"><span class="why${m.strong?" ok":""}">${why(m)}</span><span class="row">${idBadges(p)}<span class="tx"><b>${esc(projWallText(p))}</b><small>${esc(whose(p))} · ${n?`${n} ${n===1?"try":"tries"}`:"not tried yet"} · ${esc(relDay(dayKey(info.last||p.added||Date.now())))}</small></span></span>${nt?`<span class="nt">“${esc(nt)}”</span>`:""}</span></label>`;}).join("")}
+    <label class="pmatch none"><input type="radio" name="link" value="" ${d.link?"":"checked"}><span class="pm">${d.result==="Sent"?"No, another route":"No, a new route"}</span></label></div>
+    ${d.autoLink&&d.link===d.autoLink?`<p class="hint" style="margin:6px 0 0">Picked for you: the grade, wall and holds match. Tap another to change it.</p>`:""}</fieldset>`;
 }
 function markProjectSent(p,who){
   const sentBy=[...new Set([...p.sentBy,who])];
@@ -1423,7 +1573,7 @@ function saveClimb(){
 }
 /* Edit project (or + New): name, status, category, grade, wall + anchor + map, hold colour. Draft in sheet.d like the climb panel. */
 function editProject(p){
-  const t=projFilter==="Rope"?"Top rope":"Bouldering";
+  const t=projFilter!=="All"?projFilter:"Bouldering";
   openSheet({type:"project",id:p?p.id:null,d:p?{name:p.name||"",status:p.status,type:p.type,grade:p.grade,area:p.area||"",anchor:p.anchor==null?"":String(p.anchor),hold:p.hold||""}
     :{name:"",status:"Open",type:t,grade:"",area:"",anchor:"",hold:""}});
 }
@@ -1434,6 +1584,7 @@ function readProjForm(){
 }
 function setProjField(f,v){
   const d=sheet.d;
+  if(f==="type"||f==="grade")d.dupOk="";
   if(f==="type"){if(v===d.type)return;d.type=v;if(gradeIdx(v,d.grade)<0)d.grade="";
     if(areaRows(v).length&&!areaRows(v).some(r=>eqi(r.value,d.area)))d.area="";if(!typeOf(v).anchor)d.anchor="";return;}
   if(f==="grade")sheet.err="";
@@ -1450,15 +1601,26 @@ function projSheet(){
     <fieldset><legend class="flabel">Grade</legend>${sheet.err==="grade"?`<p class="err" role="alert" style="margin:0 0 8px">Pick a grade first.</p>`:""}${grades.length?`<div class="gchips${d.grade?" picked":""}">${grades.map(g=>{const c=gradeColour(d.type,g),on=gkey(g)===gkey(d.grade);return`<button type="button" class="gchip" data-act="pjf" data-f="grade" data-v="${esc(g)}" aria-pressed="${on}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(g))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet.</p>`}</fieldset>
     ${miniMap(d.type,GYM,d.area,d.anchor)}${areaField(d.type,d.area)}${anchorField(d.type,d.anchor)}
     ${holdField(d.hold)}
+    ${isNew?dupWarning(d):""}
     ${isNew?"":`<p class="hint">Each try keeps its own date, result, note and video. Fix those from <b>Every try</b>.</p>`}
     <div class="foot">${isNew?`<button type="button" class="btn" data-act="close">Cancel</button>`:`<button type="button" class="btn danger" data-act="delProj" data-id="${sheet.id}" data-confirm="Tap again to delete">Delete</button>`}<button type="submit" class="btn primary">Save</button></div>
   </form>`;
+}
+// Open projects that look like the one being added (same category, grade and wall; same holds and anchor when both are set)
+const projDups=d=>d.grade&&d.area?gymProjects().filter(p=>isOpen(p)&&sameRoute({id:"",type:d.type,grade:d.grade,area:d.area,hold:d.hold,anchor:d.anchor,gym:GYM},p)):[];
+function dupWarning(d){
+  const ds=projDups(d);if(!ds.length||d.dupOk)return"";
+  const mine=ds.some(p=>triers(p).includes(WHO)||p.owner===WHO);
+  return`<section class="dupw" id="dupw" role="alert"><h3>${mine?"You're already projecting this one":"This one is already a project"}</h3>${ds.slice(0,2).map(p=>{const info=projInfo(p),n=Object.values(info.tries).reduce((a,b)=>a+b,0),t=triers(p);
+    return`<div class="row">${idBadges(p)}<span class="tx"><b>${esc(projWallText(p))}</b><small>${esc(t.length?t.join(" & "):p.owner||"")}${n?` · ${n} ${n===1?"try":"tries"}`:""} · ${esc(relDay(dayKey(info.last||p.added||Date.now())))}</small></span></div>`;}).join("")}
+    <div class="acts"><button type="button" class="btn" data-act="openProj" data-id="${ds[0].id}">Open that one</button><button type="button" class="btn ghost2" data-act="pjf" data-f="dupOk" data-v="1">No, a new route</button></div></section>`;
 }
 function saveProject(){
   readProjForm();
   const d=sheet.d,old=sheet.id?S.projects.find(x=>x.id===sheet.id):null;
   if(sheet.id&&!old)return closeSheet();
   if(!d.grade){sheet.err="grade";renderSheet();const e=$("#sheetBody .err");if(e)e.scrollIntoView({block:"center",behavior:"smooth"});return;}
+  if(!old&&!d.dupOk&&projDups(d).length){renderSheet();const e=$("#dupw");if(e)e.scrollIntoView({block:"center",behavior:"smooth"});return;}
   const data={name:d.name,type:d.type,grade:d.grade,area:d.area,anchor:typeOf(d.type).anchor?d.anchor:"",hold:d.hold};
   if(old){
     const prev={name:old.name||"",type:old.type,grade:old.grade,area:old.area||"",anchor:old.anchor==null?"":old.anchor,hold:old.hold||"",status:old.status,sentBy:old.sentBy.slice()};
@@ -1472,6 +1634,42 @@ function saveProject(){
     closeSheet();projId=id;LS.set("projid",id);setTab("proj");
     toast("Project added",[{label:"Undo",fn:()=>{store.del("projects",id);if(tab==="proj")setTab("projects");}}]);
   }
+}
+/* Merge two projects that are the same route: every climb and beta note moves to the one you keep (notes stay each person's own),
+   Sent by is combined, the other project is deleted. Undo puts everything back. */
+function projStatusLines(p){
+  const info=projInfo(p);
+  return Object.keys(info.tries).map(w=>p.sentBy.includes(w)?{w,t:`${w} sent it`}:{w,t:`${w}: ${info.tries[w]} ${info.tries[w]===1?"try":"tries"}, still open`});
+}
+function mergeSheet(){
+  const A=S.projects.find(x=>x.id===sheet.a),B=S.projects.find(x=>x.id===sheet.b);
+  if(!A||!B)return null;
+  const card=p=>{const t=triers(p);return`<label class="pmatch"><input type="radio" name="keep" value="${p.id}" ${sheet.keep===p.id?"checked":""}><span class="pm"><span class="row">${idBadges(p)}<span class="tx"><b>${esc(t.length?t.join(" & ")+"'s":p.owner?p.owner+"'s":"Project")} · added ${esc(fmtShort(dayKey(p.added||Date.now())))}</b>${projStatusLines(p).map(l=>`<small>${esc(l.t)}</small>`).join("")||"<small>Not tried yet</small>"}</span></span></span></label>`;};
+  const sentBy=[...new Set([...A.sentBy,...B.sentBy])],tries={};
+  for(const p of[A,B]){const i=projInfo(p).tries;for(const w in i)tries[w]=(tries[w]||0)+i[w];}
+  const after=Object.keys(tries).map(w=>`<span><i style="background:${PCOL[themeFor(w)][0]}"></i>${esc(sentBy.includes(w)?`${w}: sent`:`${w}: ${tries[w]} ${tries[w]===1?"try":"tries"}, still open`)}</span>`).join("");
+  return head("Same route, two projects?",esc(`${gradeLabel(A.grade)} · ${A.hold?A.hold+" holds · ":""}${A.area}`))+`
+  <form id="mergeForm" autocomplete="off">
+    <fieldset><legend class="flabel">Keep which one's name and details?</legend><div class="pmatches picked">${card(A)}${card(B)}</div></fieldset>
+    <div class="mafter"><b style="color:var(--ink)">After merging: one project</b>${after}<span>Every climb and beta note moves over (notes stay private to each of you). Undo shows for a few seconds.</span></div>
+    <div class="foot"><button type="button" class="btn" data-act="notTwin">They're different</button><button type="button" class="btn primary" data-act="doMerge">Merge</button></div>
+  </form>`;
+}
+function doMerge(){
+  const K=S.projects.find(x=>x.id===sheet.keep),D=S.projects.find(x=>x.id===(sheet.keep===sheet.a?sheet.b:sheet.a));
+  if(!K||!D)return closeSheet();
+  const kPrev={sentBy:K.sentBy.slice(),status:K.status,name:K.name||"",hold:K.hold||"",anchor:K.anchor==null?"":K.anchor,note:K.note||"",added:K.added||""};
+  const dKeep=Object.assign({},D);delete dKeep.id;
+  const cs=S.climbs.filter(c=>c.project===D.id).map(c=>c.id),ns=S.notes.filter(n=>n.project===D.id).map(n=>n.id);
+  cs.forEach(id=>store.update("climbs",id,{project:K.id}));
+  ns.forEach(id=>store.update("notes",id,{project:K.id}));
+  store.del("projects",D.id);
+  const sentBy=[...new Set([...K.sentBy,...D.sentBy])],tri=Object.keys(projInfo(Object.assign({},K,{sentBy})).tries);
+  const status=K.status==="Reset"?"Reset":tri.length&&tri.every(w=>sentBy.includes(w))?"Sent":"Open";
+  const added=[K.added,D.added].filter(Boolean);
+  store.update("projects",K.id,{sentBy,status,name:K.name||D.name||"",hold:K.hold||D.hold||"",anchor:K.anchor||D.anchor||"",note:K.note||D.note||"",added:added.length?Math.min(...added):""});
+  closeSheet();
+  toast("Merged into one project",[{label:"Undo",fn:()=>{enqueue({op:"add",coll:"projects",id:D.id,data:dKeep});cs.forEach(id=>store.update("climbs",id,{project:D.id}));ns.forEach(id=>store.update("notes",id,{project:D.id}));store.update("projects",K.id,kPrev);}}]);
 }
 /* Share → Climb Buddy: Google Photos shares a link (manifest share_target, GET ?title&text&url).
    The app opens, waits for the sheet, then asks which climb gets the video (latest of the picked person first). */
@@ -1556,7 +1754,7 @@ document.addEventListener("click",e=>{
     case"homeWall":{const z=t.dataset.z;homeSel=!z||homeSel===z?"":z;LS.set("homesel",homeSel);render();break;}
     case"homeAll":homeAll=true;render();break;
     case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");newClimb(z.type,z.area);break;}
-    case"projWall":{const z=t.dataset.z;projSel=!z||projSel===z?"":z;render();if(projSel){const c=$("#view .cards");if(c)c.scrollIntoView({behavior:"smooth",block:"nearest"});}break;}
+    case"projWall":{const z=t.dataset.z;projSel=!z||projSel===z?"":z;render();if(projSel){const c=$("#pcards");if(c)c.scrollIntoView({behavior:"smooth",block:"nearest"});}break;}
     case"progWall":{const z=t.dataset.z;progSel=progSel===z?"":z;render();break;}
     case"wallHist":wallHist=!wallHist;render();break;
     case"prevDay":DAY=shiftDay(DAY,-1);render();break;
@@ -1566,7 +1764,13 @@ document.addEventListener("click",e=>{
     case"openClimb":{const c=S.climbs.find(x=>x.id===id);if(c)editClimb(c);break;}
     case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
     case"delClimb":{const c=S.climbs.find(x=>x.id===id);if(!c)break;const keep=Object.assign({},c);delete keep.id;store.del("climbs",id);if(sheet&&sheet.type==="climb")closeSheet();toast("Climb deleted",[{label:"Undo",fn:()=>enqueue({op:"add",coll:"climbs",id,data:keep})}]);break;}
-    case"pf":projFilter=t.dataset.v;render();break;
+    case"pf":projFilter=t.dataset.v;LS.set("pf",projFilter);projSel="";render();break;
+    case"psort":projSort=t.dataset.v;LS.set("psort",projSort);render();break;
+    case"pdir":projHard=!projHard;LS.set("phard",projHard?"1":"0");render();break;
+    case"merge":{const B=S.projects.find(x=>x.id===t.dataset.v);if(P&&B)openSheet({type:"merge",a:P.id,b:B.id,keep:P.id});break;}
+    case"mkeep":if(sheet&&sheet.type==="merge"){sheet.keep=t.dataset.v;renderSheet();}break;
+    case"doMerge":if(sheet&&sheet.type==="merge")doMerge();break;
+    case"notTwin":if(sheet&&sheet.type==="merge"){const k=pairKey(sheet.a,sheet.b),l=notTwins();if(!l.includes(k))l.push(k);LS.set("nottwins",JSON.stringify(l));closeSheet();render();toast("OK, they stay separate");}break;
     case"editProj":if(P)editProject(P);break;
     case"newProj":editProject(null);break;
     case"openProj":if(P){projId=P.id;LS.set("projid",projId);if(sheet)closeSheet();setTab("proj");}break;
@@ -1582,7 +1786,8 @@ document.addEventListener("click",e=>{
     case"mapZoom":mapZoom=Math.max(1,Math.min(3,mapZoom+ +t.dataset.d));LS.set("mapz",mapZoom);render();break;
     case"mapSel":{mapSel=mapSel===t.dataset.z?"":t.dataset.z;LS.set("mapsel",mapSel);const box=$("#mapbox"),sx=box?box.scrollLeft:0,sy=box?box.scrollTop:0;render();const nb=$("#mapbox");if(nb){nb.scrollLeft=sx;nb.scrollTop=sy;}const h=$("#zoneTitle");if(h)h.scrollIntoView({behavior:"smooth",block:"nearest"});break;}
     case"pickArea":{const root=$("#sheetBody");const radios=[...root.querySelectorAll('input[name=area][type=radio]')];const hit=radios.find(i=>eqi(i.value,t.dataset.area));
-      if(hit)hit.checked=true;else{const ti=root.querySelector('input[name=area]:not([type=radio])');if(ti)ti.value=t.dataset.area;}syncMini();break;}
+      if(hit)hit.checked=true;else{const ti=root.querySelector('input[name=area]:not([type=radio])');if(ti)ti.value=t.dataset.area;}syncMini();
+      if(sheet&&sheet.type==="climb"){readForm();renderSheet();}else if(sheet&&sheet.type==="project"){readProjForm();renderSheet();}break;}
     case"zoneReset":{const z=zoneById(t.dataset.z);if(!z)break;const ps=zoneProjects(z);ps.forEach(p=>store.update("projects",p.id,{status:"Reset"}));
       toast(`${ps.length} ${ps.length===1?"project":"projects"} moved to Reset`,[{label:"Undo",fn:()=>ps.forEach(p=>store.update("projects",p.id,{status:"Open"}))}]);break;}
     case"pickGym":if(ready)openSheet({type:"gym"});break;
@@ -1600,8 +1805,11 @@ document.addEventListener("input",e=>{
 });
 document.addEventListener("change",e=>{
   if(e.target.name==="area"){syncMini();}
+  // wall, hold colour or anchor changed: redraw so the project matches (or the duplicate warning) follow
+  if(["area","hold","anchor"].includes(e.target.name)&&sheet&&sheet.d){if(sheet.type==="climb"){readForm();renderSheet();}else if(sheet.type==="project"){readProjForm();renderSheet();}}
   if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){DAY=v;render();}return;}
   if(e.target.name==="link"&&sheet&&sheet.d){readForm();linkProject(e.target.value);renderSheet();}
+  if(e.target.name==="keep"&&sheet&&sheet.type==="merge")sheet.keep=e.target.value;
 });
 document.addEventListener("submit",e=>{
   const id=e.target.id;e.preventDefault();

@@ -143,7 +143,8 @@ legend{padding:0}
 .iconbtn{appearance:none;width:40px;height:40px;border:0;border-radius:10px;background:none;color:var(--ink);cursor:pointer;display:grid;place-items:center}
 .iconbtn svg{width:20px;height:20px}
 .iconbtn:disabled{opacity:.3;cursor:default}
-.backfill{background:var(--fell-soft);color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.backfill{background:#3A2F0E;color:#FBE3A6;border-radius:999px;padding:3px 3px 3px 12px;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px;align-self:center;margin-top:-4px}
+.backfill .btn{min-height:30px;height:30px;padding:0 11px;font-size:12px;font-weight:800;border-radius:999px;background:#F5C84B;border-color:#F5C84B;color:#2A1E00}
 .sum{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
 .sum div{display:flex;flex-direction:column;gap:1px;min-width:0}
 .sum b{font-family:var(--f-display);font-size:26px;line-height:1.15;font-weight:700;font-variant-numeric:tabular-nums}
@@ -244,8 +245,11 @@ legend{padding:0}
 .wrow .t{flex:1;min-width:0;font-size:14px}
 .mlegend .fl{display:inline-flex;align-items:center;gap:5px}
 
-.datebar{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px}
-.datepick{position:relative;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:40px;font-weight:600;font-size:15px;cursor:pointer;border-radius:10px;white-space:nowrap}
+.datebar{display:flex;align-items:center;gap:4px;background:var(--sunk);border:1px solid var(--line2);border-radius:14px;padding:4px}
+.datebar .iconbtn{color:var(--ink)}
+.datepick{position:relative;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:40px;font-weight:800;font-size:16px;color:var(--ink);cursor:pointer;border-radius:10px;white-space:nowrap;letter-spacing:.01em}
+.datepick .td{color:var(--me)}
+.datebar.past{border-color:#F5C84B}.datebar.past .datepick{color:#FBE3A6}
 .datepick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:0;padding:0;border:0;cursor:pointer}
 .tag{display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:700;white-space:nowrap;border-radius:10px;flex:none;font-variant-numeric:tabular-nums}
 .tag.lg{min-width:64px;height:40px;padding:0 10px;font-size:16px}
@@ -509,6 +513,33 @@ legend{padding:0}
 .lsheet .pmatch.none .pm{min-height:38px}
 .lsheet .foot{position:sticky;bottom:calc(-22px - env(safe-area-inset-bottom,0px));background:var(--surface);padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px));margin-bottom:calc(-22px - env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);z-index:2;grid-template-columns:1fr 2.2fr;gap:8px}
 .lsheet .foot .btn{min-height:46px}
+/* matches: "Previous project?" */
+.pqh{display:flex;align-items:center;gap:8px;font:800 16px var(--f-body);color:#F5C84B;margin:0 0 8px;padding:0}
+.pqh .dot{width:10px;height:10px;border-radius:50%;background:#F5C84B;box-shadow:0 0 0 0 rgba(245,200,75,.6);animation:pqPulse 1.8s ease-out infinite}
+@keyframes pqPulse{0%{box-shadow:0 0 0 0 rgba(245,200,75,.6)}70%{box-shadow:0 0 0 9px rgba(245,200,75,0)}100%{box-shadow:0 0 0 0 rgba(245,200,75,0)}}
+.pmatch .same{flex:none;align-self:flex-start;padding:1px 8px;margin-bottom:1px;border-radius:999px;background:#1E3A32;color:#8FE3C8;font-size:11px;font-weight:800;white-space:nowrap}
+.pmq.enter .pqh{animation:dropIn .32s ease-out both}
+.pmq.enter .pmatch{animation:dropIn .34s cubic-bezier(.2,1.2,.4,1) both;animation-delay:calc(60ms + var(--i,0)*60ms)}
+@keyframes dropIn{from{opacity:0;transform:translateY(-12px) scale(.97)}}
+/* smoother everywhere: panels, pages, lists, toasts */
+.scrim{animation:cbFade .2s ease-out}
+.sheet-wrap.closing .sheet{animation:sheetDown .19s ease-in forwards}
+.sheet-wrap.closing .scrim{animation:fadeOut .19s ease-in forwards}
+@keyframes sheetDown{to{transform:translateY(100%);opacity:.6}}
+@keyframes fadeOut{to{opacity:0}}
+.toast:not([hidden]){animation:toastIn .26s cubic-bezier(.2,1.25,.4,1)}
+@keyframes toastIn{from{transform:translate(-50%,18px) scale(.96);opacity:0}}
+.cheer.out{animation:fadeOut .18s ease-in forwards}.cheer.out .card2{animation:popOut .18s ease-in forwards}
+@keyframes popOut{to{transform:scale(.85);opacity:0}}
+#view.tabin{animation:tabIn .24s ease-out}
+@keyframes tabIn{from{opacity:0;transform:translateY(10px)}}
+#view.restack .pcards>*{animation:rise .3s ease-out both}
+#view.restack .pcards>*:nth-child(2){animation-delay:.03s}#view.restack .pcards>*:nth-child(3){animation-delay:.06s}#view.restack .pcards>*:nth-child(4){animation-delay:.09s}
+#view.restack .pcards>*:nth-child(5){animation-delay:.12s}#view.restack .pcards>*:nth-child(6){animation-delay:.15s}#view.restack .pcards>*:nth-child(n+7){animation-delay:.18s}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+.stepc.enter,.vrow.enter,.lsheet .check.enter{animation:dropIn .28s cubic-bezier(.2,1.2,.4,1) both}
+.atwall,.dupw{animation:dropIn .28s cubic-bezier(.2,1.2,.4,1) both}
+@media (prefers-reduced-motion:reduce){.pqh .dot,.pmq.enter .pqh,.pmq.enter .pmatch,.scrim,.sheet-wrap.closing .sheet,.sheet-wrap.closing .scrim,.toast:not([hidden]),.cheer.out,.cheer.out .card2,#view.tabin,#view.restack .pcards>*,.stepc.enter,.vrow.enter,.lsheet .check.enter,.atwall,.dupw{animation:none}}
 /* after-save feedback */
 .cheer{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,8,14,.72);animation:cbFade .2s ease-out}
 .cheer .card2{width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 18px 14px;border-radius:26px;background:var(--surface);border:2px solid var(--cb);text-align:center;animation:cbPop .6s cubic-bezier(.2,1.3,.4,1)}
@@ -928,7 +959,11 @@ const myNotes=(p,w)=>S.notes.filter(n=>n.project===p.id&&n.climber===w).sort((a,
 function projWhere(p){return[p.type,p.area,p.anchor?"Anchor "+p.anchor:""].filter(Boolean).join(" · ");}
 
 /* ---------- render ---------- */
-function setTab(t){hideToast();if(t==="map")mapLand();tab=t;LS.set("tab",t);render();window.scrollTo(0,0);}
+function setTab(t){hideToast();if(t==="map")mapLand();const from=tab;tab=t;LS.set("tab",t);render();window.scrollTo(0,0);
+  animView(t==="proj"?"slide-l":from==="proj"&&t==="projects"?"slide-r":from!==t?"tabin":"");}
+// one-off view animations for things you tap (never for background syncs)
+let animT=0;
+function animView(cls){if(REDUCED||!cls)return;const v=$("#view");v.classList.remove("slide-l","slide-r","tabin","restack");void v.offsetWidth;v.classList.add(cls);clearTimeout(animT);animT=setTimeout(()=>v.classList.remove(cls),700);}
 function render(msg){
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===(tab==="proj"?"projects":tab))));
   $("#gymBtn").innerHTML=esc(GYM||"Climb Buddy")+(ready?" "+ICON.down:"");
@@ -1002,12 +1037,12 @@ function renderSession(){
   const dayLbl=keyDate(DAY).toLocaleDateString([],{weekday:"long",month:"short",day:"numeric"});
   $("#view").innerHTML=`
     ${whoSeg()}
-    <div class="datebar">
+    <div class="datebar${isToday?"":" past"}">
       <button class="iconbtn" data-act="prevDay" aria-label="Previous day">${ICON.left}</button>
-      <label class="datepick"><span>${isToday?"Today · ":""}${esc(dayLbl)}</span>${ICON.down}<input type="date" id="dayInput" value="${DAY}" max="${today}" aria-label="Date you're logging for"></label>
+      <label class="datepick"><span>${isToday?`<span class="td">Today</span> · `:""}${esc(dayLbl)}</span>${ICON.down}<input type="date" id="dayInput" value="${DAY}" max="${today}" aria-label="Date you're logging for"></label>
       <button class="iconbtn" data-act="nextDay" aria-label="Next day" ${DAY>=today?"disabled":""}>${ICON.right}</button>
     </div>
-    ${isToday?"":`<div class="backfill"><span>Logging for an earlier day</span><button class="btn small" data-act="goToday">Back to today</button></div>`}
+    ${isToday?"":`<div class="backfill"><span>Logging an earlier day</span><button class="btn" data-act="goToday">↺ Today</button></div>`}
     <section class="card hcard"><div class="hrow">${map}${stats}</div>
       ${M?`<div class="hfoot"><span class="hsm">${sel?`<b>${esc(sel.area)}</b> picked · tap it again to clear`:"Tap a wall to log there"}</span><button class="btn small" data-tab="map">Full map ⤢</button></div>`:""}</section>
     <div class="logrow"><span class="t"><b>${sel?"Log a climb at "+esc(sel.area):"Log a climb"}</b><small>${sel?esc(shortKind(sel.type))+" · picked on the map":"Boulder, top rope, auto belay or Kilter"}</small></span><button class="logbtn" data-act="logNew" aria-label="Log a climb"><span class="plus" aria-hidden="true">+</span><span class="ics" aria-hidden="true">${TYPES.map(t=>catIcon(t.k)).join("")}</span></button></div>
@@ -1518,8 +1553,9 @@ function gradeCounts(type,data){
    SHEETS (bottom panels)
    ===================================================================== */
 let sheet=null,lastFocus=null;
-function openSheet(s){hideToast();if(!sheet)lastFocus=document.activeElement;sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow="hidden";setTimeout(()=>{const f=$("#sheetBody .close");if(f)f.focus();},30);}
-function closeSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style.overflow="";if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
+let sheetT=0;
+function openSheet(s){hideToast();clearTimeout(sheetT);$("#sheetWrap").classList.remove("closing");if(!sheet)lastFocus=document.activeElement;sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow="hidden";setTimeout(()=>{const f=$("#sheetBody .close");if(f)f.focus();},30);}
+function closeSheet(){sheet=null;const w=$("#sheetWrap");if(!w.hidden){w.classList.add("closing");clearTimeout(sheetT);sheetT=setTimeout(()=>{w.hidden=true;w.classList.remove("closing");},REDUCED?0:190);}document.body.style.overflow="";if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
 const head=(title,sub)=>`<div class="sheet-h"><div><h2 id="sheetTitle">${title}</h2>${sub?`<p class="sub">${sub}</p>`:""}</div><button class="close" data-act="close" aria-label="Close">×</button></div>`;
 function renderSheet(){
   if(!sheet)return;const b=$("#sheetBody");
@@ -1600,9 +1636,11 @@ function climbSheet(){
   }
   const linked=d.link?S.projects.find(p=>p.id===d.link):null;
   const inList=!linked||ms.some(m=>m.p.id===linked.id);
+  if(!(ms.length&&inList))d._mShown=false;
   const who=climbers();
   const vids=d.videos;
   const place={Fell:"What stopped you?",Rested:"Where did you rest?",Sent:"Anything to remember?"}[d.result];
+  const rWas=d._rShown;d._rShown=d.result==="Rested";const newVid=d._vids!=null&&vids.length>d._vids;d._vids=vids.length;
   const dayTxt=d.day===todayKey()?"Today":d.day===shiftDay(todayKey(),-1)?"Yesterday":fmtShort(d.day);
   const rows=areaRows(d.type),hasMap=eqi(GYM,HUB_MAP.gym)&&HUB_MAP.zones.some(z=>z.type===d.type);
   const wallPills=rows.length?`<div class="pills" role="radiogroup" aria-label="Wall">${rows.map(r=>`<label class="pill"><input type="radio" name="area" value="${esc(r.value)}" ${eqi(r.value,d.area)?"checked":""}><span>${esc(r.value)}</span></label>`).join("")}${d.area&&!rows.some(r=>eqi(r.value,d.area))?`<label class="pill"><input type="radio" name="area" value="${esc(d.area)}" checked><span>${esc(d.area)}</span></label>`:""}</div>`
@@ -1620,8 +1658,8 @@ function climbSheet(){
       <input name="problem" value="${esc(d.problem)}" placeholder="Problem name (optional)" aria-label="Problem name" class="lnote">`
       :`<div class="wallbox">${hasMap?`<div class="minimap wm" data-type="${esc(d.type)}" aria-label="Tap a wall to choose where">${miniSVG(d.type,d.area,d.anchor,true)}</div>`:""}<div class="wr"${hasMap?"":` style="grid-column:1/-1"`}><span class="flabel" style="margin:0">Wall</span>${wallPills}${typeOf(d.type).anchor?`<label class="anc">Anchor #<input id="fAnchor" name="anchor" inputmode="numeric" value="${esc(d.anchor||"")}" placeholder="—"></label>`:""}</div></div>
       <fieldset><legend class="flabel">Hold colour</legend>${holdField(d.hold).replace(/^<fieldset><legend class="flabel">Hold colour<\/legend>/,"").replace(/<\/fieldset>$/,"")}</fieldset>`}
-    <div class="lrow">${step("tries","Tries",d.tries,"try")}${d.result==="Rested"?step("rests","Rests",d.rests,"rest"):""}<button type="button" class="vbtn" data-act="cvAdd"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>${vids.length?"+ Video":"Video"}</button></div>
-    ${vids.length?`<div class="vlist">${vids.map((u,i)=>`<div class="vrow">${/^https?:\/\//i.test(u)?`<a class="vtile" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Open the video"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}<input name="video" type="url" inputmode="url" value="${esc(u)}" placeholder="Paste a share link from Google Photos" aria-label="Video link ${i+1}"><button type="button" class="x" data-act="cvDel" data-i="${i}" aria-label="Remove this link">×</button></div>`).join("")}</div>`:""}
+    <div class="lrow">${step("tries","Tries",d.tries,"try")}${d.result==="Rested"?step("rests","Rests",d.rests,"rest").replace('class="stepc"',`class="stepc${rWas?"":" enter"}"`):""}<button type="button" class="vbtn" data-act="cvAdd"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>${vids.length?"+ Video":"Video"}</button></div>
+    ${vids.length?`<div class="vlist">${vids.map((u,i)=>`<div class="vrow${newVid&&i===vids.length-1?" enter":""}">${/^https?:\/\//i.test(u)?`<a class="vtile" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Open the video"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}<input name="video" type="url" inputmode="url" value="${esc(u)}" placeholder="Paste a share link from Google Photos" aria-label="Video link ${i+1}"><button type="button" class="x" data-act="cvDel" data-i="${i}" aria-label="Remove this link">×</button></div>`).join("")}</div>`:""}
     ${ms.length&&inList?matchList(d,ms):linked?`<div class="plink">${holdDot(linked.hold,"sm")}<span class="t"><b>${esc(projName(linked))} ${esc(gradeLabel(linked.grade))} project</b><small>${d.result==="Sent"?"Marks it sent for "+esc(d.climber):"Counts as a try on it"}</small></span><button type="button" class="btn small" data-act="cf" data-f="link" data-v="">Change</button></div>`:""}
     ${!linked&&!kil&&d.result!=="Sent"?`<label class="check"><input type="checkbox" name="addProj" ${d.addProj?"checked":""}>${d.result==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
     <input name="note" value="${esc(d.note)}" placeholder="Note · ${esc(place.toLowerCase())}" aria-label="Note" class="lnote">
@@ -1640,12 +1678,12 @@ function projMatches(d){
 }
 function matchList(d,ms){
   const whose=p=>{const t=triers(p);return t.includes(d.climber)?"Yours":t.length?t.join(" & ")+"'s":p.owner&&p.owner!==d.climber?p.owner+"'s":"Yours";};
-  const why=m=>m.strong?"Probably a repeat · same grade, wall and holds":m.area&&m.hold?"Same grade, wall and holds · other anchor":m.area?"Same grade and wall":m.hold?"Same grade and holds":"Same grade only";
-  return`<fieldset><legend class="flabel">${d.result==="Sent"?"Did you send one of the projects?":"Is it one of the projects?"}</legend><div class="pmatches${d.link?" picked":""}">${ms.map(m=>{
-    const p=m.p,info=projInfo(p),n=Object.values(info.tries).reduce((a,b)=>a+b,0),nt=(myNotes(p,d.climber)[0]||{}).note||p.note||"";
-    return`<label class="pmatch"><input type="radio" name="link" value="${p.id}" ${p.id===d.link?"checked":""}><span class="pm"><span class="why${m.strong?" ok":""}">${why(m)}</span><span class="row">${idBadges(p)}<span class="tx"><b>${esc(projWallText(p))}</b><small>${esc(whose(p))} · ${n?`${n} ${n===1?"try":"tries"}`:"not tried yet"} · ${esc(relDay(dayKey(info.last||p.added||Date.now())))}</small></span></span>${nt?`<span class="nt">“${esc(nt)}”</span>`:""}</span></label>`;}).join("")}
-    <label class="pmatch none"><input type="radio" name="link" value="" ${d.link?"":"checked"}><span class="pm">${d.result==="Sent"?"No, another route":"No, a new route"}</span></label></div>
-    ${d.autoLink&&d.link===d.autoLink?`<p class="hint" style="margin:6px 0 0">Picked for you: the grade, wall and holds match. Tap another to change it.</p>`:""}</fieldset>`;
+  // slides in the first time it shows up while you fill in the climb, not on every redraw
+  const enter=!d._mShown;d._mShown=true;
+  return`<fieldset class="pmq${enter?" enter":""}"><legend class="pqh"><span class="dot" aria-hidden="true"></span>${d.result==="Sent"?"Sent a previous project?":"Previous project?"}</legend><div class="pmatches${d.link?" picked":""}">${ms.map((m,i)=>{
+    const p=m.p,info=projInfo(p),n=Object.values(info.tries).reduce((a,b)=>a+b,0);
+    return`<label class="pmatch" style="--i:${i}"><input type="radio" name="link" value="${p.id}" ${p.id===d.link?"checked":""}><span class="pm"><span class="row">${idBadges(p)}<span class="tx">${m.strong?`<span class="same">Same spot</span>`:""}<b>${esc(projWallText(p))}</b><small>${esc(whose(p))} · ${n?`${n} ${n===1?"try":"tries"}`:"not tried yet"} · ${esc(relDay(dayKey(info.last||p.added||Date.now())))}</small></span></span></span></label>`;}).join("")}
+    <label class="pmatch none" style="--i:${ms.length}"><input type="radio" name="link" value="" ${d.link?"":"checked"}><span class="pm">${d.result==="Sent"?"No, another route":"No, a new route"}</span></label></div></fieldset>`;
 }
 function markProjectSent(p,who){
   const sentBy=[...new Set([...p.sentBy,who])];
@@ -1853,7 +1891,7 @@ function toast(msg,acts){
 }
 /* After saving a new climb: a pop-up with a kawaii animation and a cheeky British line.
    sent = good job, rested = not bad (top rope with rests), dnf = better luck next time, proj = a project sent.
-   Each kind is a shuffled deck kept on this phone, so no line repeats until the list runs out. Hides itself after 5 s. */
+   Each kind is a shuffled deck kept on this phone, so no line repeats until the list runs out. Stays until you tap. */
 const CHEER={"sent": [["Wow! You did it!", "Bloody good show!"], ["Cor blimey!", "You sent it. Someone put the kettle on."], ["Absolutely spiffing!", "The wall never stood a chance."], ["Smashing!", "Topped out like a proper gent. Biscuit earned."], ["Get in!", "Ring the bells, hang the bunting, fetch the scones."], ["Jolly well done!", "Your forearms deserve a knighthood."], ["Crikey, that was tidy!", "Textbook stuff. Take a bow."], ["Bob's your uncle!", "Up, done, sorted. Marvellous."], ["Champion!", "Even the pigeons on the roof are clapping."], ["Ruddy brilliant!", "Tell your mum. Tell the whole street."], ["Blinding!", "Climbed it like you owned the freehold."], ["Well I never!", "Sent, and not a single swear word. Probably."], ["Top drawer!", "That deserves a full English. With extra beans."], ["Lovely jubbly!", "The holds were putty in your hands."], ["Bang on!", "Dead tidy, that. Proper climber, you are."], ["Hats off!", "The King would like a word. To say well done."], ["Oi oi!", "Look who's gone and sent it. Cheeky."], ["Stonking effort!", "Your chalk bag is beaming with pride."], ["Cracking climb!", "Gromit would be ever so impressed."], ["Brilliant, simply brilliant!", "Even the route setter is a bit jealous."], ["Huzzah!", "A send fit for a royal wedding."], ["Mint!", "Sorted quicker than a queue at Greggs."], ["Spot on!", "Have a cuppa. You've more than earned it."], ["Belting!", "That was smoother than a pint of best bitter."], ["Wizard!", "Absolutely wizard, old chap. Wizard."], ["Ace!", "Clean as a whistle. Clean as a Sunday roast plate."], ["Splendid!", "Somebody fetch the Pimm's."], ["Phwoar, look at that!", "Up it like a squirrel up a drainpipe."], ["Gold star!", "A big shiny one. You've earned it."], ["Well chuffed!", "And so you should be. Top marks."]], "rested": [["Not bad at all!", "A little sit-down never hurt anyone."], ["Very civilised!", "A spot of tea halfway up. Respectable."], ["Not too shabby!", "Bit of a breather, bit of a send."], ["Got there in the end!", "Like the 8:15 from Paddington. Late, but it arrived."], ["Rather good, old bean!", "Next time, skip the tea break."], ["Not half bad!", "The rope did a bit of the lifting, mind."], ["Steady on!", "That's progress. Very British of you."], ["Respectable effort!", "Hung about like washing on a line, but you finished."], ["Decent, that!", "Took the scenic route, but you got to the top."], ["Close, but no biscuit.", "Well, half a biscuit. A rich tea, perhaps."], ["Fair play!", "A rest is just a picnic with extra steps."], ["Good-ish!", "Like a Victoria sponge with a soggy bottom. Still lovely."], ["Nearly clean!", "Paul Hollywood would give it a handshake. Almost."], ["Not shabby at all!", "You hung there like a well-loved hanging basket."], ["Admirable!", "Every great Brit needs a sit down now and then."], ["That'll do, pig.", "That'll do. Next time, no hanging about."], ["Not bad, not bad!", "The rope's sending you a thank-you card."], ["Pretty decent!", "Rested more than a pensioner on a bench, but you topped it."], ["Respectable!", "Half marks for style, full marks for stubbornness."], ["Nice one!", "A breather here and there. Proper sensible."]], "dnf": [["Oh dear.", "Chin up, stiff upper lip! Next time."], ["Bad luck, old sport.", "The wall's a cheeky blighter today."], ["Bit of a damp squib.", "Have a biscuit. Have two."], ["Not today, love.", "Put the kettle on and give it another go."], ["Gone a bit pear-shaped.", "Happens to the best of us. Mostly to you, today."], ["Blimey, the wall won.", "Best of three? Rematch next session."], ["Gutted!", "Still, not the end of the world. Probably."], ["Keep calm and chalk up.", "You'll have it next time, champ."], ["Off you pop.", "Have a rest. The wall's not going anywhere."], ["Well, that's a shame.", "The holds were clearly made of butter."], ["Oh, bother.", "Shake it off. Shake your arms off, actually."], ["Bit of a pickle, that.", "Not to worry. Rome wasn't sent in a day."], ["Sod's law.", "It was going so well, too."], ["Close, but no cigar.", "Not even a cigarillo. Next time!"], ["Rotten luck!", "Must have been the weather. It's always the weather."], ["Cheer up, chuck.", "Even Wallace needed a few goes."], ["Better luck next time!", "The wall said 'not today, sunshine'."], ["Whoopsie daisy.", "Gravity: one. You: zero. For now."], ["Ah, nuts.", "Tea, biscuits, and a cheeky revenge plan."], ["Righto, regroup.", "Like a proper rainy Tuesday. It'll pass."], ["Blast!", "That route owes you an apology."], ["Not quite, old chum.", "Even the Queen had off days. Probably."], ["Oh, crumbs.", "Plenty more crumbs where that came from. Try again!"], ["Bit wobbly, that.", "Wobblier than a jelly at a kids' party."], ["Pants!", "Absolute pants. Next go will be smashing, though."], ["Hard cheese.", "Mature cheddar, mind. Builds character."], ["Not your day.", "Not to worry. There's always next Thursday."], ["Ooh, so close.", "Closer than a London bus to the kerb."], ["Down you come!", "That was a scenic descent, if nothing else."], ["Well, bugger.", "Dust yourself off and have another crack."]], "proj": [["PROJECT SENT!", "Absolutely bloody marvellous. Fetch the bunting!"], ["Finally!", "All those tries, and look at you now. Smashing!"], ["Hip hip hooray!", "That project's been well and truly sorted."], ["You legend!", "Write it in the history books. In your nicest handwriting."], ["It's done! It's DONE!", "Somebody call the BBC. And your nan."], ["Glory be!", "Weeks of faffing about, and you've only gone and sent it."], ["Bloomin' marvellous!", "That project didn't know what hit it."], ["Victory!", "Crack open the good biscuits. The chocolate ones."], ["Absolute scenes!", "Pubs across the nation are raising a pint."], ["Get in there!", "From projecting to perfecting. Champion."], ["Sorted, at long last!", "The wall has formally surrendered."], ["Ta-da!", "One project down. Knighthood pending."]]};
 const CHEER_ART={"sent": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><rect class=\"conf\" x=\"10\" y=\"4\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"47\" y=\"17\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"84\" y=\"10\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"21\" y=\"23\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"58\" y=\"16\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.40s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"95\" y=\"9\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:1.65s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"32\" y=\"22\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.90s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"69\" y=\"15\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:2.15s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"106\" y=\"8\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.40s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"43\" y=\"21\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:1.65s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"80\" y=\"14\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.90s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"17\" y=\"7\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:2.15s;animation-delay:0.18s\"/><g class=\"bob\"><path d=\"M60 14 L72 42 L103 45 L79 65 L86 96 L60 80 L34 96 L41 65 L17 45 L48 42 Z\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><circle cx=\"51\" cy=\"58\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"58\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"65\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"65\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M54 64 Q60 71 66 64\" fill=\"#E8607A\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/></g></svg>", "proj": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><rect class=\"conf\" x=\"10\" y=\"4\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"47\" y=\"17\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"84\" y=\"10\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"21\" y=\"23\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"58\" y=\"16\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.40s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"95\" y=\"9\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:1.65s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"32\" y=\"22\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.90s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"69\" y=\"15\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:2.15s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"106\" y=\"8\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.40s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"43\" y=\"21\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:1.65s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"80\" y=\"14\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.90s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"17\" y=\"7\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:2.15s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"54\" y=\"20\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"91\" y=\"13\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"28\" y=\"6\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"65\" y=\"19\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.00s\"/><g class=\"bob\"><path d=\"M38 28h44v22a22 22 0 0 1-44 0z\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><path d=\"M38 34h-10a12 12 0 0 0 12 16M82 34h10a12 12 0 0 1-12 16\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"3.2\"/><rect x=\"54\" y=\"72\" width=\"12\" height=\"12\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3\"/><rect x=\"42\" y=\"84\" width=\"36\" height=\"10\" rx=\"3\" fill=\"#3DC2EC\" stroke=\"#1E2235\" stroke-width=\"3\"/><circle cx=\"51\" cy=\"44\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"44\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"51\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"51\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M54 50 Q60 57 66 50\" fill=\"#E8607A\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/></g></svg>", "rested": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><g fill=\"none\" stroke=\"#C9D8E8\" stroke-width=\"3.4\" stroke-linecap=\"round\"><path class=\"steam\" d=\"M46 34 q-6 -8 0 -16\"/><path class=\"steam\" style=\"animation-delay:.5s\" d=\"M60 32 q-6 -8 0 -16\"/><path class=\"steam\" style=\"animation-delay:1s\" d=\"M74 34 q-6 -8 0 -16\"/></g><g class=\"bob\"><ellipse cx=\"60\" cy=\"96\" rx=\"40\" ry=\"8\" fill=\"#5B45D6\" stroke=\"#1E2235\" stroke-width=\"3\"/><path d=\"M28 44h64v20a32 32 0 0 1-64 0z\" fill=\"#fff\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><path d=\"M92 52h6a10 10 0 0 1 0 20h-8\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"3.2\"/><rect x=\"28\" y=\"44\" width=\"64\" height=\"7\" fill=\"#C4B8F5\" stroke=\"#1E2235\" stroke-width=\"3\"/><circle cx=\"51\" cy=\"66\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"66\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"73\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"73\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M55 73 Q60 77 65 73\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></g></svg>", "dnf": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><g fill=\"#7FB6F0\" stroke=\"#1E2235\" stroke-width=\"2.4\"><path class=\"drop\" d=\"M40 84 q-5 8 0 12 q5 -4 0 -12z\"/><path class=\"drop\" style=\"animation-delay:.45s\" d=\"M62 86 q-5 8 0 12 q5 -4 0 -12z\"/><path class=\"drop\" style=\"animation-delay:.9s\" d=\"M82 82 q-5 8 0 12 q5 -4 0 -12z\"/></g><g class=\"wob\"><path d=\"M30 78a20 20 0 0 1 2-38 26 26 0 0 1 50-6 20 20 0 0 1 10 44z\" fill=\"#DCE6F2\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><circle cx=\"51\" cy=\"56\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"56\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"63\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"63\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"60\" cy=\"65\" rx=\"3.2\" ry=\"3.8\" fill=\"#1E2235\"/></g></svg>"};
 const CHEER_STYLE={sent:{cb:"var(--me)",cbg:"var(--me-soft)",cfg:"var(--me)",tag:"SENT"},proj:{cb:"#F5C84B",cbg:"#3A2F0E",cfg:"#F5C84B",tag:"PROJECT SENT"},
@@ -1870,9 +1908,10 @@ function showCheer(k,what,undo){
   hideToast();const[h,l]=cheerLine(k),st=CHEER_STYLE[k],el=$("#cheer");
   el.style.cssText=`--cb:${st.cb};--cbg:${st.cbg};--cfg:${st.cfg}`;
   el.innerHTML=`<div class="card2" role="status">${CHEER_ART[k]}<span class="tag2">${st.tag}</span><h3>${esc(h)}</h3><p>${esc(l)}</p>${what?`<span class="what">${esc(what)}</span>`:""}<div class="acts"><button class="btn" data-cheer="undo">Undo</button><button class="btn ok" data-cheer="ok">Ta very much</button></div></div>`;
-  el.hidden=false;cheerUndo=undo||null;clearTimeout(cheerT);cheerT=setTimeout(hideCheer,5000);
+  el.classList.remove("out");el.hidden=false;cheerUndo=undo||null;clearTimeout(cheerT);
 }
-function hideCheer(){$("#cheer").hidden=true;cheerUndo=null;clearTimeout(cheerT);}
+// stays up until you answer; fades out when you do
+function hideCheer(){const el=$("#cheer");cheerUndo=null;clearTimeout(cheerT);if(el.hidden)return;el.classList.add("out");cheerT=setTimeout(()=>{el.hidden=true;el.classList.remove("out");},REDUCED?0:180);}
 $("#cheer").addEventListener("click",e=>{
   const b=e.target.closest("[data-cheer]");
   if(b&&b.dataset.cheer==="undo"&&cheerUndo){const u=cheerUndo;hideCheer();u();toast("Undone");return;}
@@ -1897,25 +1936,25 @@ document.addEventListener("click",e=>{
     case"cvAdd":if(sheet&&sheet.d){readForm();sheet.d.videos.push("");renderSheet();const v=document.querySelectorAll("#sheetBody input[name=video]");if(v.length)v[v.length-1].focus();}break;
     case"cvDel":if(sheet&&sheet.d){readForm();sheet.d.videos.splice(+t.dataset.i,1);renderSheet();}break;
     case"homeWall":{const z=t.dataset.z;homeSel=!z||homeSel===z?"":z;LS.set("homesel",homeSel);render();break;}
-    case"homeAll":homeAll=true;render();break;
+    case"homeAll":homeAll=true;render();animView("restack");break;
     case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");newClimb(z.type,z.area);break;}
-    case"projWall":{const z=t.dataset.z;projSel=!z||projSel===z?"":z;render();if(projSel){const c=$("#pcards");if(c)c.scrollIntoView({behavior:"smooth",block:"nearest"});}break;}
+    case"projWall":{const z=t.dataset.z;projSel=!z||projSel===z?"":z;render();animView("restack");if(projSel){const c=$("#pcards");if(c)c.scrollIntoView({behavior:"smooth",block:"nearest"});}break;}
     case"progWall":{const z=t.dataset.z;progSel=progSel===z?"":z;render();break;}
     case"wallHist":wallHist=!wallHist;render();break;
-    case"prevDay":DAY=shiftDay(DAY,-1);render();break;
-    case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();break;
-    case"goToday":DAY=todayKey();render();break;
+    case"prevDay":DAY=shiftDay(DAY,-1);render();animView("slide-r");break;
+    case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();animView("slide-l");break;
+    case"goToday":DAY=todayKey();render();animView("slide-l");break;
     case"openDay":openSheet({type:"day",k:t.dataset.k});break;
     case"openClimb":{const c=S.climbs.find(x=>x.id===id);if(c)editClimb(c);break;}
     case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
     case"delClimb":{const c=S.climbs.find(x=>x.id===id);if(!c)break;const keep=Object.assign({},c);delete keep.id;store.del("climbs",id);if(sheet&&sheet.type==="climb")closeSheet();toast("Climb deleted",[{label:"Undo",fn:()=>enqueue({op:"add",coll:"climbs",id,data:keep})}]);break;}
-    case"pf":projFilter=t.dataset.v;LS.set("pf",projFilter);projSel="";render();break;
+    case"pf":projFilter=t.dataset.v;LS.set("pf",projFilter);projSel="";render();animView("restack");break;
     case"logNew":{const w=homeWall();newClimb(w?w.type:TYPE,w?w.area:"");break;}
-    case"dayf":dayFilter=t.dataset.v;LS.set("dayf",dayFilter);render();break;
-    case"days":daySort=t.dataset.v;LS.set("days",daySort);render();break;
-    case"dayh":dayHard=!dayHard;LS.set("dayh",dayHard?"1":"0");render();break;
-    case"psort":projSort=t.dataset.v;LS.set("psort",projSort);render();break;
-    case"pdir":projHard=!projHard;LS.set("phard",projHard?"1":"0");render();break;
+    case"dayf":dayFilter=t.dataset.v;LS.set("dayf",dayFilter);render();animView("restack");break;
+    case"days":daySort=t.dataset.v;LS.set("days",daySort);render();animView("restack");break;
+    case"dayh":dayHard=!dayHard;LS.set("dayh",dayHard?"1":"0");render();animView("restack");break;
+    case"psort":projSort=t.dataset.v;LS.set("psort",projSort);render();animView("restack");break;
+    case"pdir":projHard=!projHard;LS.set("phard",projHard?"1":"0");render();animView("restack");break;
     case"merge":{const B=S.projects.find(x=>x.id===t.dataset.v);if(P&&B)openSheet({type:"merge",a:P.id,b:B.id,keep:P.id});break;}
     case"mkeep":if(sheet&&sheet.type==="merge"){sheet.keep=t.dataset.v;renderSheet();}break;
     case"doMerge":if(sheet&&sheet.type==="merge")doMerge();break;

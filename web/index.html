@@ -447,6 +447,89 @@ legend{padding:0}
 .psort button[aria-pressed="true"]{background:var(--sunk);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--me)}
 .pdir{flex:none;display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 10px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--ink);font:700 12px var(--f-body);cursor:pointer}
 .pdir svg{width:14px;height:14px}
+/* home: log row + the day's climbs as badge cards */
+.logrow{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.logrow .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.logrow .t b{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.logrow .t small{font-size:12px;color:var(--muted)}
+.logbtn{appearance:none;flex:none;display:flex;align-items:center;gap:6px;height:46px;padding:0 9px 0 7px;border-radius:14px;border:0;background:var(--me);color:var(--me-ink);cursor:pointer}
+.logbtn .plus{width:30px;height:30px;border-radius:50%;background:var(--me-ink);color:var(--me);display:flex;align-items:center;justify-content:center;font:800 22px/1 var(--f-body)}
+.logbtn .ics{display:flex;gap:1px}.logbtn .cicon{width:21px;height:21px}
+.dhead{display:flex;align-items:baseline;gap:8px;margin-top:6px}.dhead h2{margin:0;font:800 19px var(--f-body)}.dhead small{font-size:12px;color:var(--muted)}
+.cc3{display:flex;align-items:center;border-radius:14px;border:1px solid var(--line);border-left:5px solid var(--rc,var(--line));background:var(--surface);overflow:hidden}
+.cc3 .pmain{appearance:none;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 4px 6px 6px;flex:1;min-width:0;min-height:58px}
+.cc3 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-left:4px}
+.cc3 .tx b{display:flex;align-items:center;gap:5px;font-size:14px;min-width:0}.cc3 .tx b span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc3 .tx .ricon{width:16px;height:16px;flex:none}
+.cc3 .tx small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc3 .chev{width:20px;height:20px}.cc3 .vtile{width:40px;height:40px;margin-right:6px}
+.idh .cicon{width:28px;height:28px}
+/* compact log panel */
+.lsheet .sheet-h{align-items:center;gap:8px;padding:12px 0 8px;flex-wrap:nowrap}
+.lsheet .sheet-h h2{font:800 19px var(--f-body);flex:1;min-width:0;white-space:nowrap}
+.lwho{display:flex;padding:2px;border-radius:999px;border:1px solid var(--line2);flex:none}
+.lwho button{appearance:none;height:32px;padding:0 9px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:800 12.5px var(--f-body);cursor:pointer}
+.lwho button[aria-pressed="true"]{background:var(--pc);color:#08202C}
+.dchip{position:relative;flex:none;display:inline-flex;align-items:center;height:36px;padding:0 10px;border-radius:999px;border:1px solid var(--line2);font:700 12.5px var(--f-body);white-space:nowrap}
+.dchip input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:0;padding:0;border:0;cursor:pointer}
+.lsheet .close{width:36px;height:36px}
+.lsheet form{gap:12px}
+.lsheet .flabel{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px}
+.lsheet .ccat{gap:6px}
+.lsheet .cbtn{height:38px;flex-direction:row;gap:4px;border-radius:11px;font-size:12px;padding:0 3px}
+.lsheet .cbtn .cicon{width:20px;height:20px;flex:none}
+.lsheet .resrow{gap:6px}
+.lsheet .rbtn{height:36px;border-radius:11px;font-size:13px;font-weight:700;gap:5px}
+.lsheet .rbtn .ricon{width:16px;height:16px}
+.lsheet .rbtn[aria-pressed="true"]::after,.lsheet .gchip[aria-pressed="true"]::after{display:none}
+.lsheet .gchips{display:flex;gap:6px;overflow-x:auto;padding:3px;margin:-3px;scrollbar-width:none}.lsheet .gchips::-webkit-scrollbar{display:none}
+.lsheet .gchip{flex:none;min-width:44px;height:32px;padding:0 8px;border-radius:9px;font-size:12.5px;font-weight:800}
+.lsheet .gchip[aria-pressed="true"]{border:0;box-shadow:0 0 0 2.5px #fff}
+.wallbox{display:grid;grid-template-columns:132px 1fr;gap:10px}
+.wallbox .minimap{height:150px;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.wallbox .minimap svg{width:100%;height:100%;display:block}
+.wallbox .wr{display:flex;flex-direction:column;gap:6px;min-width:0}
+.wallbox .pills{gap:5px}
+.wallbox .pill span{height:30px;padding:0 9px;border-radius:15px;font-size:12px;font-weight:700;gap:4px}
+.wallbox .pill input:checked+span,:root[data-dark] .wallbox .pill input:checked+span{background:#F5C84B;border-color:#F5C84B;color:#2A1E00}
+.wallbox .anc{display:flex;align-items:center;gap:8px;margin-top:auto;font-size:12px;font-weight:700;color:var(--muted)}
+.wallbox .anc input{width:64px;height:32px;min-height:0;padding:0 10px;border-radius:10px;font-weight:700}
+.lsheet .swatches{flex-wrap:nowrap;justify-content:space-between;gap:0}
+.lsheet .sw span{width:27px;height:27px;border-width:2px}
+.lsheet .sw input:checked+span{box-shadow:0 0 0 3px var(--me)}
+.lrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stepc{display:flex;align-items:center;gap:2px;padding:2px;border-radius:12px;background:var(--bg);border:1px solid var(--line2)}
+.stepc span{padding:0 6px 0 8px;font-size:12px;font-weight:700;color:var(--muted)}
+.stepc button{appearance:none;width:32px;height:32px;border:0;border-radius:8px;background:var(--surface);color:var(--ink);font-size:17px;cursor:pointer}
+.stepc output{min-width:22px;text-align:center;font-weight:800}
+.vbtn{appearance:none;margin-left:auto;display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 11px;border-radius:11px;border:1px dashed var(--line2);background:transparent;color:var(--ink);font:700 12.5px var(--f-body);cursor:pointer}
+.angs{display:flex;gap:5px}.angs button{appearance:none;flex:1;height:32px;border-radius:9px;border:1px solid var(--line2);background:transparent;color:var(--ink);font:800 12.5px var(--f-body);cursor:pointer}
+.angs button[aria-pressed="true"]{background:#8FE3C8;border-color:#8FE3C8;color:#08202C}
+.lsheet .check{padding:8px 12px;font-size:13.5px}
+.lsheet .lnote{height:38px;min-height:0}
+.lsheet .pmatch.none .pm{min-height:38px}
+.lsheet .foot{position:sticky;bottom:calc(-22px - env(safe-area-inset-bottom,0px));background:var(--surface);padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px));margin-bottom:calc(-22px - env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);z-index:2;grid-template-columns:1fr 2.2fr;gap:8px}
+.lsheet .foot .btn{min-height:46px}
+/* after-save feedback */
+.cheer{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,8,14,.72);animation:cbFade .2s ease-out}
+.cheer .card2{width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 18px 14px;border-radius:26px;background:var(--surface);border:2px solid var(--cb);text-align:center;animation:cbPop .6s cubic-bezier(.2,1.3,.4,1)}
+.cheer .tag2{padding:3px 10px;border-radius:999px;background:var(--cbg);color:var(--cfg);font-size:11px;font-weight:800;letter-spacing:.05em}
+.cheer h3{margin:0;font:800 24px/1.15 var(--f-body)}
+.cheer p{margin:0;font-size:15px;color:var(--ink);opacity:.85;line-height:1.35}
+.cheer .what{font-size:12px;color:var(--muted)}
+.cheer .acts{width:100%;display:grid;grid-template-columns:1fr 1.6fr;gap:8px;margin-top:6px}
+.cheer .acts .btn{min-height:42px}.cheer .acts .ok{background:var(--cb);border-color:var(--cb);color:#08202C;font-weight:800}
+.cheer svg.art{width:112px;height:112px;overflow:visible}
+@keyframes cbPop{0%{transform:scale(.3) rotate(-8deg);opacity:0}55%{transform:scale(1.08) rotate(2deg);opacity:1}78%{transform:scale(.97)}100%{transform:scale(1)}}
+@keyframes cbFall{0%{transform:translateY(-10px) rotate(0);opacity:0}12%{opacity:1}100%{transform:translateY(120px) rotate(320deg);opacity:0}}
+@keyframes cbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes cbSteam{0%{transform:translateY(8px);opacity:0}40%{opacity:.95}100%{transform:translateY(-16px);opacity:0}}
+@keyframes cbDrop{0%{transform:translateY(0);opacity:0}25%{opacity:1}100%{transform:translateY(30px);opacity:0}}
+@keyframes cbWobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+@keyframes cbFade{from{opacity:0}to{opacity:1}}
+.cheer .bob{animation:cbBob 1.6s ease-in-out infinite}.cheer .wob{animation:cbWobble 2.2s ease-in-out infinite;transform-origin:60px 55px}
+.cheer .conf{animation:cbFall 1.6s ease-in infinite;transform-box:fill-box;transform-origin:center}
+.cheer .steam{animation:cbSteam 1.8s ease-in-out infinite}.cheer .drop{animation:cbDrop 1.3s ease-in infinite}
+@media (prefers-reduced-motion:reduce){.cheer,.cheer .card2,.cheer .bob,.cheer .wob,.cheer .conf,.cheer .steam,.cheer .drop{animation:none}}
 /* log panel: which project is it? */
 .pmatches{display:flex;flex-direction:column;gap:8px}
 .pmatch{position:relative;display:block;cursor:pointer}
@@ -561,6 +644,7 @@ legend{padding:0}
   <div class="scrim" data-act="close"></div>
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div id="sheetBody"></div></section>
 </div>
+<div id="cheer" class="cheer" hidden></div>
 <div id="toast" class="toast" role="status" hidden><span id="toastMsg"></span><span id="toastActs" style="display:flex;margin:0"></span></div>
 
 <script>
@@ -600,7 +684,7 @@ const RES_ART={
   Rested:`<circle cx="12" cy="12" r="10.5" fill="#2A2260" stroke="#8C7CF0" stroke-width="1.6"/><path d="M9.5 8.5v7M14.5 8.5v7" stroke="#C9C0FF" stroke-width="3" stroke-linecap="round"/>`,
   Fell:`<circle cx="12" cy="12" r="10.5" fill="#CDBFFB" ${OL}/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#5B3FC4" stroke-width="3" stroke-linecap="round"/>`
 };
-const resIcon=(res,cls)=>`<svg class="ricon ${cls||""}" viewBox="0 0 24 24" role="img" aria-label="${res}">${RES_ART[res]||RES_ART.Fell}</svg>`;
+const resIcon=(res,cls)=>`<svg class="ricon ${cls||""}" viewBox="0 0 24 24" role="img" aria-label="${resLabel(res)}">${RES_ART[res]||RES_ART.Fell}</svg>`;
 // Person avatars by theme: Gary a chalk bag (cyan band), Cecilia a hold with a pink bow
 const AVATAR={
   green:`<path d="M8 10h16v14a5 5 0 0 1-5 5h-6a5 5 0 0 1-5-5z" fill="#fff" ${OL}/><rect x="7" y="6" width="18" height="5" rx="2.5" fill="#3DC2EC" ${OL}/>${face(17)}`,
@@ -646,7 +730,9 @@ function tagHTML(type,g,size){const c=gradeColour(type,g);const lbl=esc(gradeLab
 const CSSCOL={red:"#D83A34",orange:"#F08A24",yellow:"#F5D02E",green:"#3DA35D",teal:"#2BA5A0",blue:"#2F6FD6",purple:"#8150C8",pink:"#EE7FB0",black:"#22262A",white:"#F7F7F4",grey:"#9AA0A6",gray:"#9AA0A6",brown:"#8A5A3B"};
 function holdHex(name){if(!name)return"";const r=holdRows().find(x=>eqi(x.value,name));if(r&&/^#[0-9a-f]{6}$/i.test(r.colour))return r.colour;return CSSCOL[String(name).trim().toLowerCase()]||"";}
 function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${cls||""}" style="background:${h}" aria-hidden="true"></span>`:`<span class="hdot none ${cls||""}" aria-hidden="true"></span>`;}
-const RES_KEYS=[["Sent","sent","Sent"],["Rested","rest","Rested"],["Fell","fell","Fell"]];
+const RES_KEYS=[["Sent","sent","Sent"],["Rested","rest","Rested"],["Fell","fell","Didn't finish"]];
+// "Fell" is what's saved in the sheet; the app calls it "Didn't finish"
+const resLabel=r=>r==="Fell"?"Didn't finish":r;
 // both sets pass the colour-blind / contrast validator on their own backgrounds
 const RES_LIGHT={sent:"#1F4FB8",rest:"#6C8CEB",fell:"#DD6B26"},RES_DARK={sent:"#2A9FD0",rest:"#5B45D6",fell:"#CDBFFB"};
 // Charts keep sent / rested / fell apart by lightness: mid sent (per person), deep violet rested, light purple fell
@@ -664,6 +750,7 @@ let ready=false,auth="ok",KEY=LS.get("key",""),API=API_URL||LS.get("api",""),she
 let queue=[],inflight=false,flushT=null,retryT=null;
 let GYM=LS.get("gym",""),WHO=LS.get("who",""),DAY=todayKey(),TYPE=LS.get("type","Bouldering");
 let projId=LS.get("projid",""),projSel="";
+let dayFilter=LS.get("dayf","All"),daySort=LS.get("days","Recent"),dayHard=LS.get("dayh","1")==="1";
 let tab=LS.get("tab","session"),projFilter=LS.get("pf","All"),projSort=LS.get("psort","Recent"),projHard=LS.get("phard","1")==="1",pMonth=todayKey().slice(0,7),BOTH=LS.get("both","")==="1";
 function readLinkParams(){
   try{
@@ -895,9 +982,23 @@ function renderSession(){
     <span class="hleg">${parts.filter(p=>p.v||p.k!=="rest").map(p=>`<span><i style="background:${RES_HEX[p.k]}"></i>${p.v} ${p.k==="rest"?"with rests":p.l}</span>`).join("")}</span>`:""}
     ${top?`<span class="hsm">Hardest <b>${esc(top)}</b></span>`:""}
     <span class="hsm">${myOpen.length} open ${myOpen.length===1?"project":"projects"}</span></div>`;
-  const tiles=TYPES.map(t=>{const n=mine.filter(c=>c.type===t.k).length,hi=!!sel&&sel.type===t.k;
-    return`<button class="tile${hi?" hi":""}" data-act="pick" data-v="${t.k}">${catIcon(t.k,"big")}<span class="nm"><b>${shortType(t.k)}</b><small>${n?`${n} ${isToday?"today":"that day"}`:"none yet"}${hi?" · "+esc(sel.area):""}</small></span></button>`;}).join("");
-  const shown=homeAll?mine:mine.slice(0,5);
+  // the day's climbs, shown and sorted like Projects
+  if(dayFilter!=="All"&&!mine.some(c=>c.type===dayFilter))dayFilter="All";
+  const vis=mine.filter(c=>dayFilter==="All"||c.type===dayFilter);
+  const rk=c=>gradeIdx(c.type,c.grade),byR=(a,b)=>b.when-a.when,byG=(a,b)=>(dayHard?rk(b)-rk(a):rk(a)-rk(b))||byR(a,b);
+  const grp=t=>t==="Bouldering"?0:t==="Kilter Board"?2:1;
+  let groups;
+  if(daySort==="Grade"){
+    const m={};for(const c of vis){const k=grp(c.type)+"|"+gkey(c.grade);(m[k]=m[k]||[]).push(c);}
+    groups=Object.values(m).map(it=>{const c=it[0],r=rk(c);return{items:it.sort(byR),title:gradeLabel(c.grade),sub:shortKind(c.type==="Auto belay"||c.type==="Top rope"?"Rope":c.type)+" · "+it.length,sw:gradeFill(c.type,c.grade),k:grp(c.type)*1000+(dayHard?-r:r)};}).sort((a,b)=>a.k-b.k);
+  }else if(daySort==="Type"){
+    groups=TYPES.map(t=>t.k).map(t=>{const it=vis.filter(c=>c.type===t).sort(byG);return{items:it,title:shortKind(t),sub:it.length+(it.length===1?" climb":" climbs")};}).filter(g=>g.items.length);
+  }else{const it=vis.slice().sort(byR);groups=[{items:homeAll?it:it.slice(0,8),more:it.length>8&&!homeAll?it.length:0}];}
+  const kinds=[["All","All"],["Bouldering","Boulder"],["Top rope","Top rope"],["Auto belay","Auto"],["Kilter Board","Kilter"]].filter(([k])=>k==="All"||mine.some(c=>c.type===k));
+  const dctl=mine.length?`<div class="pctl">
+    ${kinds.length>2?`<div class="row"><span class="lb">Show</span><div class="chips" role="group" aria-label="Show">${kinds.map(([k,l])=>`<button class="chip" data-act="dayf" data-v="${k}" aria-pressed="${dayFilter===k}">${l} <span class="n">${mine.filter(c=>k==="All"||c.type===k).length}</span></button>`).join("")}</div></div>`:""}
+    <div class="row"><span class="lb">Sort</span><div class="psort" role="group" aria-label="Sort by">${PSORT.map(k=>`<button data-act="days" data-v="${k}" aria-pressed="${daySort===k}">${k}</button>`).join("")}</div>${daySort!=="Recent"?`<button class="pdir" data-act="dayh" aria-label="Flip grade order"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2v12M5 14l-3-3M5 14l3-3M11 14V2M11 2l-3 3M11 2l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${dayHard?"Hardest":"Easiest"}</button>`:""}</div>
+  </div>`:"";
   const dayLbl=keyDate(DAY).toLocaleDateString([],{weekday:"long",month:"short",day:"numeric"});
   $("#view").innerHTML=`
     ${whoSeg()}
@@ -909,11 +1010,20 @@ function renderSession(){
     ${isToday?"":`<div class="backfill"><span>Logging for an earlier day</span><button class="btn small" data-act="goToday">Back to today</button></div>`}
     <section class="card hcard"><div class="hrow">${map}${stats}</div>
       ${M?`<div class="hfoot"><span class="hsm">${sel?`<b>${esc(sel.area)}</b> picked · tap it again to clear`:"Tap a wall to log there"}</span><button class="btn small" data-tab="map">Full map ⤢</button></div>`:""}</section>
-    <div class="shead"><h2>Log a climb</h2>${sel?`<span class="atwall">at ${esc(sel.area)}<button data-act="homeWall" data-z="" aria-label="Clear wall">×</button></span>`:""}</div>
-    <div class="tiles">${tiles}</div>
-    <div class="shead"><h2>${isToday?"Today's climbs":"Climbs that day"}</h2>${mine.length?`<span class="hsm">Tap any climb to fix it</span>`:""}</div>
-    ${mine.length?`<div class="clist">${shown.map(climbRow).join("")}</div>${mine.length>shown.length?`<button class="btn dashed" data-act="homeAll">Show all ${mine.length}</button>`:""}`:`<p class="hint">Nothing logged ${isToday?"yet today":"on this day"}. Pick what you climbed above.</p>`}
+    <div class="logrow"><span class="t"><b>${sel?"Log a climb at "+esc(sel.area):"Log a climb"}</b><small>${sel?esc(shortKind(sel.type))+" · picked on the map":"Boulder, top rope, auto belay or Kilter"}</small></span><button class="logbtn" data-act="logNew" aria-label="Log a climb"><span class="plus" aria-hidden="true">+</span><span class="ics" aria-hidden="true">${TYPES.map(t=>catIcon(t.k)).join("")}</span></button></div>
+    <div class="dhead"><h2>${isToday?"Today's climbs":"Climbs that day"}</h2>${mine.length?`<small>${mine.length} · tap one to fix it</small>`:""}</div>
+    ${dctl}
+    ${mine.length?`<div class="pcards">${groups.map(g=>(g.title?`<div class="pgh">${g.sw?`<i style="background:${g.sw}"></i>`:""}<b>${esc(g.title)}</b><small>${esc(g.sub)}</small><span class="ln"></span></div>`:"")+g.items.map(climbCard).join("")+(g.more?`<button class="btn dashed" data-act="homeAll">Show all ${g.more}</button>`:"")).join("")}</div>`:`<p class="hint">Nothing logged ${isToday?"yet today":"on this day"}. Tap <b>+</b> to log your first climb.</p>`}
     ${sheetLink()}`;
+}
+// One climb as a card: result edge + icon, grade · holds · wall badges, where, then time, tries, rests and note; play tile for a video
+function climbCard(c){
+  const kil=c.type==="Kilter Board";
+  const title=kil?[c.problem?"“"+c.problem+"”":"Kilter Board",c.angle?c.angle+"°":""].filter(Boolean).join(" · "):projWallText(c);
+  const tm=dayKey(c.when)===todayKey()?new Date(c.when).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"";
+  const det=[tm,c.tries>1?c.tries+" tries":"",c.result==="Rested"&&c.rests?c.rests+(c.rests===1?" rest":" rests"):"",c.project?"project":"",c.note||""].filter(Boolean).join(" · ");
+  const vids=videoLinks(c),rc=c.result==="Sent"?"var(--me)":c.result==="Rested"?"#5B45D6":"#CDBFFB";
+  return`<div class="cc3" style="--rc:${rc}"><button class="pmain" data-act="openClimb" data-id="${c.id}">${idBadges(c)}<span class="tx"><b>${resIcon(c.result)}<span>${esc(title)}</span></b><small>${esc(det||resLabel(c.result)+" · tap to add details")}</small></span>${vids.length?"":CHEV}</button>${vids.length?`<a class="vtile" href="${esc(vids[0])}" target="_blank" rel="noopener" aria-label="Watch the video${vids.length>1?" (1 of "+vids.length+")":""}"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}</div>`;
 }
 // One climb: result, category, grade, wall / anchor, hold dot, tries and note, and a play tile when it has a video
 function climbRow(c){
@@ -936,6 +1046,7 @@ const CHEV=`<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9
 const ROPE_RAMP=["#CFF3FF","#9FE6FF","#5FD0F2","#4B8DF5","#4B70F5","#4C3BCF","#402E7A","#2E2266","#1E164A"];
 function gradeFill(type,g){
   const c=gradeColour(type,g);if(c)return c;
+  if(type==="Kilter Board")return"#8FE3C8";
   if(!typeOf(type).anchor)return"#34506E";
   const i=gradeIdx(type,g),n=gradeRows(type).length;
   return i<0?"#34506E":ROPE_RAMP[Math.round(i*(ROPE_RAMP.length-1)/Math.max(1,n-1))];
@@ -950,7 +1061,7 @@ function holdBlob(name){
 }
 // Tiny map of the gym with the project's wall lit (and its anchor when there is one)
 function wallThumb(p){
-  const M=gymMap(),z=M&&M.zones.find(z=>!z.any&&inZone(p,z));
+  const M=gymMap(),z=M&&M.zones.find(z=>inZone(p,z));
   if(!z)return`<span>${esc(p.area||"?")}</span>`;
   const pt=typeOf(p.type).anchor&&p.anchor?anchorPoint(p.area,p.anchor):null;
   return`<svg viewBox="0 0 ${M.w} ${M.h}" aria-hidden="true"><rect x="12" y="18" width="1201" height="1377" fill="#050B12" stroke="#34506E" stroke-width="22"/><circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="240" fill="rgba(61,194,236,.4)"/>${M.zones.map(q=>q===z?"":`<polygon points="${q.pts}" fill="#1E3249"/>`).join("")}<polygon points="${z.pts}" fill="#3DC2EC" stroke="#3DC2EC" stroke-width="70" stroke-linejoin="round"/>${pt?`<circle cx="${pt.x.toFixed(0)}" cy="${pt.y.toFixed(0)}" r="70" fill="#F5C84B" stroke="#0B1622" stroke-width="16"/>`:""}</svg>`;
@@ -958,7 +1069,7 @@ function wallThumb(p){
 // The three badges that identify a project at a glance: grade · holds · wall
 function idBadges(p){
   const g=gradeFill(p.type,p.grade);
-  return`<span class="idb"><span class="idg" style="background:${g};color:${inkOn(g)}"><b>${esc(gradeLabel(p.grade))}</b><small>${esc(shortKind(p.type))}</small></span><span class="idh">${holdBlob(p.hold)}<small>${esc(p.hold||"None")}</small></span><span class="idm" title="${esc(p.area||"")}">${wallThumb(p)}</span></span>`;
+  return`<span class="idb"><span class="idg" style="background:${g};color:${inkOn(g)}"><b>${esc(gradeLabel(p.grade))}</b><small>${esc(shortKind(p.type))}</small></span><span class="idh">${p.type==="Kilter Board"?catIcon("Kilter Board")+`<small>${p.angle?esc(p.angle)+"°":"Board"}</small>`:holdBlob(p.hold)+`<small>${esc(p.hold||"None")}</small>`}</span><span class="idm" title="${esc(p.area||"")}">${wallThumb(p)}</span></span>`;
 }
 const projWallText=p=>(p.area||"Wall not set")+(p.anchor?" · #"+p.anchor:"");
 /* Twins: another project (open or sent, not reset) that looks like the same route: same category, grade and wall,
@@ -1055,7 +1166,7 @@ function renderProject(){
   const h=holdHex(p.hold),t=themeFor(w);
   const pt=typeOf(p.type).anchor&&p.area&&p.anchor?anchorPoint(p.area,p.anchor):null;
   const map=gymMap()&&HUB_MAP.zones.some(z=>z.type===p.type)?`<div class="pmap">${mapSVG({type:p.type,sel:p.area||"",act:"noop",pins:pt?[{pt,colour:PCOL[t][0],big:true}]:null})}</div>`:"";
-  const quick=(p.type==="Top rope"?["Fell","Rested","Sent"]:["Fell","Sent"]).map(r=>`<button class="qbtn" data-act="projLog" data-id="${p.id}" data-v="${r}">${resIcon(r)}${r==="Sent"?"Sent it!":r}</button>`).join("");
+  const quick=(p.type==="Top rope"?["Fell","Rested","Sent"]:["Fell","Sent"]).map(r=>`<button class="qbtn" data-act="projLog" data-id="${p.id}" data-v="${r}">${resIcon(r)}${r==="Sent"?"Sent it!":resLabel(r)}</button>`).join("");
   // keep a half-typed note when the page redraws after a sync
   const ni=$("#noteForm input"),keep=ni?ni.value:"",focused=ni&&document.activeElement===ni;
   $("#view").innerHTML=`
@@ -1081,7 +1192,7 @@ function projLog(p,res){
   const prev={sentBy:p.sentBy.slice(),status:p.status};
   const cid=store.add("climbs",Object.assign({when:whenFor(DAY),climber:WHO,type:p.type,grade:p.grade,result:res,gym:p.gym||GYM,area:p.area||"",anchor:p.anchor||"",hold:p.hold||"",tries:1,project:p.id},res==="Rested"?{rests:1}:{}));
   if(res==="Sent")markProjectSent(p,WHO);else store.update("projects",p.id,{});
-  toast(res==="Sent"?`Sent! ${gradeLabel(p.grade)} logged for ${WHO}`:`Logged a try for ${WHO}`,[{label:"Undo",fn:()=>{store.del("climbs",cid);if(res==="Sent")store.update("projects",p.id,prev);}}]);
+  showCheer(cheerKind(res,true),[gradeLabel(p.grade),projWallText(p),"logged for "+WHO].join(" · "),()=>{store.del("climbs",cid);if(res==="Sent")store.update("projects",p.id,prev);});
 }
 
 /* =====================================================================
@@ -1259,9 +1370,9 @@ function mapSVG(o){
   return s+`</svg>`;
 }
 /* Small map shown in a details panel: tap a wall to fill in Where */
-function miniSVG(type,area,anchor){
+function miniSVG(type,area,anchor,small){
   const pt=typeOf(type).anchor&&area&&anchor?anchorPoint(area,anchor):null;
-  return mapSVG({type,sel:area||"",pins:pt?[{pt,colour:"#3DC2EC",big:true}]:null});
+  return mapSVG({type,sel:area||"",pins:pt?[{pt,colour:"#3DC2EC",big:true}]:null,noLabels:!!small});
 }
 function miniMap(type,gym,area,anchor){
   if(!eqi(gym,HUB_MAP.gym)||!HUB_MAP.zones.some(z=>z.type===type))return"";
@@ -1271,7 +1382,7 @@ function syncMini(){
   const root=$("#sheetBody");if(!root)return;const mm=root.querySelector(".minimap");if(!mm)return;
   const ch=root.querySelector('input[name=area]:checked')||root.querySelector('input[name=area]:not([type=radio])');
   const an=root.querySelector("#fAnchor");
-  mm.innerHTML=miniSVG(mm.dataset.type,ch?ch.value:"",an?an.value:"");
+  mm.innerHTML=miniSVG(mm.dataset.type,ch?ch.value:"",an?an.value:"",mm.classList.contains("wm"));
 }
 
 /* Map tab */
@@ -1326,7 +1437,7 @@ function zonePanel(z,P){
     ${ps.length?`<div class="wprojs">${ps.map(p=>{const tries=Object.values(projInfo(p).tries).reduce((a,b)=>a+b,0);
       return`<button class="wrow" data-act="openProj" data-id="${p.id}">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(projName(p))}${p.anchor?" · #"+esc(p.anchor):""}</span><span class="hsm">${tries} ${tries===1?"try":"tries"}</span></button>`;}).join("")}</div>`:`<p class="hint" style="margin:0">None here right now.</p>`}`}
     <div class="foot"><button class="btn primary wide" data-act="logHere" data-z="${z.id}">Log a climb here</button><button class="btn" data-act="wallHist" aria-expanded="${wallHist}">Wall history</button></div>
-    ${!wallHist?"":people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Fell</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
+    ${!wallHist?"":people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Didn't finish</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
     ${z.any?"":`<button class="btn" data-act="zoneReset" data-z="${z.id}" ${ps.length?`data-confirm="Tap again: move ${ps.length} to Reset"`:"disabled"}>This wall was reset</button>`}
   </section>`;
 }
@@ -1354,13 +1465,13 @@ function renderProgress(){
   }else{
     html+=`<div class="kpis">
       <div class="kpi"><b>${days.length}</b><span>${days.length===1?"session":"sessions"}</span></div>
-      <div class="kpi"><b>${data.length}</b><span>climbs · ${sent} sent, ${rested?rested+" rested, ":""}${fell} fell</span></div>
+      <div class="kpi"><b>${data.length}</b><span>climbs · ${sent} sent, ${rested?rested+" rested, ":""}${fell} didn't finish</span></div>
       <div class="kpi"><b>${Math.round(sent/data.length*100)}%</b><span>send rate</span></div>
       <div class="kpi"><b class="small">${esc(hardest(data)||"—")}</b><span>hardest sends</span></div>
     </div>`;
   }
   html+=progressMap(data,pWho,mLabel);
-  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--chart-sent,var(--sent))"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rested</span>`:""}<span><i style="background:var(--fell-bar)"></i>Fell</span></div></div>
+  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--chart-sent,var(--sent))"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rested</span>`:""}<span><i style="background:var(--fell-bar)"></i>Didn't finish</span></div></div>
     <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.r?`<i style="height:${Math.round(x.r/max*H)}px;background:var(--rest-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--chart-sent,var(--sent))"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
   // sends by grade, per type
   let gb="";const bmax=Math.max(1,...TYPES.flatMap(t=>gradeCounts(t.k,data).map(r=>r.s)));
@@ -1390,7 +1501,7 @@ function progressMap(data,pWho,mLabel){
   }
   if(!Object.keys(info).length)return"";
   const sel=info[progSel];
-  const line=sel?`<div class="pline"><b>${esc(sel.z.area)} · ${esc(mLabel)}</b><span class="hsm">${sel.n} ${sel.n===1?"send":"sends"}${sel.top?` · hardest ${esc(gradeLabel(sel.top))}${sel.nb?" (new best!)":""}`:""}${sel.rest?` · ${sel.rest} rested`:""}${sel.fell?` · ${sel.fell} ${sel.fell===1?"fall":"falls"}`:""}</span></div>`
+  const line=sel?`<div class="pline"><b>${esc(sel.z.area)} · ${esc(mLabel)}</b><span class="hsm">${sel.n} ${sel.n===1?"send":"sends"}${sel.top?` · hardest ${esc(gradeLabel(sel.top))}${sel.nb?" (new best!)":""}`:""}${sel.rest?` · ${sel.rest} rested`:""}${sel.fell?` · ${sel.fell} didn't finish`:""}</span></div>`
     :`<p class="hint">Tap a wall for its month.</p>`;
   return`<section class="panel"><div class="phead2"><h2>Where you sent</h2><span class="hsm">${total} ${total===1?"send":"sends"} · ${walls} ${walls===1?"wall":"walls"}</span></div>
     <div class="bigmap">${mapSVG(o)}</div>
@@ -1412,6 +1523,7 @@ function closeSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style
 const head=(title,sub)=>`<div class="sheet-h"><div><h2 id="sheetTitle">${title}</h2>${sub?`<p class="sub">${sub}</p>`:""}</div><button class="close" data-act="close" aria-label="Close">×</button></div>`;
 function renderSheet(){
   if(!sheet)return;const b=$("#sheetBody");
+  b.closest(".sheet").classList.toggle("lsheet",sheet.type==="climb");
   if(sheet.type==="climb"){if(sheet.id&&!S.climbs.some(x=>x.id===sheet.id)){closeSheet();return;}b.innerHTML=climbSheet();}
   else if(sheet.type==="project"){if(sheet.id&&!S.projects.some(x=>x.id===sheet.id)){closeSheet();return;}b.innerHTML=projSheet();}
   else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
@@ -1490,26 +1602,30 @@ function climbSheet(){
   const inList=!linked||ms.some(m=>m.p.id===linked.id);
   const who=climbers();
   const vids=d.videos;
-  const sub=[d.day===todayKey()?"Today":fmtShort(d.day),d.climber,GYM].filter(Boolean).map(esc).join(" · ");
   const place={Fell:"What stopped you?",Rested:"Where did you rest?",Sent:"Anything to remember?"}[d.result];
-  return head(isNew?"Log a climb":"Edit climb",sub)+`
+  const dayTxt=d.day===todayKey()?"Today":d.day===shiftDay(todayKey(),-1)?"Yesterday":fmtShort(d.day);
+  const rows=areaRows(d.type),hasMap=eqi(GYM,HUB_MAP.gym)&&HUB_MAP.zones.some(z=>z.type===d.type);
+  const wallPills=rows.length?`<div class="pills" role="radiogroup" aria-label="Wall">${rows.map(r=>`<label class="pill"><input type="radio" name="area" value="${esc(r.value)}" ${eqi(r.value,d.area)?"checked":""}><span>${esc(r.value)}</span></label>`).join("")}${d.area&&!rows.some(r=>eqi(r.value,d.area))?`<label class="pill"><input type="radio" name="area" value="${esc(d.area)}" checked><span>${esc(d.area)}</span></label>`:""}</div>`
+    :`<input name="area" value="${esc(d.area||"")}" placeholder="Wall or area">`;
+  const step=(f,label,val,what)=>`<div class="stepc" role="group" aria-label="${label}"><span>${label}</span><button type="button" data-act="cf" data-f="${f}" data-d="-1" aria-label="One fewer ${what}">−</button><output>${val}</output><button type="button" data-act="cf" data-f="${f}" data-d="1" aria-label="One more ${what}">+</button></div>`;
+  return`<div class="sheet-h"><h2 id="sheetTitle">${isNew?"Log a climb":"Edit climb"}</h2>
+    ${who.length>1?`<div class="lwho" role="group" aria-label="Who climbed it">${who.map(w=>`<button type="button" data-act="cf" data-f="climber" data-v="${esc(w)}" aria-pressed="${w===d.climber}" style="--pc:${PCOL[themeFor(w)][0]}">${esc(w)}</button>`).join("")}</div>`:""}
+    <label class="dchip">${esc(dayTxt)} ⌄<input id="fDay" name="day" type="date" value="${d.day}" max="${todayKey()}" aria-label="Date"></label>
+    <button class="close" data-act="close" aria-label="Close">×</button></div>
   <form id="climbForm" autocomplete="off">
     <div class="ccat" role="group" aria-label="What you climbed">${TYPES.map(t=>`<button type="button" class="cbtn" data-act="cf" data-f="type" data-v="${t.k}" aria-pressed="${t.k===d.type}">${catIcon(t.k)}${t.k==="Kilter Board"?"Kilter":esc(shortType(t.k))}</button>`).join("")}</div>
-    <fieldset><legend class="flabel">Result</legend><div class="resrow">${results.map(r=>`<button type="button" class="rbtn" data-act="cf" data-f="result" data-v="${r}" aria-pressed="${r===d.result}">${resIcon(r)}${r}</button>`).join("")}</div></fieldset>
-    <fieldset><legend class="flabel">Grade</legend>${sheet.err==="grade"?`<p class="err" role="alert" style="margin:0 0 8px">Pick a grade first.</p>`:""}${grades.length?`<div class="gchips${d.grade?" picked":""}">${grades.map(g=>{const c=gradeColour(d.type,g),on=gkey(g)===gkey(d.grade);return`<button type="button" class="gchip" data-act="cf" data-f="grade" data-v="${esc(g)}" aria-pressed="${on}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(g))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet (List: ${esc(typeOf(d.type).grades)}).</p>`}</fieldset>
-    ${kil?`<div class="kgrid"><label class="field">Angle °<input name="angle" type="number" inputmode="numeric" min="0" max="70" step="5" value="${esc(d.angle)}" placeholder="40"></label><label class="field">Problem name<input name="problem" value="${esc(d.problem)}" placeholder="From the Kilter app"></label></div>`
-      :`${miniMap(d.type,GYM,d.area,d.anchor)}${areaField(d.type,d.area)}${anchorField(d.type,d.anchor)}`}
-    ${holdField(d.hold)}
-    ${climbStep("tries",d.result==="Sent"?"Tries it took":"Tries on it",d.tries,"try")}
-    ${d.result==="Rested"?climbStep("rests","Rests needed",d.rests,"rest"):""}
-    ${who.length>1?`<fieldset><legend class="flabel">Who climbed it</legend><div class="seg cwho" role="group">${who.map(w=>{const c=PCOL[themeFor(w)];return`<button type="button" data-act="cf" data-f="climber" data-v="${esc(w)}" aria-pressed="${w===d.climber}" style="--pc:${c[0]};--pcs:${c[1]}">${esc(w)}</button>`;}).join("")}</div></fieldset>`:""}
-    <fieldset><legend class="flabel">Video · Google Photos link</legend><div class="vlist">${vids.map((u,i)=>`<div class="vrow">${/^https?:\/\//i.test(u)?`<a class="vtile" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Open the video"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}<input name="video" type="url" inputmode="url" value="${esc(u)}" placeholder="Paste a share link from Google Photos" aria-label="Video link ${i+1}"><button type="button" class="x" data-act="cvDel" data-i="${i}" aria-label="Remove this link">×</button></div>`).join("")}
-      <button type="button" class="btn small dashed" data-act="cvAdd">+ ${vids.length?"Add another link":"Add a video link"}</button></div></fieldset>
+    <div class="resrow" role="group" aria-label="Result">${results.map(r=>`<button type="button" class="rbtn" data-act="cf" data-f="result" data-v="${r}" aria-pressed="${r===d.result}">${resIcon(r)}${resLabel(r)}</button>`).join("")}</div>
+    <fieldset><legend class="flabel">Grade</legend>${sheet.err==="grade"?`<p class="err" role="alert" style="margin:0 0 6px">Pick a grade first.</p>`:""}${grades.length?`<div class="gchips${d.grade?" picked":""}">${grades.map(g=>{const c=kil?"":gradeFill(d.type,g),on=gkey(g)===gkey(d.grade);return`<button type="button" class="gchip" data-act="cf" data-f="grade" data-v="${esc(g)}" aria-pressed="${on}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(g))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet (List: ${esc(typeOf(d.type).grades)}).</p>`}</fieldset>
+    ${kil?`<fieldset><legend class="flabel">Board angle</legend><div class="angs" role="group" aria-label="Board angle">${[20,25,30,35,40,45,50].map(v=>`<button type="button" data-act="cf" data-f="angle" data-v="${v}" aria-pressed="${String(d.angle)===String(v)}">${v}°</button>`).join("")}</div></fieldset>
+      <input name="problem" value="${esc(d.problem)}" placeholder="Problem name (optional)" aria-label="Problem name" class="lnote">`
+      :`<div class="wallbox">${hasMap?`<div class="minimap wm" data-type="${esc(d.type)}" aria-label="Tap a wall to choose where">${miniSVG(d.type,d.area,d.anchor,true)}</div>`:""}<div class="wr"${hasMap?"":` style="grid-column:1/-1"`}><span class="flabel" style="margin:0">Wall</span>${wallPills}${typeOf(d.type).anchor?`<label class="anc">Anchor #<input id="fAnchor" name="anchor" inputmode="numeric" value="${esc(d.anchor||"")}" placeholder="—"></label>`:""}</div></div>
+      <fieldset><legend class="flabel">Hold colour</legend>${holdField(d.hold).replace(/^<fieldset><legend class="flabel">Hold colour<\/legend>/,"").replace(/<\/fieldset>$/,"")}</fieldset>`}
+    <div class="lrow">${step("tries","Tries",d.tries,"try")}${d.result==="Rested"?step("rests","Rests",d.rests,"rest"):""}<button type="button" class="vbtn" data-act="cvAdd"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>${vids.length?"+ Video":"Video"}</button></div>
+    ${vids.length?`<div class="vlist">${vids.map((u,i)=>`<div class="vrow">${/^https?:\/\//i.test(u)?`<a class="vtile" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Open the video"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}<input name="video" type="url" inputmode="url" value="${esc(u)}" placeholder="Paste a share link from Google Photos" aria-label="Video link ${i+1}"><button type="button" class="x" data-act="cvDel" data-i="${i}" aria-label="Remove this link">×</button></div>`).join("")}</div>`:""}
     ${ms.length&&inList?matchList(d,ms):linked?`<div class="plink">${holdDot(linked.hold,"sm")}<span class="t"><b>${esc(projName(linked))} ${esc(gradeLabel(linked.grade))} project</b><small>${d.result==="Sent"?"Marks it sent for "+esc(d.climber):"Counts as a try on it"}</small></span><button type="button" class="btn small" data-act="cf" data-f="link" data-v="">Change</button></div>`:""}
     ${!linked&&!kil&&d.result!=="Sent"?`<label class="check"><input type="checkbox" name="addProj" ${d.addProj?"checked":""}>${d.result==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
-    <label class="field">Note<input name="note" value="${esc(d.note)}" placeholder="${place}"></label>
-    <div class="inrow"><label for="fDay" class="flabel" style="margin:0">Date</label><input id="fDay" name="day" type="date" value="${d.day}" max="${todayKey()}" style="width:auto"></div>
-    <div class="foot">${isNew?`<button type="button" class="btn" data-act="close">Cancel</button>`:`<button type="button" class="btn danger" data-act="delClimb" data-id="${sheet.id}" data-confirm="Tap again to delete">Delete</button>`}<button type="submit" class="btn primary">Save</button></div>
+    <input name="note" value="${esc(d.note)}" placeholder="Note · ${esc(place.toLowerCase())}" aria-label="Note" class="lnote">
+    <div class="foot">${isNew?`<button type="button" class="btn" data-act="close">Cancel</button>`:`<button type="button" class="btn danger" data-act="delClimb" data-id="${sheet.id}" data-confirm="Tap again to delete">Delete</button>`}<button type="submit" class="btn primary">${linked?(d.result==="Sent"?"Save · project sent!":"Save to project"):!kil&&d.result!=="Sent"&&d.addProj?"Save + add to Projects":"Save"}</button></div>
   </form>`;
 }
 // Open projects at this gym with the same category and grade, ranked by how much else matches
@@ -1569,7 +1685,9 @@ function saveClimb(){
   const msg=p&&d.result==="Sent"?`Saved ${lbl}: project sent!`:p?`Saved ${lbl} to your project`:proj?`Saved ${lbl} to Projects`:`Saved ${lbl}`;
   TYPE=d.type;LS.set("type",TYPE);
   if(old){const prev=Object.assign({},old);store.update("climbs",old.id,data);closeSheet();toast(msg,undoSave(old,prev,false,Object.keys(data),proj));}
-  else{const id=store.add("climbs",Object.assign({gym:GYM},data));closeSheet();toast(msg,undoSave({id},null,true,[],proj));}
+  else{const id=store.add("climbs",Object.assign({gym:GYM},data));closeSheet();
+    const where=kil?["Kilter",data.angle?data.angle+"°":""].filter(Boolean).join(" "):[data.area,data.anchor?"#"+data.anchor:""].filter(Boolean).join(" ");
+    showCheer(cheerKind(d.result,p&&d.result==="Sent"),[lbl,where,d.climber!==WHO?d.climber:"",proj&&proj.created?"added to Projects":p?"project":""].filter(Boolean).join(" · "),undoSave({id},null,true,[],proj)[0].fn);}
 }
 /* Edit project (or + New): name, status, category, grade, wall + anchor + map, hold colour. Draft in sheet.d like the climb panel. */
 function editProject(p){
@@ -1733,6 +1851,33 @@ function toast(msg,acts){
   $("#toastActs").innerHTML=acts.map((a,i)=>`<button data-i="${i}" class="${a.hi?"hi":""}">${esc(a.label)}</button>`).join("");
   $("#toast").hidden=false;clearTimeout(tT);tT=setTimeout(()=>{$("#toast").hidden=true;tActs=[];},acts.length?7000:2600);
 }
+/* After saving a new climb: a pop-up with a kawaii animation and a cheeky British line.
+   sent = good job, rested = not bad (top rope with rests), dnf = better luck next time, proj = a project sent.
+   Each kind is a shuffled deck kept on this phone, so no line repeats until the list runs out. Hides itself after 5 s. */
+const CHEER={"sent": [["Wow! You did it!", "Bloody good show!"], ["Cor blimey!", "You sent it. Someone put the kettle on."], ["Absolutely spiffing!", "The wall never stood a chance."], ["Smashing!", "Topped out like a proper gent. Biscuit earned."], ["Get in!", "Ring the bells, hang the bunting, fetch the scones."], ["Jolly well done!", "Your forearms deserve a knighthood."], ["Crikey, that was tidy!", "Textbook stuff. Take a bow."], ["Bob's your uncle!", "Up, done, sorted. Marvellous."], ["Champion!", "Even the pigeons on the roof are clapping."], ["Ruddy brilliant!", "Tell your mum. Tell the whole street."], ["Blinding!", "Climbed it like you owned the freehold."], ["Well I never!", "Sent, and not a single swear word. Probably."], ["Top drawer!", "That deserves a full English. With extra beans."], ["Lovely jubbly!", "The holds were putty in your hands."], ["Bang on!", "Dead tidy, that. Proper climber, you are."], ["Hats off!", "The King would like a word. To say well done."], ["Oi oi!", "Look who's gone and sent it. Cheeky."], ["Stonking effort!", "Your chalk bag is beaming with pride."], ["Cracking climb!", "Gromit would be ever so impressed."], ["Brilliant, simply brilliant!", "Even the route setter is a bit jealous."], ["Huzzah!", "A send fit for a royal wedding."], ["Mint!", "Sorted quicker than a queue at Greggs."], ["Spot on!", "Have a cuppa. You've more than earned it."], ["Belting!", "That was smoother than a pint of best bitter."], ["Wizard!", "Absolutely wizard, old chap. Wizard."], ["Ace!", "Clean as a whistle. Clean as a Sunday roast plate."], ["Splendid!", "Somebody fetch the Pimm's."], ["Phwoar, look at that!", "Up it like a squirrel up a drainpipe."], ["Gold star!", "A big shiny one. You've earned it."], ["Well chuffed!", "And so you should be. Top marks."]], "rested": [["Not bad at all!", "A little sit-down never hurt anyone."], ["Very civilised!", "A spot of tea halfway up. Respectable."], ["Not too shabby!", "Bit of a breather, bit of a send."], ["Got there in the end!", "Like the 8:15 from Paddington. Late, but it arrived."], ["Rather good, old bean!", "Next time, skip the tea break."], ["Not half bad!", "The rope did a bit of the lifting, mind."], ["Steady on!", "That's progress. Very British of you."], ["Respectable effort!", "Hung about like washing on a line, but you finished."], ["Decent, that!", "Took the scenic route, but you got to the top."], ["Close, but no biscuit.", "Well, half a biscuit. A rich tea, perhaps."], ["Fair play!", "A rest is just a picnic with extra steps."], ["Good-ish!", "Like a Victoria sponge with a soggy bottom. Still lovely."], ["Nearly clean!", "Paul Hollywood would give it a handshake. Almost."], ["Not shabby at all!", "You hung there like a well-loved hanging basket."], ["Admirable!", "Every great Brit needs a sit down now and then."], ["That'll do, pig.", "That'll do. Next time, no hanging about."], ["Not bad, not bad!", "The rope's sending you a thank-you card."], ["Pretty decent!", "Rested more than a pensioner on a bench, but you topped it."], ["Respectable!", "Half marks for style, full marks for stubbornness."], ["Nice one!", "A breather here and there. Proper sensible."]], "dnf": [["Oh dear.", "Chin up, stiff upper lip! Next time."], ["Bad luck, old sport.", "The wall's a cheeky blighter today."], ["Bit of a damp squib.", "Have a biscuit. Have two."], ["Not today, love.", "Put the kettle on and give it another go."], ["Gone a bit pear-shaped.", "Happens to the best of us. Mostly to you, today."], ["Blimey, the wall won.", "Best of three? Rematch next session."], ["Gutted!", "Still, not the end of the world. Probably."], ["Keep calm and chalk up.", "You'll have it next time, champ."], ["Off you pop.", "Have a rest. The wall's not going anywhere."], ["Well, that's a shame.", "The holds were clearly made of butter."], ["Oh, bother.", "Shake it off. Shake your arms off, actually."], ["Bit of a pickle, that.", "Not to worry. Rome wasn't sent in a day."], ["Sod's law.", "It was going so well, too."], ["Close, but no cigar.", "Not even a cigarillo. Next time!"], ["Rotten luck!", "Must have been the weather. It's always the weather."], ["Cheer up, chuck.", "Even Wallace needed a few goes."], ["Better luck next time!", "The wall said 'not today, sunshine'."], ["Whoopsie daisy.", "Gravity: one. You: zero. For now."], ["Ah, nuts.", "Tea, biscuits, and a cheeky revenge plan."], ["Righto, regroup.", "Like a proper rainy Tuesday. It'll pass."], ["Blast!", "That route owes you an apology."], ["Not quite, old chum.", "Even the Queen had off days. Probably."], ["Oh, crumbs.", "Plenty more crumbs where that came from. Try again!"], ["Bit wobbly, that.", "Wobblier than a jelly at a kids' party."], ["Pants!", "Absolute pants. Next go will be smashing, though."], ["Hard cheese.", "Mature cheddar, mind. Builds character."], ["Not your day.", "Not to worry. There's always next Thursday."], ["Ooh, so close.", "Closer than a London bus to the kerb."], ["Down you come!", "That was a scenic descent, if nothing else."], ["Well, bugger.", "Dust yourself off and have another crack."]], "proj": [["PROJECT SENT!", "Absolutely bloody marvellous. Fetch the bunting!"], ["Finally!", "All those tries, and look at you now. Smashing!"], ["Hip hip hooray!", "That project's been well and truly sorted."], ["You legend!", "Write it in the history books. In your nicest handwriting."], ["It's done! It's DONE!", "Somebody call the BBC. And your nan."], ["Glory be!", "Weeks of faffing about, and you've only gone and sent it."], ["Bloomin' marvellous!", "That project didn't know what hit it."], ["Victory!", "Crack open the good biscuits. The chocolate ones."], ["Absolute scenes!", "Pubs across the nation are raising a pint."], ["Get in there!", "From projecting to perfecting. Champion."], ["Sorted, at long last!", "The wall has formally surrendered."], ["Ta-da!", "One project down. Knighthood pending."]]};
+const CHEER_ART={"sent": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><rect class=\"conf\" x=\"10\" y=\"4\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"47\" y=\"17\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"84\" y=\"10\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"21\" y=\"23\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"58\" y=\"16\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.40s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"95\" y=\"9\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:1.65s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"32\" y=\"22\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.90s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"69\" y=\"15\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:2.15s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"106\" y=\"8\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.40s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"43\" y=\"21\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:1.65s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"80\" y=\"14\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.90s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"17\" y=\"7\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:2.15s;animation-delay:0.18s\"/><g class=\"bob\"><path d=\"M60 14 L72 42 L103 45 L79 65 L86 96 L60 80 L34 96 L41 65 L17 45 L48 42 Z\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><circle cx=\"51\" cy=\"58\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"58\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"65\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"65\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M54 64 Q60 71 66 64\" fill=\"#E8607A\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/></g></svg>", "proj": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><rect class=\"conf\" x=\"10\" y=\"4\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"47\" y=\"17\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"84\" y=\"10\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"21\" y=\"23\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"58\" y=\"16\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.40s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"95\" y=\"9\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:1.65s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"32\" y=\"22\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.90s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"69\" y=\"15\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:2.15s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"106\" y=\"8\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.40s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"43\" y=\"21\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:1.65s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"80\" y=\"14\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.90s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"17\" y=\"7\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:2.15s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"54\" y=\"20\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"91\" y=\"13\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"28\" y=\"6\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"65\" y=\"19\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.00s\"/><g class=\"bob\"><path d=\"M38 28h44v22a22 22 0 0 1-44 0z\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><path d=\"M38 34h-10a12 12 0 0 0 12 16M82 34h10a12 12 0 0 1-12 16\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"3.2\"/><rect x=\"54\" y=\"72\" width=\"12\" height=\"12\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3\"/><rect x=\"42\" y=\"84\" width=\"36\" height=\"10\" rx=\"3\" fill=\"#3DC2EC\" stroke=\"#1E2235\" stroke-width=\"3\"/><circle cx=\"51\" cy=\"44\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"44\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"51\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"51\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M54 50 Q60 57 66 50\" fill=\"#E8607A\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/></g></svg>", "rested": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><g fill=\"none\" stroke=\"#C9D8E8\" stroke-width=\"3.4\" stroke-linecap=\"round\"><path class=\"steam\" d=\"M46 34 q-6 -8 0 -16\"/><path class=\"steam\" style=\"animation-delay:.5s\" d=\"M60 32 q-6 -8 0 -16\"/><path class=\"steam\" style=\"animation-delay:1s\" d=\"M74 34 q-6 -8 0 -16\"/></g><g class=\"bob\"><ellipse cx=\"60\" cy=\"96\" rx=\"40\" ry=\"8\" fill=\"#5B45D6\" stroke=\"#1E2235\" stroke-width=\"3\"/><path d=\"M28 44h64v20a32 32 0 0 1-64 0z\" fill=\"#fff\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><path d=\"M92 52h6a10 10 0 0 1 0 20h-8\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"3.2\"/><rect x=\"28\" y=\"44\" width=\"64\" height=\"7\" fill=\"#C4B8F5\" stroke=\"#1E2235\" stroke-width=\"3\"/><circle cx=\"51\" cy=\"66\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"66\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"73\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"73\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M55 73 Q60 77 65 73\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></g></svg>", "dnf": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><g fill=\"#7FB6F0\" stroke=\"#1E2235\" stroke-width=\"2.4\"><path class=\"drop\" d=\"M40 84 q-5 8 0 12 q5 -4 0 -12z\"/><path class=\"drop\" style=\"animation-delay:.45s\" d=\"M62 86 q-5 8 0 12 q5 -4 0 -12z\"/><path class=\"drop\" style=\"animation-delay:.9s\" d=\"M82 82 q-5 8 0 12 q5 -4 0 -12z\"/></g><g class=\"wob\"><path d=\"M30 78a20 20 0 0 1 2-38 26 26 0 0 1 50-6 20 20 0 0 1 10 44z\" fill=\"#DCE6F2\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><circle cx=\"51\" cy=\"56\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"56\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"63\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"63\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"60\" cy=\"65\" rx=\"3.2\" ry=\"3.8\" fill=\"#1E2235\"/></g></svg>"};
+const CHEER_STYLE={sent:{cb:"var(--me)",cbg:"var(--me-soft)",cfg:"var(--me)",tag:"SENT"},proj:{cb:"#F5C84B",cbg:"#3A2F0E",cfg:"#F5C84B",tag:"PROJECT SENT"},
+  rested:{cb:"#8C7CF0",cbg:"#2A2260",cfg:"#C9C0FF",tag:"SENT WITH RESTS"},dnf:{cb:"#CDBFFB",cbg:"#2E2847",cfg:"#CDBFFB",tag:"DIDN'T FINISH"}};
+const cheerKind=(res,proj)=>res==="Sent"?(proj?"proj":"sent"):res==="Rested"?"rested":"dnf";
+function cheerLine(k){
+  const L=CHEER[k];let deck;try{deck=JSON.parse(LS.get("deck."+k,"[]"));}catch(e){deck=[];}
+  deck=(Array.isArray(deck)?deck:[]).filter(i=>i>=0&&i<L.length);
+  if(!deck.length){deck=L.map((_,i)=>i);for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}}
+  const i=deck.pop();LS.set("deck."+k,JSON.stringify(deck));return L[i];
+}
+let cheerT=0,cheerUndo=null;
+function showCheer(k,what,undo){
+  hideToast();const[h,l]=cheerLine(k),st=CHEER_STYLE[k],el=$("#cheer");
+  el.style.cssText=`--cb:${st.cb};--cbg:${st.cbg};--cfg:${st.cfg}`;
+  el.innerHTML=`<div class="card2" role="status">${CHEER_ART[k]}<span class="tag2">${st.tag}</span><h3>${esc(h)}</h3><p>${esc(l)}</p>${what?`<span class="what">${esc(what)}</span>`:""}<div class="acts"><button class="btn" data-cheer="undo">Undo</button><button class="btn ok" data-cheer="ok">Ta very much</button></div></div>`;
+  el.hidden=false;cheerUndo=undo||null;clearTimeout(cheerT);cheerT=setTimeout(hideCheer,5000);
+}
+function hideCheer(){$("#cheer").hidden=true;cheerUndo=null;clearTimeout(cheerT);}
+$("#cheer").addEventListener("click",e=>{
+  const b=e.target.closest("[data-cheer]");
+  if(b&&b.dataset.cheer==="undo"&&cheerUndo){const u=cheerUndo;hideCheer();u();toast("Undone");return;}
+  if(b||e.target.id==="cheer")hideCheer();
+});
 $("#toastActs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const a=tActs[+b.dataset.i];$("#toast").hidden=true;tActs=[];if(a)a.fn();});
 
 /* ---------- events ---------- */
@@ -1765,6 +1910,10 @@ document.addEventListener("click",e=>{
     case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
     case"delClimb":{const c=S.climbs.find(x=>x.id===id);if(!c)break;const keep=Object.assign({},c);delete keep.id;store.del("climbs",id);if(sheet&&sheet.type==="climb")closeSheet();toast("Climb deleted",[{label:"Undo",fn:()=>enqueue({op:"add",coll:"climbs",id,data:keep})}]);break;}
     case"pf":projFilter=t.dataset.v;LS.set("pf",projFilter);projSel="";render();break;
+    case"logNew":{const w=homeWall();newClimb(w?w.type:TYPE,w?w.area:"");break;}
+    case"dayf":dayFilter=t.dataset.v;LS.set("dayf",dayFilter);render();break;
+    case"days":daySort=t.dataset.v;LS.set("days",daySort);render();break;
+    case"dayh":dayHard=!dayHard;LS.set("dayh",dayHard?"1":"0");render();break;
     case"psort":projSort=t.dataset.v;LS.set("psort",projSort);render();break;
     case"pdir":projHard=!projHard;LS.set("phard",projHard?"1":"0");render();break;
     case"merge":{const B=S.projects.find(x=>x.id===t.dataset.v);if(P&&B)openSheet({type:"merge",a:P.id,b:B.id,keep:P.id});break;}
@@ -1794,7 +1943,7 @@ document.addEventListener("click",e=>{
     case"setGym":GYM=t.dataset.v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+GYM);break;
   }
 });
-document.addEventListener("click",e=>{if(e.target.id==="dayInput"&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
+document.addEventListener("click",e=>{if((e.target.id==="dayInput"||e.target.id==="fDay")&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
 document.addEventListener("input",e=>{
   // Typing an anchor number picks the wall it belongs to and pins roughly where it is on the map
   if(e.target.id==="fAnchor"){const n=parseInt(e.target.value,10);const form=e.target.form;if(!form)return;
@@ -1810,6 +1959,7 @@ document.addEventListener("change",e=>{
   if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){DAY=v;render();}return;}
   if(e.target.name==="link"&&sheet&&sheet.d){readForm();linkProject(e.target.value);renderSheet();}
   if(e.target.name==="keep"&&sheet&&sheet.type==="merge")sheet.keep=e.target.value;
+  if((e.target.name==="day"||e.target.name==="addProj")&&sheet&&sheet.type==="climb"&&sheet.d){readForm();renderSheet();}
 });
 document.addEventListener("submit",e=>{
   const id=e.target.id;e.preventDefault();

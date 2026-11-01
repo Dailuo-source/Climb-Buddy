@@ -1666,15 +1666,13 @@ function climbSheet(){
     <div class="foot">${isNew?`<button type="button" class="btn" data-act="close">Cancel</button>`:`<button type="button" class="btn danger" data-act="delClimb" data-id="${sheet.id}" data-confirm="Tap again to delete">Delete</button>`}<button type="submit" class="btn primary">${linked?(d.result==="Sent"?"Save · project sent!":"Save to project"):!kil&&d.result!=="Sent"&&d.addProj?"Save + add to Projects":"Save"}</button></div>
   </form>`;
 }
-// Open projects at this gym with the same category and grade, ranked by how much else matches
+// "Previous project?" only shows for an open project on the same wall, with the same hold colour and grade
+// (and the same anchor when both have one). Gary's call: no near-misses. A climb already linked keeps its project listed.
 function projMatches(d){
   if(d.type==="Kilter Board"||!d.grade)return[];
-  return gymProjects().filter(p=>(isOpen(p)||p.id===d.link)&&p.type===d.type&&gkey(p.grade)===gkey(d.grade)).map(p=>{
-    const area=!!d.area&&eqi(p.area,d.area),hold=!!d.hold&&eqi(p.hold,d.hold);
-    const anc=!!d.anchor&&!!p.anchor&&String(p.anchor)===String(d.anchor),clash=!!d.anchor&&!!p.anchor&&!anc;
-    return{p,area,hold,clash,strong:area&&hold&&!clash,last:projInfo(p).last,
-      score:(area?4:0)+(hold?3:0)+(anc?2:0)-(clash?3:0)+(triedBy(p,d.climber)?1:0)};
-  }).sort((a,b)=>b.score-a.score||b.last-a.last).slice(0,5);
+  return gymProjects().filter(p=>p.type===d.type&&gkey(p.grade)===gkey(d.grade)&&(p.id===d.link||(isOpen(p)&&!!d.area&&eqi(p.area,d.area)&&!!d.hold&&eqi(p.hold,d.hold)&&!(d.anchor&&p.anchor&&String(p.anchor)!==String(d.anchor)))))
+    .map(p=>({p,strong:true,last:projInfo(p).last,mine:triedBy(p,d.climber)}))
+    .sort((a,b)=>(b.mine-a.mine)||b.last-a.last).slice(0,3);
 }
 function matchList(d,ms){
   const whose=p=>{const t=triers(p);return t.includes(d.climber)?"Yours":t.length?t.join(" & ")+"'s":p.owner&&p.owner!==d.climber?p.owner+"'s":"Yours";};
@@ -1682,7 +1680,7 @@ function matchList(d,ms){
   const enter=!d._mShown;d._mShown=true;
   return`<fieldset class="pmq${enter?" enter":""}"><legend class="pqh"><span class="dot" aria-hidden="true"></span>${d.result==="Sent"?"Sent a previous project?":"Previous project?"}</legend><div class="pmatches${d.link?" picked":""}">${ms.map((m,i)=>{
     const p=m.p,info=projInfo(p),n=Object.values(info.tries).reduce((a,b)=>a+b,0);
-    return`<label class="pmatch" style="--i:${i}"><input type="radio" name="link" value="${p.id}" ${p.id===d.link?"checked":""}><span class="pm"><span class="row">${idBadges(p)}<span class="tx">${m.strong?`<span class="same">Same spot</span>`:""}<b>${esc(projWallText(p))}</b><small>${esc(whose(p))} · ${n?`${n} ${n===1?"try":"tries"}`:"not tried yet"} · ${esc(relDay(dayKey(info.last||p.added||Date.now())))}</small></span></span></span></label>`;}).join("")}
+    return`<label class="pmatch" style="--i:${i}"><input type="radio" name="link" value="${p.id}" ${p.id===d.link?"checked":""}><span class="pm"><span class="row">${idBadges(p)}<span class="tx"><b>${esc(projWallText(p))}</b><small>${esc(whose(p))} · ${n?`${n} ${n===1?"try":"tries"}`:"not tried yet"} · ${esc(relDay(dayKey(info.last||p.added||Date.now())))}</small></span></span></span></label>`;}).join("")}
     <label class="pmatch none" style="--i:${ms.length}"><input type="radio" name="link" value="" ${d.link?"":"checked"}><span class="pm">${d.result==="Sent"?"No, another route":"No, a new route"}</span></label></div></fieldset>`;
 }
 function markProjectSent(p,who){

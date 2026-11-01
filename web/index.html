@@ -1045,7 +1045,7 @@ function renderSession(){
     ${isToday?"":`<div class="backfill"><span>Logging an earlier day</span><button class="btn" data-act="goToday">↺ Today</button></div>`}
     <section class="card hcard"><div class="hrow">${map}${stats}</div>
       ${M?`<div class="hfoot"><span class="hsm">${sel?`<b>${esc(sel.area)}</b> picked · tap it again to clear`:"Tap a wall to log there"}</span><button class="btn small" data-tab="map">Full map ⤢</button></div>`:""}</section>
-    <div class="logrow"><span class="t"><b>${sel?"Log a climb at "+esc(sel.area):"Log a climb"}</b><small>${sel?esc(shortKind(sel.type))+" · picked on the map":"Boulder, top rope, auto belay or Kilter"}</small></span><button class="logbtn" data-act="logNew" aria-label="Log a climb"><span class="plus" aria-hidden="true">+</span><span class="ics" aria-hidden="true">${TYPES.map(t=>catIcon(t.k)).join("")}</span></button></div>
+    <div class="logrow"><span class="t"><b>${sel?"Log a climb at "+esc(sel.area):"Log a climb"}</b><small>${sel?esc(shortKind(sel.type))+" · picked on the map":esc(gymTypes().map(t=>t.k==="Bouldering"?"boulder":t.k==="Kilter Board"?"Kilter":t.k.toLowerCase()).join(", ").replace(/, ([^,]*)$/," or $1").replace(/^./,c=>c.toUpperCase()))}</small></span><button class="logbtn" data-act="logNew" aria-label="Log a climb"><span class="plus" aria-hidden="true">+</span><span class="ics" aria-hidden="true">${gymTypes().map(t=>catIcon(t.k)).join("")}</span></button></div>
     <div class="dhead"><h2>${isToday?"Today's climbs":"Climbs that day"}</h2>${mine.length?`<small>${mine.length} · tap one to fix it</small>`:""}</div>
     ${dctl}
     ${mine.length?`<div class="pcards">${groups.map(g=>(g.title?`<div class="pgh">${g.sw?`<i style="background:${g.sw}"></i>`:""}<b>${esc(g.title)}</b><small>${esc(g.sub)}</small><span class="ln"></span></div>`:"")+g.items.map(climbCard).join("")+(g.more?`<button class="btn dashed" data-act="homeAll">Show all ${g.more}</button>`:"")).join("")}</div>`:`<p class="hint">Nothing logged ${isToday?"yet today":"on this day"}. Tap <b>+</b> to log your first climb.</p>`}
@@ -1099,7 +1099,7 @@ function wallThumb(p){
   const M=gymMap(),z=M&&M.zones.find(z=>inZone(p,z));
   if(!z)return`<span>${esc(p.area||"?")}</span>`;
   const pt=typeOf(p.type).anchor&&p.anchor?anchorPoint(p.area,p.anchor):null;
-  return`<svg viewBox="0 0 ${M.w} ${M.h}" aria-hidden="true"><rect x="12" y="18" width="1201" height="1377" fill="#050B12" stroke="#34506E" stroke-width="22"/><circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="240" fill="rgba(61,194,236,.4)"/>${M.zones.map(q=>q===z?"":`<polygon points="${q.pts}" fill="#1E3249"/>`).join("")}<polygon points="${z.pts}" fill="#3DC2EC" stroke="#3DC2EC" stroke-width="70" stroke-linejoin="round"/>${pt?`<circle cx="${pt.x.toFixed(0)}" cy="${pt.y.toFixed(0)}" r="70" fill="#F5C84B" stroke="#0B1622" stroke-width="16"/>`:""}</svg>`;
+  return`<svg viewBox="0 0 ${M.w} ${M.h}" aria-hidden="true">${M.outline?`<polygon points="${M.outline}" fill="#050B12" stroke="#34506E" stroke-width="22" stroke-linejoin="round"/>`:`<rect x="12" y="18" width="1201" height="1377" fill="#050B12" stroke="#34506E" stroke-width="22"/>`}<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="240" fill="rgba(61,194,236,.4)"/>${M.zones.map(q=>q===z?"":`<polygon points="${q.pts}" fill="#1E3249"/>`).join("")}<polygon points="${z.pts}" fill="#3DC2EC" stroke="#3DC2EC" stroke-width="70" stroke-linejoin="round"/>${pt?`<circle cx="${pt.x.toFixed(0)}" cy="${pt.y.toFixed(0)}" r="70" fill="#F5C84B" stroke="#0B1622" stroke-width="16"/>`:""}</svg>`;
 }
 // The three badges that identify a project at a glance: grade · holds · wall
 function idBadges(p){
@@ -1124,7 +1124,7 @@ function renderProjects(){
   $("#title").textContent="Projects";
   const w=WHO,all=gymProjects().filter(p=>p.type!=="Kilter Board");
   const open=all.filter(p=>openFor(p,w));
-  if(!PF.some(f=>f[0]===projFilter))projFilter="All";
+  if(!PF.some(f=>f[0]===projFilter)||(projFilter!=="All"&&!gymTypes().some(t=>t.k===projFilter)))projFilter="All";
   if(!PSORT.includes(projSort))projSort="Recent";
   const list=open.filter(p=>pfMatch(p,projFilter));
   // a wall picked on the map narrows the cards to that wall's projects
@@ -1144,7 +1144,7 @@ function renderProjects(){
   // done for this person: they sent it, or the route is closed (sent by everyone or reset)
   const done=all.filter(p=>(p.updated||p.added)>=cutoff&&triedBy(p,w)&&(!isOpen(p)||p.sentBy.includes(w))).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const ctl=`<div class="pctl">
-    <div class="row"><span class="lb">Show</span><div class="chips" role="group" aria-label="Show">${PF.map(([k,l])=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${l} <span class="n">${open.filter(p=>pfMatch(p,k)).length}</span></button>`).join("")}</div></div>
+    <div class="row"><span class="lb">Show</span><div class="chips" role="group" aria-label="Show">${PF.filter(([k])=>k==="All"||gymTypes().some(t=>t.k===k)).map(([k,l])=>`<button class="chip" data-act="pf" data-v="${k}" aria-pressed="${projFilter===k}">${l} <span class="n">${open.filter(p=>pfMatch(p,k)).length}</span></button>`).join("")}</div></div>
     <div class="row"><span class="lb">Sort</span><div class="psort" role="group" aria-label="Sort by">${PSORT.map(k=>`<button data-act="psort" data-v="${k}" aria-pressed="${projSort===k}">${k}</button>`).join("")}</div>${projSort!=="Recent"?`<button class="pdir" data-act="pdir" aria-label="Flip grade order"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2v12M5 14l-3-3M5 14l3-3M11 14V2M11 2l-3 3M11 2l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${projHard?"Hardest":"Easiest"}</button>`:""}</div>
   </div>`;
   $("#view").innerHTML=`
@@ -1200,7 +1200,7 @@ function renderProject(){
   const st=p.status==="Reset"?"Route reset":sent?`Sent by ${w}`:p.status==="Sent"?"Sent":`Open · since ${fmtShort(dayKey(p.added||Date.now()))}`;
   const h=holdHex(p.hold),t=themeFor(w);
   const pt=typeOf(p.type).anchor&&p.area&&p.anchor?anchorPoint(p.area,p.anchor):null;
-  const map=gymMap()&&HUB_MAP.zones.some(z=>z.type===p.type)?`<div class="pmap">${mapSVG({type:p.type,sel:p.area||"",act:"noop",pins:pt?[{pt,colour:PCOL[t][0],big:true}]:null})}</div>`:"";
+  const map=gymMap()&&gymMap().zones.some(z=>z.type===p.type)?`<div class="pmap">${mapSVG({type:p.type,sel:p.area||"",act:"noop",pins:pt?[{pt,colour:PCOL[t][0],big:true}]:null})}</div>`:"";
   const quick=(p.type==="Top rope"?["Fell","Rested","Sent"]:["Fell","Sent"]).map(r=>`<button class="qbtn" data-act="projLog" data-id="${p.id}" data-v="${r}">${resIcon(r)}${r==="Sent"?"Sent it!":resLabel(r)}</button>`).join("");
   // keep a half-typed note when the page redraws after a sync
   const ni=$("#noteForm input"),keep=ni?ni.value:"",focused=ni&&document.activeElement===ni;
@@ -1274,6 +1274,12 @@ const HUB_MAP={
     {name:"Speed climb",lbl:[440,322],lines:["Speed climb","#71–74"],fs:20}
   ]
 };
+/* The Hub Markham, traced from Gary's sketch (Nov 1, 2026) and turned 90° counter-clockwise.
+   Bouldering, auto belay (one wall all the way round) and the Kilter Board; no top rope there.
+   Entrance, Kids Training, Front Desk and Training are landmarks (no climbs). The Tunnel runs under the Dragon block. */
+const MARKHAM_MAP={gym:"The Hub Markham",w:1125,h:1045,outline:"32,1022 32,25 893,25 893,400 1093,400 1107,415 1107,930 1025,1022",noTypes:["Top rope"],zones:[{id:"mk_bwl",area:"Backwall Left",type:"Bouldering",pts:"32,47 32,25 330,25 330,47",lbl:[210,76],pin:[181,36],lines:["Backwall Left"],fs:26},{id:"mk_bwr",area:"Back Wall Right",type:"Bouldering",pts:"330,47 330,25 705,25 705,47",lbl:[520,76],pin:[518,36],lines:["Back Wall Right"],fs:26},{id:"mk_door",area:"Door Nook",type:"Bouldering",pts:"32,175 32,47 54,47 54,153 230,153 230,175",lbl:[118,112],pin:[105,125],lines:["Door Nook"],fs:24},{id:"mk_slab",area:"Slab Wall",type:"Bouldering",pts:"230,500 230,153 252,153 252,500",lbl:[298,338],pin:[241,327],lines:["Slab Wall"],fs:30,rot:true},{id:"mk_cslab",area:"Comp Slab",type:"Bouldering",pts:"335,600 357,578 600,578 600,600",lbl:[470,556],pin:[473,589],lines:["Comp Slab"],fs:26},{id:"mk_cpow",area:"Comp Power",type:"Bouldering",pts:"600,600 600,578 853,578 853,560 885,533 895,545 865,570 865,600",lbl:[720,556],pin:[802,571],lines:["Comp Power"],fs:26},{id:"mk_drag",area:"Dragon",type:"Bouldering",pts:"405,352 405,160 578,160 578,352",lbl:[492,245],pin:[492,256],lines:["Dragon"],fs:30},{id:"mk_dside",area:"Dragon's Side",type:"Bouldering",pts:"578,247 578,160 705,160 705,247",lbl:[641,196],pin:[642,204],lines:["Dragon’s Side"],fs:17},{id:"mk_dback",area:"Dragon's Back",type:"Bouldering",pts:"405,160 440,135 705,135 705,160",lbl:[555,118],pin:[564,148],lines:["Dragon’s Back"],fs:21},{id:"mk_abyss",area:"Deep Abyss",type:"Bouldering",pts:"900,545 900,523 1085,523 1085,450 1107,450 1107,545",lbl:[990,498],pin:[1031,506],lines:["Deep Abyss"],fs:24},{id:"mk_auto",area:"Auto Belay Wall",type:"Auto belay",pts:"630,820 630,800 885,800 885,546 1107,546 1107,930 1025,1022 480,1022 480,1000 1016,1000 1085,922 1085,566 905,566 905,820",lbl:[740,945],pin:[873,811],lines:["Auto belay"],fs:34},{id:"mk_kilter",area:"Kilter Board",type:"Kilter Board",any:true,pts:"465,740 465,625 850,625 850,740",lbl:[658,682],pin:[658,683],lines:["Kilter Board"],fs:30}],anchorRuns:[],anchorAreas:[],features:[{name:"Entrance",pts:"32,1022 32,850 182,1022",lbl:[88,990],lines:["Entrance"],fs:20},{name:"Kids Training",pts:"32,500 32,175 230,175 230,500",lbl:[112,338],lines:["Kids Training"],fs:30,rot:true},{name:"Front Desk",pts:"240,907 185,850 185,740 335,600 865,600 865,570 895,545 900,545 900,803 625,803 592,770 465,770 465,907",lbl:[330,770],lines:["Front Desk"],fs:28},{name:"Training",pts:"893,450 893,400 1093,400 1107,415 1107,450",lbl:[1000,418],lines:["Training"],fs:20},{name:"Dragon (past the tunnel)",pts:"705,247 705,135 893,135 893,247"},{name:"Tunnel",pts:"705,247 705,135 855,135 855,247",dash:true,lbl:[780,192],lines:["Tunnel"],fs:22}]};
+const MAPS=[HUB_MAP,MARKHAM_MAP];
+const mapFor=g=>MAPS.find(m=>eqi(g,m.gym))||null;
 const MAP_LIGHT={edge:{},featEdge:"#2D3A34",wall:"#2D3A34",ink:"#2D3A34",floor:"#FBF8F1",feat:"#ECE8DE",off:"#F1EEE6",heat:"31,79,184",chip:"#fff",tint:{"Bouldering":"#FBE0CF","Top rope":"#D9E5FB","Auto belay":"#E7DFFB","Kilter Board":"#D8F3EA"}};
 // dark map: black floor, walls drawn as glowing outlines in the palette (violet boulders, blue top rope, cyan auto belay)
 const MAP_DARK={ink:"#E8E8F4",floor:"#000000",feat:"#111117",featEdge:"#3A3A4C",wall:"#5E5E78",off:"#0A0A10",heat:"61,194,236",chip:"#000000",
@@ -1282,11 +1288,14 @@ const MAP_DARK={ink:"#E8E8F4",floor:"#000000",feat:"#111117",featEdge:"#3A3A4C",
 const MAPC=Object.assign({},MAP_LIGHT);
 const TYPE_TINT=new Proxy({},{get:(_,k)=>MAPC.tint[k]});
 let MAP_INK="#2D3A34";
-const gymMap=()=>eqi(GYM,HUB_MAP.gym)?HUB_MAP:null;
-const zoneById=id=>HUB_MAP.zones.find(z=>z.id===id);
+const gymMap=()=>mapFor(GYM);
+const zoneById=id=>{for(const m of MAPS){const z=m.zones.find(z=>z.id===id);if(z)return z;}return null;};
+const zoneGym=z=>(MAPS.find(m=>m.zones.includes(z))||HUB_MAP).gym;
+// the categories climbed at this gym (Markham has no top rope)
+const gymTypes=()=>{const M=gymMap(),no=M&&M.noTypes||[];return TYPES.filter(t=>!no.includes(t.k));};
 const inZone=(x,z)=>x.type===z.type&&(z.any||eqi(x.area,z.area)||(z.alias||[]).some(a=>eqi(x.area,a)));
-const zoneClimbs=z=>S.climbs.filter(c=>eqi(c.gym,HUB_MAP.gym)&&inZone(c,z));
-const zoneProjects=(z,w)=>S.projects.filter(p=>openFor(p,w||"*")&&eqi(p.gym,HUB_MAP.gym)&&inZone(p,z));
+const zoneClimbs=z=>S.climbs.filter(c=>eqi(c.gym,zoneGym(z))&&inZone(c,z));
+const zoneProjects=(z,w)=>S.projects.filter(p=>openFor(p,w||"*")&&eqi(p.gym,zoneGym(z))&&inZone(p,z));
 
 /* Anchor ranges live in the Lists tab: List "Anchors", Value like "Upper: 1-43" or "Pit: 77-86, 87-109" */
 function anchorRanges(){
@@ -1302,13 +1311,13 @@ function areaForAnchor(type,num){
   const allowed=areaRows(type).map(r=>r.value);
   const hit=anchorRanges().find(r=>num>=r.lo&&num<=r.hi&&allowed.some(a=>eqi(a,r.area)));
   if(hit)return hit.area;
-  const w=HUB_MAP.anchorAreas.find(w=>num>=w.lo&&num<=w.hi&&allowed.some(a=>eqi(a,w.area)));
+  const w=(gymMap()||HUB_MAP).anchorAreas.find(w=>num>=w.lo&&num<=w.hi&&allowed.some(a=>eqi(a,w.area)));
   return w?w.area:"";
 }
 /* Spot on the map for an anchor number: found by number on the drawn runs, spread along the wall between drawn numbers */
 function anchorPoint(area,num){
   num=parseInt(num,10);if(!num)return null;
-  for(const run of HUB_MAP.anchorRuns){
+  for(const run of (gymMap()||HUB_MAP).anchorRuns){
     const P=run.pts,known=P.map((p,i)=>[p[0],i]).filter(k=>k[0]!=null);
     if(num<known[0][0]||num>known[known.length-1][0])continue;
     let k=0;while(k<known.length-2&&num>known[k+1][0])k++;
@@ -1352,7 +1361,7 @@ function anchorPinSVG(pt,colour,big){
 /* One SVG for both the Map tab and the small pickers.
    o.type: only that type's walls are active (picker), o.sel: selected zone id or area, o.dots/o.heat: overlays */
 function mapSVG(o){
-  const M=HUB_MAP;o=o||{};
+  const M=gymMap()||HUB_MAP;o=o||{};
   let vb=[0,0,M.w,M.h];
   if(o.type){
     const xs=[],ys=[];
@@ -1367,7 +1376,7 @@ function mapSVG(o){
     return`<text x="${x}" y="${y0}" text-anchor="middle" dominant-baseline="middle" font-size="${fs}" font-weight="${bold?700:600}" fill="${MAP_INK}" opacity="${dim?.4:1}"${tf} pointer-events="none">${lines.map((l,i)=>`<tspan x="${x}" dy="${i?lh:0}"${item.anchors&&i===lines.length-1?` font-size="${fs*.8}" font-weight="500"`:""}>${esc(l)}</tspan>`).join("")}</text>`;
   };
   let s=`<svg viewBox="${vb.join(" ")}" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans, system-ui, sans-serif" role="group" aria-label="Map of ${esc(M.gym)}">`;
-  s+=`<rect x="12" y="18" width="1201" height="1377" fill="${MAPC.floor}"/>`;
+  s+=M.outline?`<polygon points="${M.outline}" fill="${MAPC.floor}"/>`:`<rect x="12" y="18" width="1201" height="1377" fill="${MAPC.floor}"/>`;
   for(const f of M.features)if(f.pts)s+=`<polygon points="${f.pts}" fill="${f.dash?"none":MAPC.feat}" stroke="${MAPC.featEdge}" stroke-width="5" stroke-linejoin="round"${f.dash?' stroke-dasharray="14 10"':""}/>`;
   for(const z of M.zones){
     const active=!o.type||z.type===o.type;
@@ -1378,8 +1387,8 @@ function mapSVG(o){
     s+=active?`<g class="zone${sel?" sel":""}" data-act="${o.act||(o.type?"pickArea":"mapSel")}" data-z="${z.id}" data-area="${esc(z.area)}" tabindex="0" role="button" aria-label="${esc(name)}" aria-pressed="${!!sel}"><polygon points="${z.pts}" fill="${fill}" stroke="${MAPC.edge[z.type]||MAP_INK}" stroke-width="5" stroke-linejoin="round"/></g>`
       :`<polygon points="${z.pts}" fill="${MAPC.off}" stroke="${MAPC.featEdge}" stroke-width="4" stroke-linejoin="round" opacity=".45" aria-hidden="true"/>`;
   }
-  s+=`<rect x="12" y="18" width="1201" height="1377" fill="none" stroke="${MAPC.wall}" stroke-width="12"/>`;
-  if(!o.noLabels){for(const f of M.features)s+=label(f,false,!!o.type);
+  s+=M.outline?`<polygon points="${M.outline}" fill="none" stroke="${MAPC.wall}" stroke-width="12" stroke-linejoin="round"/>`:`<rect x="12" y="18" width="1201" height="1377" fill="none" stroke="${MAPC.wall}" stroke-width="12"/>`;
+  if(!o.noLabels){for(const f of M.features)if(f.lbl&&f.lines)s+=label(f,false,!!o.type);
   for(const z of M.zones){
     const active=!o.type||z.type===o.type;
     const sel=o.sel&&(o.sel===z.id||(o.type&&active&&eqi(o.sel,z.area)));
@@ -1410,7 +1419,7 @@ function miniSVG(type,area,anchor,small){
   return mapSVG({type,sel:area||"",pins:pt?[{pt,colour:"#3DC2EC",big:true}]:null,noLabels:!!small});
 }
 function miniMap(type,gym,area,anchor){
-  if(!eqi(gym,HUB_MAP.gym)||!HUB_MAP.zones.some(z=>z.type===type))return"";
+  const GM=mapFor(gym);if(!GM||!GM.zones.some(z=>z.type===type))return"";
   return`<div class="minimap" data-type="${esc(type)}" aria-label="Tap a wall to choose where">${miniSVG(type,area,anchor)}</div><p class="hint" style="margin-top:-8px">Tap a wall on the map, or pick it below.${typeOf(type).anchor?" An anchor number shows roughly where it is on the wall.":""}</p>`;
 }
 function syncMini(){
@@ -1583,6 +1592,7 @@ const anchorField=(type,val)=>typeOf(type).anchor?`<div class="inrow"><label for
    The form lives in sheet.d (a draft) so tapping a button can redraw the panel without losing what was typed.
    A new climb is only stored on Save. */
 function newClimb(type,area){
+  if(!gymTypes().some(t=>t.k===type))type="Bouldering";
   TYPE=type;LS.set("type",type);
   openSheet({type:"climb",id:null,d:{type,result:"Sent",grade:"",climber:WHO,area:area||"",anchor:"",hold:"",tries:1,rests:1,videos:[],note:"",day:DAY,angle:"",problem:"",link:"",addProj:true}});
 }
@@ -1642,7 +1652,7 @@ function climbSheet(){
   const place={Fell:"What stopped you?",Rested:"Where did you rest?",Sent:"Anything to remember?"}[d.result];
   const rWas=d._rShown;d._rShown=d.result==="Rested";const newVid=d._vids!=null&&vids.length>d._vids;d._vids=vids.length;
   const dayTxt=d.day===todayKey()?"Today":d.day===shiftDay(todayKey(),-1)?"Yesterday":fmtShort(d.day);
-  const rows=areaRows(d.type),hasMap=eqi(GYM,HUB_MAP.gym)&&HUB_MAP.zones.some(z=>z.type===d.type);
+  const rows=areaRows(d.type),GM=gymMap(),hasMap=!!GM&&GM.zones.some(z=>z.type===d.type);
   const wallPills=rows.length?`<div class="pills" role="radiogroup" aria-label="Wall">${rows.map(r=>`<label class="pill"><input type="radio" name="area" value="${esc(r.value)}" ${eqi(r.value,d.area)?"checked":""}><span>${esc(r.value)}</span></label>`).join("")}${d.area&&!rows.some(r=>eqi(r.value,d.area))?`<label class="pill"><input type="radio" name="area" value="${esc(d.area)}" checked><span>${esc(d.area)}</span></label>`:""}</div>`
     :`<input name="area" value="${esc(d.area||"")}" placeholder="Wall or area">`;
   const step=(f,label,val,what)=>`<div class="stepc" role="group" aria-label="${label}"><span>${label}</span><button type="button" data-act="cf" data-f="${f}" data-d="-1" aria-label="One fewer ${what}">−</button><output>${val}</output><button type="button" data-act="cf" data-f="${f}" data-d="1" aria-label="One more ${what}">+</button></div>`;
@@ -1651,7 +1661,7 @@ function climbSheet(){
     <label class="dchip">${esc(dayTxt)} ⌄<input id="fDay" name="day" type="date" value="${d.day}" max="${todayKey()}" aria-label="Date"></label>
     <button class="close" data-act="close" aria-label="Close">×</button></div>
   <form id="climbForm" autocomplete="off">
-    <div class="ccat" role="group" aria-label="What you climbed">${TYPES.map(t=>`<button type="button" class="cbtn" data-act="cf" data-f="type" data-v="${t.k}" aria-pressed="${t.k===d.type}">${catIcon(t.k)}${t.k==="Kilter Board"?"Kilter":esc(shortType(t.k))}</button>`).join("")}</div>
+    <div class="ccat" role="group" aria-label="What you climbed"${gymTypes().length<4?` style="grid-template-columns:repeat(${gymTypes().length},minmax(0,1fr))"`:""}>${gymTypes().map(t=>`<button type="button" class="cbtn" data-act="cf" data-f="type" data-v="${t.k}" aria-pressed="${t.k===d.type}">${catIcon(t.k)}${t.k==="Kilter Board"?"Kilter":esc(shortType(t.k))}</button>`).join("")}</div>
     <div class="resrow" role="group" aria-label="Result">${results.map(r=>`<button type="button" class="rbtn" data-act="cf" data-f="result" data-v="${r}" aria-pressed="${r===d.result}">${resIcon(r)}${resLabel(r)}</button>`).join("")}</div>
     <fieldset><legend class="flabel">Grade</legend>${sheet.err==="grade"?`<p class="err" role="alert" style="margin:0 0 6px">Pick a grade first.</p>`:""}${grades.length?`<div class="gchips${d.grade?" picked":""}">${grades.map(g=>{const c=kil?"":gradeFill(d.type,g),on=gkey(g)===gkey(d.grade);return`<button type="button" class="gchip" data-act="cf" data-f="grade" data-v="${esc(g)}" aria-pressed="${on}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(g))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet (List: ${esc(typeOf(d.type).grades)}).</p>`}</fieldset>
     ${kil?`<fieldset><legend class="flabel">Board angle</legend><div class="angs" role="group" aria-label="Board angle">${[20,25,30,35,40,45,50].map(v=>`<button type="button" data-act="cf" data-f="angle" data-v="${v}" aria-pressed="${String(d.angle)===String(v)}">${v}°</button>`).join("")}</div></fieldset>
@@ -1751,7 +1761,7 @@ function projSheet(){
   <form id="projForm" autocomplete="off">
     <label class="field">Name (optional)<input name="name" value="${esc(d.name)}" placeholder="${esc(d.hold?d.hold+" holds":"e.g. the slopey one")}"></label>
     ${isNew?"":`<fieldset><legend class="flabel">Status</legend><div class="resrow">${[["Open","Open"],["Sent","Sent"],["Reset","Route reset"]].map(([v,l])=>`<button type="button" class="rbtn st" data-act="pjf" data-f="status" data-v="${v}" aria-pressed="${v===d.status}">${l}</button>`).join("")}</div></fieldset>`}
-    <div class="ccat c3" role="group" aria-label="Category">${TYPES.filter(t=>t.k!=="Kilter Board").map(t=>`<button type="button" class="cbtn" data-act="pjf" data-f="type" data-v="${t.k}" aria-pressed="${t.k===d.type}">${catIcon(t.k)}${esc(shortType(t.k))}</button>`).join("")}</div>
+    <div class="ccat c3" role="group" aria-label="Category"${gymTypes().filter(t=>t.k!=="Kilter Board").length<3?` style="grid-template-columns:repeat(${gymTypes().filter(t=>t.k!=="Kilter Board").length},minmax(0,1fr))"`:""}>${gymTypes().filter(t=>t.k!=="Kilter Board").map(t=>`<button type="button" class="cbtn" data-act="pjf" data-f="type" data-v="${t.k}" aria-pressed="${t.k===d.type}">${catIcon(t.k)}${esc(shortType(t.k))}</button>`).join("")}</div>
     <fieldset><legend class="flabel">Grade</legend>${sheet.err==="grade"?`<p class="err" role="alert" style="margin:0 0 8px">Pick a grade first.</p>`:""}${grades.length?`<div class="gchips${d.grade?" picked":""}">${grades.map(g=>{const c=gradeColour(d.type,g),on=gkey(g)===gkey(d.grade);return`<button type="button" class="gchip" data-act="pjf" data-f="grade" data-v="${esc(g)}" aria-pressed="${on}"${c?` style="background:${c};border-color:${c};color:${inkOn(c)}"`:""}>${esc(gradeLabel(g))}</button>`;}).join("")}</div>`:`<p class="hint">No grades yet. Add some to the Lists tab in your sheet.</p>`}</fieldset>
     ${miniMap(d.type,GYM,d.area,d.anchor)}${areaField(d.type,d.area)}${anchorField(d.type,d.anchor)}
     ${holdField(d.hold)}

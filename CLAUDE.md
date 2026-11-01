@@ -39,7 +39,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a cate
 - `marksSVG` keeps tags inside the gym and nudges overlapping ones down.
 - **Videos:** links only, nothing uploaded. Climbs keep Google Photos share links (`video`, one per line); rows show a play tile that opens the first. **Share → Climb Buddy**: the manifest's `share_target` (GET `./?title&text&url`) opens the app; `readShare` (in `boot`) pulls the first link out and clears the address; after the first sync `showShare` opens the `share` sheet (`shareSheet`): the 12 latest climbs at this gym, the picked person's latest preselected; **Add to this climb** (`attachShare`, Undo) or **Log a new climb** (new climb panel with the link filled in). `sw.js` doesn't cache addresses with a query.
 - **Project matches in the log panel** (`matchList`): a bold gold **"Previous project?"** heading with a pulsing dot (Gary wanted it short and noticeable), cards without the long "why" text; the grade + wall + holds match gets a small "Same spot" tag and is picked for you. The list slides in the first time it appears (`d._mShown`), not on every redraw.
-- **Animations** (2026-10-31, Gary wants everything to feel smooth): panels slide up and now slide down when closed (`closeSheet` adds `.closing`, hides after 190 ms); tab changes fade up (`animView("tabin")`), the project page slides in from the right and back out; Show / Sort / wall picks re-stack the cards (`animView("restack")`); day arrows slide; toasts spring in; the pop-up fades out; Rests stepper, a new video row and the match list drop in. `animView` only runs for taps, never for background syncs. All respect reduced motion.
+- **Animations** (2026-10-31, Gary wants everything to feel smooth): panels slide up and now slide down when closed (`closeSheet` adds `.closing`, hides after 190 ms); tab changes fade up (`animView("tabin")`), the project page slides in from the right and back out; Show / Sort / wall picks re-stack the cards (`animView("restack")`); day arrows slide; toasts spring in; the pop-up fades out; Rests stepper, a new video row and the match list drop in. `animView` only runs for taps, never for background syncs. All respect reduced motion. Gary found them too quick to notice, so they run about twice as long as usual (≈0.4–0.55 s, panels close in 0.33 s, list items stagger 60 ms, pop-up 0.9 s): keep them this slow.
 - **Date bar**: brighter (bold 16px, "Today" in the person's colour); an earlier day gets a gold border and a small "Logging an earlier day · ↺ Today" pill instead of the big Back to today button.
 - **"Didn't finish"**: the sheet still stores `Fell`; the app shows it as "Didn't finish" everywhere (`resLabel`, `RES_KEYS`, result buttons, quick log, Progress legends and tables).
 - **After-save pop-up** (`showCheer`, `#cheer`): a new climb (and a project-page quick log) gets a pop-up with a kawaii animation (`CHEER_ART`: star + confetti, teacup with steam, wobbling rain cloud, trophy) and a cheeky British line from `CHEER` (sent 30, rested 20, dnf 30, proj 12; `cheerKind`). Each kind is a shuffled deck on the phone (`cb.deck.<kind>`), so no repeat until it runs out. Undo and "Ta very much"; stays up until you tap (Gary's call), then fades out. Editing a climb keeps the plain toast.
@@ -55,7 +55,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a cate
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v32`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v33`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome: sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Sheet edits via the Google Sheets connector are fine; insert rows in Lists rather than rewriting blocks (colour cells are painted).
 - Commits use author `Claude <noreply@anthropic.com>`. Push to `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -104,11 +104,11 @@ The October 2026 redesign is finished; the rules above describe it. The approved
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-31: Animations slowed to about twice as long, with bigger movement, so they read clearly
 - 2026-10-31: Clearer date bar, small ↺ Today pill, pop-up waits for a tap, bold "Previous project?" matches that slide in, smoother animations everywhere
 - 2026-10-31: Quicker logging: compact log panel with pinned Save, one Log row on home, day climbs as badge cards with Show + Sort, "Didn't finish" wording, cheeky British pop-up after saving
 - 2026-10-31: Projects easier to tell apart: grade / hold / wall badges on compact cards, Show + Sort under the map, map tags with hold dots, repeat matching when logging, duplicate warning on New, merge twins
 - 2026-10-27: Full map shows only the picked person's climbs for one session (no project flags, no Week/Month); ‹ › step sessions
-- 2026-10-26: Projects map: tapping a wall or tag picks the wall and narrows the cards below, instead of opening a project
 
 ## Working efficiently
 - Find code with search first, then read only the relevant lines. Don't read index.html top to bottom.

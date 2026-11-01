@@ -29,10 +29,10 @@
 :root[data-who="lav"]{--bg:#F3EFFA;--sunk:#E2DAF2;--line:#DDD5EB;--line2:#C7BDDC}
 body,.top{transition:background-color .25s ease}
 :root.notrans body,:root.notrans .top{transition:none}
-#view.slide-l{animation:slideL .2s ease-out}
-#view.slide-r{animation:slideR .2s ease-out}
-@keyframes slideL{from{transform:translateX(28px);opacity:.6}}
-@keyframes slideR{from{transform:translateX(-28px);opacity:.6}}
+#view.slide-l{animation:slideL .42s cubic-bezier(.2,.9,.3,1)}
+#view.slide-r{animation:slideR .42s cubic-bezier(.2,.9,.3,1)}
+@keyframes slideL{from{transform:translateX(56px);opacity:.3}}
+@keyframes slideR{from{transform:translateX(-56px);opacity:.3}}
 /* person switcher: a big button per climber with their kawaii avatar; the picked one is filled in their colour (--pc) */
 .wseg{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px}
 .wseg button{appearance:none;display:flex;align-items:center;gap:10px;height:60px;padding:0 12px;border-radius:18px;border:2px solid var(--line);background:var(--surface);color:var(--ink);text-align:left;cursor:pointer;min-width:0;font:inherit;transition:background-color .15s,border-color .15s}
@@ -156,7 +156,7 @@ legend{padding:0}
 :root{--tap-ring:rgba(31,79,184,.38)}
 :root[data-dark]{--tap-ring:rgba(61,194,236,.6)}
 .tapping{transform:scale(.95)!important;filter:brightness(1.18);transition:transform .07s ease-out,filter .07s ease-out}
-.tapped{animation:tapPop .42s ease-out}
+.tapped{animation:tapPop .55s ease-out}
 @keyframes tapPop{0%{transform:scale(.95);filter:brightness(1.3);box-shadow:0 0 0 0 var(--tap-ring)}55%{filter:brightness(1.1);box-shadow:0 0 0 10px transparent}100%{transform:none;filter:none;box-shadow:0 0 0 0 transparent}}
 .zone.tapping polygon,.zone.tapped polygon{filter:brightness(1.7)}
 .zone.tapping,.zone.tapped{transform:none!important;animation:none;box-shadow:none}
@@ -331,9 +331,9 @@ legend{padding:0}
 /* bottom sheet */
 .sheet-wrap{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
 .scrim{position:absolute;inset:0;background:var(--scrim)}
-.sheet{position:relative;background:var(--surface);width:100%;max-width:600px;max-height:calc(100% - 28px - env(safe-area-inset-top,0px));overflow:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));animation:up .22s ease-out;box-shadow:var(--shadow)}
+.sheet{position:relative;background:var(--surface);width:100%;max-width:600px;max-height:calc(100% - 28px - env(safe-area-inset-top,0px));overflow:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));animation:up .42s cubic-bezier(.2,.9,.3,1);box-shadow:var(--shadow)}
 @media (min-width:700px){.sheet-wrap{align-items:center}.sheet{border-radius:22px;max-height:88%}}
-@keyframes up{from{transform:translateY(28px);opacity:.5}}
+@keyframes up{from{transform:translateY(120px);opacity:0}}
 @media (prefers-reduced-motion:reduce){.sheet{animation:none}}
 .sheet-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--surface);padding:18px 0 10px;z-index:1}
 .sheet-h h2{font-family:var(--f-display);font-size:25px;line-height:1.15;margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -518,31 +518,31 @@ legend{padding:0}
 .pqh .dot{width:10px;height:10px;border-radius:50%;background:#F5C84B;box-shadow:0 0 0 0 rgba(245,200,75,.6);animation:pqPulse 1.8s ease-out infinite}
 @keyframes pqPulse{0%{box-shadow:0 0 0 0 rgba(245,200,75,.6)}70%{box-shadow:0 0 0 9px rgba(245,200,75,0)}100%{box-shadow:0 0 0 0 rgba(245,200,75,0)}}
 .pmatch .same{flex:none;align-self:flex-start;padding:1px 8px;margin-bottom:1px;border-radius:999px;background:#1E3A32;color:#8FE3C8;font-size:11px;font-weight:800;white-space:nowrap}
-.pmq.enter .pqh{animation:dropIn .32s ease-out both}
-.pmq.enter .pmatch{animation:dropIn .34s cubic-bezier(.2,1.2,.4,1) both;animation-delay:calc(60ms + var(--i,0)*60ms)}
-@keyframes dropIn{from{opacity:0;transform:translateY(-12px) scale(.97)}}
+.pmq.enter .pqh{animation:dropIn .5s cubic-bezier(.2,1.2,.4,1) both}
+.pmq.enter .pmatch{animation:dropIn .55s cubic-bezier(.2,1.2,.4,1) both;animation-delay:calc(120ms + var(--i,0)*110ms)}
+@keyframes dropIn{from{opacity:0;transform:translateY(-22px) scale(.95)}}
 /* smoother everywhere: panels, pages, lists, toasts */
-.scrim{animation:cbFade .2s ease-out}
-.sheet-wrap.closing .sheet{animation:sheetDown .19s ease-in forwards}
-.sheet-wrap.closing .scrim{animation:fadeOut .19s ease-in forwards}
+.scrim{animation:cbFade .36s ease-out}
+.sheet-wrap.closing .sheet{animation:sheetDown .34s cubic-bezier(.5,0,.8,.4) forwards}
+.sheet-wrap.closing .scrim{animation:fadeOut .34s ease-in forwards}
 @keyframes sheetDown{to{transform:translateY(100%);opacity:.6}}
 @keyframes fadeOut{to{opacity:0}}
-.toast:not([hidden]){animation:toastIn .26s cubic-bezier(.2,1.25,.4,1)}
-@keyframes toastIn{from{transform:translate(-50%,18px) scale(.96);opacity:0}}
-.cheer.out{animation:fadeOut .18s ease-in forwards}.cheer.out .card2{animation:popOut .18s ease-in forwards}
+.toast:not([hidden]){animation:toastIn .45s cubic-bezier(.2,1.25,.4,1)}
+@keyframes toastIn{from{transform:translate(-50%,30px) scale(.94);opacity:0}}
+.cheer.out{animation:fadeOut .32s ease-in forwards}.cheer.out .card2{animation:popOut .32s ease-in forwards}
 @keyframes popOut{to{transform:scale(.85);opacity:0}}
-#view.tabin{animation:tabIn .24s ease-out}
-@keyframes tabIn{from{opacity:0;transform:translateY(10px)}}
-#view.restack .pcards>*{animation:rise .3s ease-out both}
-#view.restack .pcards>*:nth-child(2){animation-delay:.03s}#view.restack .pcards>*:nth-child(3){animation-delay:.06s}#view.restack .pcards>*:nth-child(4){animation-delay:.09s}
-#view.restack .pcards>*:nth-child(5){animation-delay:.12s}#view.restack .pcards>*:nth-child(6){animation-delay:.15s}#view.restack .pcards>*:nth-child(n+7){animation-delay:.18s}
-@keyframes rise{from{opacity:0;transform:translateY(8px)}}
-.stepc.enter,.vrow.enter,.lsheet .check.enter{animation:dropIn .28s cubic-bezier(.2,1.2,.4,1) both}
-.atwall,.dupw{animation:dropIn .28s cubic-bezier(.2,1.2,.4,1) both}
+#view.tabin{animation:tabIn .45s cubic-bezier(.2,.9,.3,1)}
+@keyframes tabIn{from{opacity:0;transform:translateY(22px)}}
+#view.restack .pcards>*{animation:rise .5s cubic-bezier(.2,.9,.3,1) both}
+#view.restack .pcards>*:nth-child(2){animation-delay:.06s}#view.restack .pcards>*:nth-child(3){animation-delay:.12s}#view.restack .pcards>*:nth-child(4){animation-delay:.18s}
+#view.restack .pcards>*:nth-child(5){animation-delay:.24s}#view.restack .pcards>*:nth-child(6){animation-delay:.3s}#view.restack .pcards>*:nth-child(n+7){animation-delay:.36s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+.stepc.enter,.vrow.enter,.lsheet .check.enter{animation:dropIn .48s cubic-bezier(.2,1.2,.4,1) both}
+.atwall,.dupw{animation:dropIn .48s cubic-bezier(.2,1.2,.4,1) both}
 @media (prefers-reduced-motion:reduce){.pqh .dot,.pmq.enter .pqh,.pmq.enter .pmatch,.scrim,.sheet-wrap.closing .sheet,.sheet-wrap.closing .scrim,.toast:not([hidden]),.cheer.out,.cheer.out .card2,#view.tabin,#view.restack .pcards>*,.stepc.enter,.vrow.enter,.lsheet .check.enter,.atwall,.dupw{animation:none}}
 /* after-save feedback */
-.cheer{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,8,14,.72);animation:cbFade .2s ease-out}
-.cheer .card2{width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 18px 14px;border-radius:26px;background:var(--surface);border:2px solid var(--cb);text-align:center;animation:cbPop .6s cubic-bezier(.2,1.3,.4,1)}
+.cheer{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,8,14,.72);animation:cbFade .35s ease-out}
+.cheer .card2{width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 18px 14px;border-radius:26px;background:var(--surface);border:2px solid var(--cb);text-align:center;animation:cbPop .9s cubic-bezier(.2,1.3,.4,1)}
 .cheer .tag2{padding:3px 10px;border-radius:999px;background:var(--cbg);color:var(--cfg);font-size:11px;font-weight:800;letter-spacing:.05em}
 .cheer h3{margin:0;font:800 24px/1.15 var(--f-body)}
 .cheer p{margin:0;font-size:15px;color:var(--ink);opacity:.85;line-height:1.35}
@@ -963,7 +963,7 @@ function setTab(t){hideToast();if(t==="map")mapLand();const from=tab;tab=t;LS.se
   animView(t==="proj"?"slide-l":from==="proj"&&t==="projects"?"slide-r":from!==t?"tabin":"");}
 // one-off view animations for things you tap (never for background syncs)
 let animT=0;
-function animView(cls){if(REDUCED||!cls)return;const v=$("#view");v.classList.remove("slide-l","slide-r","tabin","restack");void v.offsetWidth;v.classList.add(cls);clearTimeout(animT);animT=setTimeout(()=>v.classList.remove(cls),700);}
+function animView(cls){if(REDUCED||!cls)return;const v=$("#view");v.classList.remove("slide-l","slide-r","tabin","restack");void v.offsetWidth;v.classList.add(cls);clearTimeout(animT);animT=setTimeout(()=>v.classList.remove(cls),1300);}
 function render(msg){
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===(tab==="proj"?"projects":tab))));
   $("#gymBtn").innerHTML=esc(GYM||"Climb Buddy")+(ready?" "+ICON.down:"");
@@ -1555,7 +1555,7 @@ function gradeCounts(type,data){
 let sheet=null,lastFocus=null;
 let sheetT=0;
 function openSheet(s){hideToast();clearTimeout(sheetT);$("#sheetWrap").classList.remove("closing");if(!sheet)lastFocus=document.activeElement;sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow="hidden";setTimeout(()=>{const f=$("#sheetBody .close");if(f)f.focus();},30);}
-function closeSheet(){sheet=null;const w=$("#sheetWrap");if(!w.hidden){w.classList.add("closing");clearTimeout(sheetT);sheetT=setTimeout(()=>{w.hidden=true;w.classList.remove("closing");},REDUCED?0:190);}document.body.style.overflow="";if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
+function closeSheet(){sheet=null;const w=$("#sheetWrap");if(!w.hidden){w.classList.add("closing");clearTimeout(sheetT);sheetT=setTimeout(()=>{w.hidden=true;w.classList.remove("closing");},REDUCED?0:330);}document.body.style.overflow="";if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
 const head=(title,sub)=>`<div class="sheet-h"><div><h2 id="sheetTitle">${title}</h2>${sub?`<p class="sub">${sub}</p>`:""}</div><button class="close" data-act="close" aria-label="Close">×</button></div>`;
 function renderSheet(){
   if(!sheet)return;const b=$("#sheetBody");
@@ -1911,7 +1911,7 @@ function showCheer(k,what,undo){
   el.classList.remove("out");el.hidden=false;cheerUndo=undo||null;clearTimeout(cheerT);
 }
 // stays up until you answer; fades out when you do
-function hideCheer(){const el=$("#cheer");cheerUndo=null;clearTimeout(cheerT);if(el.hidden)return;el.classList.add("out");cheerT=setTimeout(()=>{el.hidden=true;el.classList.remove("out");},REDUCED?0:180);}
+function hideCheer(){const el=$("#cheer");cheerUndo=null;clearTimeout(cheerT);if(el.hidden)return;el.classList.add("out");cheerT=setTimeout(()=>{el.hidden=true;el.classList.remove("out");},REDUCED?0:310);}
 $("#cheer").addEventListener("click",e=>{
   const b=e.target.closest("[data-cheer]");
   if(b&&b.dataset.cheer==="undo"&&cheerUndo){const u=cheerUndo;hideCheer();u();toast("Undone");return;}
@@ -2063,7 +2063,7 @@ const TAP_KEYS=["act","tab","f","v","id","res","g","z","d","k"];
 let lastTap=null;
 const tapTarget=el=>el.matches("label.pill,label.sw")?el.querySelector("span")||el:el;
 function tapKey(el){const parts=TAP_KEYS.filter(k=>el.dataset[k]!=null).map(k=>`[data-${k}="${CSS.escape(el.dataset[k])}"]`);return parts.length?parts.join(""):null;}
-function popTap(t){t.classList.remove("tapping","tapped");void t.offsetWidth;t.classList.add("tapped");setTimeout(()=>t.classList.remove("tapped"),450);}
+function popTap(t){t.classList.remove("tapping","tapped");void t.offsetWidth;t.classList.add("tapped");setTimeout(()=>t.classList.remove("tapped"),580);}
 document.addEventListener("pointerdown",e=>{
   const el=e.target.closest(TAP_SEL);if(!el||el.disabled)return;
   const t=tapTarget(el);t.classList.add("tapping");

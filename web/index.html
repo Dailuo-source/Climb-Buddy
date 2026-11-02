@@ -1115,11 +1115,14 @@ function sameRoute(a,b){
   return a.id!==b.id&&a.type===b.type&&a.type!=="Kilter Board"&&eqi(a.gym,b.gym)&&gkey(a.grade)===gkey(b.grade)&&!!a.area&&eqi(a.area,b.area)
     &&(!a.hold||!b.hold||eqi(a.hold,b.hold))&&(!a.anchor||!b.anchor||String(a.anchor)===String(b.anchor));
 }
+// Gary and Cecilia keep separate projects, even on the same route: twins are only two of the same person's projects
 function twinOf(p){
   const no=notTwins();
-  return S.projects.find(q=>q.status!=="Reset"&&sameRoute(p,q)&&!no.includes(pairKey(p.id,q.id)))||null;
+  return S.projects.find(q=>q.status!=="Reset"&&sameRoute(p,q)&&ownProj(q,WHO)&&!no.includes(pairKey(p.id,q.id)))||null;
 }
 const triers=p=>Object.keys(projInfo(p).tries);
+// strictly this person's project: they've tried it (or sent it), or they added it and nobody has tried it yet
+const ownProj=(p,w)=>{const t=triers(p);return t.length?t.includes(w):p.owner===w;};
 function renderProjects(){
   $("#title").textContent="Projects";
   const w=WHO,all=gymProjects().filter(p=>p.type!=="Kilter Board");
@@ -1680,7 +1683,8 @@ function climbSheet(){
 // (and the same anchor when both have one). Gary's call: no near-misses. A climb already linked keeps its project listed.
 function projMatches(d){
   if(d.type==="Kilter Board"||!d.grade)return[];
-  return gymProjects().filter(p=>p.type===d.type&&gkey(p.grade)===gkey(d.grade)&&(p.id===d.link||(isOpen(p)&&!!d.area&&eqi(p.area,d.area)&&!!d.hold&&eqi(p.hold,d.hold)&&!(d.anchor&&p.anchor&&String(p.anchor)!==String(d.anchor)))))
+  // only the climber's own open projects: never suggest the other person's, even on the same route
+  return gymProjects().filter(p=>p.type===d.type&&gkey(p.grade)===gkey(d.grade)&&(p.id===d.link||(isOpen(p)&&ownProj(p,d.climber)&&!p.sentBy.includes(d.climber)&&!!d.area&&eqi(p.area,d.area)&&!!d.hold&&eqi(p.hold,d.hold)&&!(d.anchor&&p.anchor&&String(p.anchor)!==String(d.anchor)))))
     .map(p=>({p,strong:true,last:projInfo(p).last,mine:triedBy(p,d.climber)}))
     .sort((a,b)=>(b.mine-a.mine)||b.last-a.last).slice(0,3);
 }
@@ -1771,7 +1775,7 @@ function projSheet(){
   </form>`;
 }
 // Open projects that look like the one being added (same category, grade and wall; same holds and anchor when both are set)
-const projDups=d=>d.grade&&d.area?gymProjects().filter(p=>isOpen(p)&&sameRoute({id:"",type:d.type,grade:d.grade,area:d.area,hold:d.hold,anchor:d.anchor,gym:GYM},p)):[];
+const projDups=d=>d.grade&&d.area?gymProjects().filter(p=>isOpen(p)&&ownProj(p,WHO)&&!p.sentBy.includes(WHO)&&sameRoute({id:"",type:d.type,grade:d.grade,area:d.area,hold:d.hold,anchor:d.anchor,gym:GYM},p)):[];
 function dupWarning(d){
   const ds=projDups(d);if(!ds.length||d.dupOk)return"";
   const mine=ds.some(p=>triers(p).includes(WHO)||p.owner===WHO);

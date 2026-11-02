@@ -38,6 +38,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a cate
 - **Progress map** (`progressMap`, above the charts, follows the month and Gary / Cecilia / Both): walls shaded by sends that month, a tag with the hardest send per wall (grade colour for boulders), a gold ★ when it beats everything sent on that wall before the month (only if there were earlier sends there); tap a wall (`progWall`, `progSel`) for its line: sends, hardest, new best, rested, falls.
 - `marksSVG` keeps tags inside the gym and nudges overlapping ones down.
 - **Videos:** links only, nothing uploaded. Climbs keep Google Photos share links (`video`, one per line); rows show a play tile that opens the first. **Share → Climb Buddy**: the manifest's `share_target` (GET `./?title&text&url`) opens the app; `readShare` (in `boot`) pulls the first link out and clears the address; after the first sync `showShare` opens the `share` sheet (`shareSheet`): the 12 latest climbs at this gym, the picked person's latest preselected; **Add to this climb** (`attachShare`, Undo) or **Log a new climb** (new climb panel with the link filled in). `sw.js` doesn't cache addresses with a query.
+- **Projects are never mixed between Gary and Cecilia** (2026-11-02), even on the same route: `ownProj(p,w)` = they've tried or sent it, or added it untried. "Previous project?" only offers the climber's own open projects, the New-project duplicate warning only checks your own, and twins / Merge only pair two of the same person's projects.
 - **Project matches in the log panel** (`projMatches`/`matchList`): a bold gold **"Previous project?"** heading with a pulsing dot. It only appears when an open project has the **same wall, hold colour and grade** (and the same anchor when both have one); no near-misses (Gary's call, 2026-11-01). The match is picked for you; "No, a new route" unpicks it. The list slides in the first time it appears (`d._mShown`), not on every redraw.
 - **Animations** (2026-10-31, Gary wants everything to feel smooth): panels slide up and now slide down when closed (`closeSheet` adds `.closing`, hides after 190 ms); tab changes fade up (`animView("tabin")`), the project page slides in from the right and back out; Show / Sort / wall picks re-stack the cards (`animView("restack")`); day arrows slide; toasts spring in; the pop-up fades out; Rests stepper, a new video row and the match list drop in. `animView` only runs for taps, never for background syncs. All respect reduced motion. Gary found them too quick to notice, so they run about twice as long as usual (≈0.4–0.55 s, panels close in 0.33 s, list items stagger 60 ms, pop-up 0.9 s): keep them this slow.
 - **Date bar**: brighter (bold 16px, "Today" in the person's colour); an earlier day gets a gold border and a small "Logging an earlier day · ↺ Today" pill instead of the big Back to today button.
@@ -56,7 +57,7 @@ Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a cate
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v36`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `climb-buddy-v37`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome: sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Sheet edits via the Google Sheets connector are fine; insert rows in Lists rather than rewriting blocks (colour cells are painted).
 - Commits use author `Claude <noreply@anthropic.com>`. Push to `https://github.com/Dailuo-source/Climb-Buddy.git`.
@@ -105,11 +106,11 @@ The October 2026 redesign is finished; the rules above describe it. The approved
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-02: Previous project?, the duplicate warning and Merge only use the climber's own projects (never the other person's)
 - 2026-11-01: Markham Tunnel is a bouldering wall
 - 2026-11-01: The Hub Markham map (from Gary's sketch), maps per gym, no top rope at Markham
 - 2026-11-01: "Previous project?" only for the same wall, hold colour and grade
 - 2026-10-31: Animations slowed to about twice as long, with bigger movement, so they read clearly
-- 2026-10-31: Clearer date bar, small ↺ Today pill, pop-up waits for a tap, bold "Previous project?" matches that slide in, smoother animations everywhere
 
 ## Working efficiently
 - Find code with search first, then read only the relevant lines. Don't read index.html top to bottom.

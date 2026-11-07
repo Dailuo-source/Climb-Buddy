@@ -2,7 +2,7 @@
 
 > **Claude: read this first.** Open only the files a change touches; use the code map to jump to a function.
 > `web/index.html` is ~102 KB: search for a function name (e.g. `grep -n "function render" web/index.html`) and read just that function.
-> At the end of a work session, update **Status** and add one line to **Changelog** (keep about 5).
+> At the end of a work session, update **Status** and add one line to **Changelog** (keep about 5). Keep **For Gary** current too: tick off (delete) what's done, add each step Gary must do himself (deploy, sheet menus, settings, checks). App Atlas reads Status, For Gary and Changelog to show where each app is.
 
 Gary and Cecilia's climbing log, mainly for **The Hub Mississauga**. Pick a category tile and fill in one panel (result, grade, wall, anchor, hold colour, tries, rests, who, video links, note, date); tap any climb to change any of it. Falls become projects; there's a gym map. Samsung Android phones, Chrome PWA.
 
@@ -104,6 +104,12 @@ The October 2026 redesign is finished; the rules above describe it. The approved
 - Working: Projects tab with ID badges, Show / Sort, repeat matching and merge (2026-10-31); Climb home with map card and tiles, one log / edit panel (Kilter, video links) with Undo, Projects with a page per project and beta notes, Share → Climb Buddy from Google Photos, full map of one session, Progress (with Both), per-person views with swipe, always-dark theme.
 - Open: remove the old workers.dev Worker.
 - Ideas: speed climb or Boards & Training sessions (map labels for now).
+
+## For Gary
+
+Steps only Gary can do (App Atlas shows these as his to-dos). One line each; delete a line once it's done.
+
+- [ ] Check the Lists tab has Anchors rows (like Upper: 1-43)
 
 ## Changelog (latest first, keep about 5 lines)
 - 2026-11-02: Previous project?, the duplicate warning and Merge only use the climber's own projects (never the other person's)

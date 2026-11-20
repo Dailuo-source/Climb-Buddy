@@ -513,7 +513,7 @@ function seedLists_(ss) {
   ['Upper', 'Upper Back', 'Upper Entrance', 'Pit', 'Pit Small Wall'].forEach(function (a) { rows.push(['Rope area', a, '', HUB]); });
   ['Upper Back', 'Upper Learners', 'Upper Entrance'].forEach(function (a) { rows.push(['Auto belay area', a, '', HUB]); });
   // Anchor numbers per wall, as "Wall: from-to" (several ranges can be comma-separated)
-  ['Upper: 1-43', 'Pit: 87-109'].forEach(function (a) { rows.push(['Anchors', a, '', HUB]); });
+  ['Upper: 1-43', 'Upper Back: 44-58', 'Pit Small Wall: 71-74, 88-91', 'Pit: 75-87, 92-109'].forEach(function (a) { rows.push(['Anchors', a, '', HUB]); });
   [['Red', '#D83A34'], ['Orange', '#F08A24'], ['Yellow', '#F5D02E'], ['Green', '#3DA35D'], ['Teal', '#2BA5A0'],
     ['Blue', '#2F6FD6'], ['Purple', '#8150C8'], ['Pink', '#EE7FB0'], ['Black', '#22262A'], ['White', '#F7F7F4'], ['Grey', '#9AA0A6']]
     .forEach(function (h) { rows.push(['Hold colour', h[0], h[1]]); });

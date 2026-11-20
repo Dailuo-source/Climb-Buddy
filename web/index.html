@@ -1262,14 +1262,16 @@ const HUB_MAP={
      with null for corners in between. Numbers between two drawn ones are spread along the wall.
      Labels sit on the left-hand side of the direction of travel (side:-1 = right-hand side).
      Speed climb is 71-74. 75-82 and 92-98 hang on the overhead bridge (not a wall; counted as Pit).
-     106 to 107 crosses the gap with no anchors. */
+     106 to 107 crosses the gap with no anchors. 76-82 and 92-98 are spaced evenly across the bridge.
+     Upper Back 44-58 runs right to left along the back wall's front face, ending at the left of the Upper Back auto belay. */
   anchorRuns:[
-    {side:-1,pts:[[71,374,278],[74,374,397],[null,374,404],[75,388,425],[null,388,477],[77,424,477],[78,487,477],[81,552,477],[82,585,477],[null,595,477],[87,595,278]]},
-    {pts:[[88,355,690],[null,355,564],[91,372,547],[null,388,530],[95,549,530],[null,558,530],[98,627,608],[null,627,668],[null,613,709],[102,621,751],[null,613,837],[null,613,908],[null,623,967],[106,606,1002],[null,593,1029],[107,593,1111],[null,609,1135],[109,609,1198]]},
-    {pts:[[1,617,1197],[null,705,1087],[null,705,380],[43,602,277]]}
+    {side:-1,pts:[[71,374,278],[74,374,397],[null,374,404],[75,388,425],[null,388,477],[76,404,477],[82,585,477],[null,595,477],[87,595,278]]},
+    {pts:[[88,355,690],[null,355,564],[91,372,547],[null,388,530],[92,404,530],[null,558,530],[98,627,608],[null,627,668],[null,613,709],[102,621,751],[null,613,837],[null,613,908],[null,623,967],[106,606,1002],[null,593,1029],[107,593,1111],[null,609,1135],[109,609,1198]]},
+    {pts:[[1,617,1197],[null,705,1087],[null,705,380],[43,602,277]]},
+    {side:-1,pts:[[44,805,66],[null,775,97],[null,720,97],[null,690,68],[null,582,68],[null,540,107],[null,503,107],[null,492,67],[null,478,67],[58,368,67]]}
   ],
   /* Which wall an anchor number belongs to when the Lists tab doesn't say */
-  anchorAreas:[{area:"Upper",lo:1,hi:43},{area:"Pit Small Wall",lo:71,hi:74},{area:"Pit",lo:75,hi:87},{area:"Pit Small Wall",lo:88,hi:91},{area:"Pit",lo:92,hi:109}],
+  anchorAreas:[{area:"Upper",lo:1,hi:43},{area:"Upper Back",lo:44,hi:58},{area:"Pit Small Wall",lo:71,hi:74},{area:"Pit",lo:75,hi:87},{area:"Pit Small Wall",lo:88,hi:91},{area:"Pit",lo:92,hi:109}],
   features:[
     {name:"Bridge",pts:"388,477 595,477 627,515 627,608 558,530 388,530",dash:true,lbl:[490,503],lines:["Bridge (overhead)"],fs:18},
     {name:"Training",pts:"12,132 100,132 100,671 12,671",lbl:[56,400],lines:["Training"],rot:true},

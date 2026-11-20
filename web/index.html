@@ -282,6 +282,12 @@ legend{padding:0}
 
 /* progress */
 .monthrow{display:flex;align-items:center;justify-content:space-between}
+.prt{display:flex;flex-direction:column;line-height:1.25;min-width:0}.prt b{font-family:var(--f-display);font-size:19px;font-weight:700}.prt small{font-size:13px;color:var(--muted)}
+.prpick{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:16px;display:flex;align-items:center;gap:12px;padding:8px 14px;min-height:52px;cursor:pointer;text-align:left;font:inherit;width:100%}
+.prpick svg{color:var(--accent,var(--ink));flex:none}
+.prdates{display:grid;grid-template-columns:1fr 1fr;gap:10px}.prdates input{width:100%;box-sizing:border-box;min-height:46px}
+.chart.tight .bar{flex:1 0 var(--bw);max-width:32px}.chart.tight .v,.chart.tight .d{font-size:10.5px}
+.gpchart{width:100%;height:auto;display:block;font-family:var(--f-body);overflow:visible}
 .month{display:flex;align-items:center;gap:2px;font-weight:600}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:1px;min-width:0}
@@ -761,9 +767,10 @@ function tagHTML(type,g,size){const c=gradeColour(type,g);const lbl=esc(gradeLab
 const CSSCOL={red:"#D83A34",orange:"#F08A24",yellow:"#F5D02E",green:"#3DA35D",teal:"#2BA5A0",blue:"#2F6FD6",purple:"#8150C8",pink:"#EE7FB0",black:"#22262A",white:"#F7F7F4",grey:"#9AA0A6",gray:"#9AA0A6",brown:"#8A5A3B"};
 function holdHex(name){if(!name)return"";const r=holdRows().find(x=>eqi(x.value,name));if(r&&/^#[0-9a-f]{6}$/i.test(r.colour))return r.colour;return CSSCOL[String(name).trim().toLowerCase()]||"";}
 function holdDot(name,cls){const h=holdHex(name);return h?`<span class="hdot ${cls||""}" style="background:${h}" aria-hidden="true"></span>`:`<span class="hdot none ${cls||""}" aria-hidden="true"></span>`;}
-const RES_KEYS=[["Sent","sent","Sent"],["Rested","rest","Rested"],["Fell","fell","Didn't finish"]];
+const RES_KEYS=[["Sent","sent","Sent"],["Rested","rest","Rope Weighted"],["Fell","fell","Didn't finish"]];
 // "Fell" is what's saved in the sheet; the app calls it "Didn't finish"
-const resLabel=r=>r==="Fell"?"Didn't finish":r;
+const resLabel=r=>r==="Fell"?"Didn't finish":r==="Rested"?"Rope Weighted":r;
+const weighedText=n=>n>1?"rope weighted ×"+n:"rope weighted";
 // both sets pass the colour-blind / contrast validator on their own backgrounds
 const RES_LIGHT={sent:"#1F4FB8",rest:"#6C8CEB",fell:"#DD6B26"},RES_DARK={sent:"#2A9FD0",rest:"#5B45D6",fell:"#CDBFFB"};
 // Charts keep sent / rested / fell apart by lightness: mid sent (per person), deep violet rested, light purple fell
@@ -1014,7 +1021,7 @@ function renderSession(){
   const top=hardest(mine);
   const stats=`<div class="hstats"><span class="k">${isToday?"Today":"That day"}</span><span class="big">${mine.length} <small>${mine.length===1?"climb":"climbs"}</small></span>
     ${mine.length?`<span class="sbar" role="img" aria-label="${parts.map(p=>p.v+" "+p.l).join(", ")}">${parts.filter(p=>p.v).map(p=>`<i style="flex:${p.v};background:${RES_HEX[p.k]}"></i>`).join("")}</span>
-    <span class="hleg">${parts.filter(p=>p.v||p.k!=="rest").map(p=>`<span><i style="background:${RES_HEX[p.k]}"></i>${p.v} ${p.k==="rest"?"with rests":p.l}</span>`).join("")}</span>`:""}
+    <span class="hleg">${parts.filter(p=>p.v||p.k!=="rest").map(p=>`<span><i style="background:${RES_HEX[p.k]}"></i>${p.v} ${p.l}</span>`).join("")}</span>`:""}
     ${top?`<span class="hsm">Hardest <b>${esc(top)}</b></span>`:""}
     <span class="hsm">${myOpen.length} open ${myOpen.length===1?"project":"projects"}</span></div>`;
   // the day's climbs, shown and sorted like Projects
@@ -1056,18 +1063,18 @@ function climbCard(c){
   const kil=c.type==="Kilter Board";
   const title=kil?[c.problem?"“"+c.problem+"”":"Kilter Board",c.angle?c.angle+"°":""].filter(Boolean).join(" · "):projWallText(c);
   const tm=dayKey(c.when)===todayKey()?new Date(c.when).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"";
-  const det=[tm,c.tries>1?c.tries+" tries":"",c.result==="Rested"&&c.rests?c.rests+(c.rests===1?" rest":" rests"):"",c.project?"project":"",c.note||""].filter(Boolean).join(" · ");
+  const det=[tm,c.tries>1?c.tries+" tries":"",c.result==="Rested"?weighedText(c.rests):"",c.project?"project":"",c.note||""].filter(Boolean).join(" · ");
   const vids=videoLinks(c),rc=c.result==="Sent"?"var(--me)":c.result==="Rested"?"#5B45D6":"#CDBFFB";
-  return`<div class="cc3" style="--rc:${rc}"><button class="pmain" data-act="openClimb" data-id="${c.id}">${idBadges(c)}<span class="tx"><b>${resIcon(c.result)}<span>${esc(title)}</span></b><small>${esc(det||resLabel(c.result)+" · tap to add details")}</small></span>${vids.length?"":CHEV}</button>${vids.length?`<a class="vtile" href="${esc(vids[0])}" target="_blank" rel="noopener" aria-label="Watch the video${vids.length>1?" (1 of "+vids.length+")":""}"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}</div>`;
+  return`<div class="cc3" style="--rc:${rc}"><button class="pmain" data-act="openClimb" data-id="${c.id}">${idBadges(c,true)}<span class="tx"><b>${resIcon(c.result)}<span>${esc(title)}</span></b><small>${esc(det||resLabel(c.result)+" · tap to add details")}</small></span>${vids.length?"":CHEV}</button>${vids.length?`<a class="vtile" href="${esc(vids[0])}" target="_blank" rel="noopener" aria-label="Watch the video${vids.length>1?" (1 of "+vids.length+")":""}"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}</div>`;
 }
 // One climb: result, category, grade, wall / anchor, hold dot, tries and note, and a play tile when it has a video
 function climbRow(c){
   const kil=c.type==="Kilter Board";
   const where=kil?["Kilter",c.angle?c.angle+"°":""].filter(Boolean).join(" "):[c.area,c.anchor?"#"+c.anchor:""].filter(Boolean).join(" ");
-  const det=[c.hold||"",kil&&c.problem?"“"+c.problem+"”":"",c.tries>1?c.tries+" tries":"",c.result==="Rested"&&c.rests?c.rests+(c.rests===1?" rest":" rests"):"",c.note||""].filter(Boolean).join(" · ");
+  const det=[c.hold||"",kil&&c.problem?"“"+c.problem+"”":"",c.tries>1?c.tries+" tries":"",c.result==="Rested"?weighedText(c.rests):"",c.note||""].filter(Boolean).join(" · ");
   const vids=videoLinks(c),h=holdHex(c.hold);
   const tm=dayKey(c.when)===todayKey()?new Date(c.when).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"";
-  return`<div class="crow2">${resIcon(c.result)}<button class="t" data-act="openClimb" data-id="${c.id}"><b>${catIcon(c.type)}${tagHTML(c.type,c.grade,"sm")}${where?`<span class="w">· ${esc(where)}</span>`:""}</b><span class="d">${h?`<span class="hd" style="background:${h}"></span>`:""}${esc(det||"Tap to add details")}</span></button>${vids.length?`<a class="vtile" href="${esc(vids[0])}" target="_blank" rel="noopener" aria-label="Watch the video${vids.length>1?" (1 of "+vids.length+")":""}"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:tm?`<span class="tm">${tm}</span>`:""}</div>`;
+  return`<div class="crow2">${resIcon(c.result)}<button class="t" data-act="openClimb" data-id="${c.id}"><b>${catIcon(c.type)}${tagHTML(c.type,c.grade,"sm")}${where?`<span class="w">· ${esc(where)}</span>`:""}</b><span class="d">${h?`<span class="hd" style="background:${h}"></span>`:""}${esc(det||"Tap to add details")}</span></button>${spotBadge(c)}${vids.length?`<a class="vtile" href="${esc(vids[0])}" target="_blank" rel="noopener" aria-label="Watch the video${vids.length>1?" (1 of "+vids.length+")":""}"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:tm?`<span class="tm">${tm}</span>`:""}</div>`;
 }
 const sheetLink=()=>sheetUrl?`<div class="sheetlink"><a href="${esc(sheetUrl)}" target="_blank" rel="noopener">Edit in Google Sheets ↗</a></div>`:"";
 
@@ -1101,10 +1108,23 @@ function wallThumb(p){
   const pt=typeOf(p.type).anchor&&p.anchor?anchorPoint(p.area,p.anchor):null;
   return`<svg viewBox="0 0 ${M.w} ${M.h}" aria-hidden="true">${M.outline?`<polygon points="${M.outline}" fill="#050B12" stroke="#34506E" stroke-width="22" stroke-linejoin="round"/>`:`<rect x="12" y="18" width="1201" height="1377" fill="#050B12" stroke="#34506E" stroke-width="22"/>`}<circle cx="${z.pin[0]}" cy="${z.pin[1]}" r="240" fill="rgba(61,194,236,.4)"/>${M.zones.map(q=>q===z?"":`<polygon points="${q.pts}" fill="#1E3249"/>`).join("")}<polygon points="${z.pts}" fill="#3DC2EC" stroke="#3DC2EC" stroke-width="70" stroke-linejoin="round"/>${pt?`<circle cx="${pt.x.toFixed(0)}" cy="${pt.y.toFixed(0)}" r="70" fill="#F5C84B" stroke="#0B1622" stroke-width="16"/>`:""}</svg>`;
 }
-// The three badges that identify a project at a glance: grade · holds · wall
-function idBadges(p){
+// Close-up of a climb's wall with its anchor pinned, so you can see roughly where on the wall it was (whole-gym thumb when there's no anchor)
+function wallSpot(c){
+  const M=gymMap(),z=M&&M.zones.find(z=>inZone(c,z));
+  const pt=z&&typeOf(c.type).anchor&&c.anchor?anchorPoint(c.area,c.anchor):null;
+  if(!pt)return wallThumb(c);
+  const P=z.pts.trim().split(/\s+/).map(p=>p.split(",").map(Number));
+  const pad=50;let x0=Math.min(pt.x,...P.map(p=>p[0]))-pad,x1=Math.max(pt.x,...P.map(p=>p[0]))+pad,y0=Math.min(pt.y,...P.map(p=>p[1]))-pad,y1=Math.max(pt.y,...P.map(p=>p[1]))+pad;
+  let w=x1-x0,h=y1-y0;const A=34/40;
+  if(w/h>A){const nh=w/A;y0-=(nh-h)/2;h=nh;}else{const nw=h*A;x0-=(nw-w)/2;w=nw;}
+  const r=Math.max(w,h)*.08,f=n=>n.toFixed(0);
+  return`<svg viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}" aria-hidden="true"><rect x="${f(x0)}" y="${f(y0)}" width="${f(w)}" height="${f(h)}" fill="#050B12"/>${M.zones.map(q=>q===z?"":`<polygon points="${q.pts}" fill="#1E3249"/>`).join("")}<polygon points="${z.pts}" fill="rgba(61,194,236,.35)" stroke="#3DC2EC" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><circle cx="${f(pt.x)}" cy="${f(pt.y)}" r="${f(r)}" fill="#F5C84B" stroke="#0B1622" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+const spotBadge=c=>c.type!=="Kilter Board"&&c.anchor&&typeOf(c.type).anchor?`<span class="idm spot" title="${esc((c.area||"")+" #"+c.anchor)}">${wallSpot(c)}</span>`:"";
+// The three badges that identify a project at a glance: grade · holds · wall (a climb with an anchor gets the close-up instead)
+function idBadges(p,spot){
   const g=gradeFill(p.type,p.grade);
-  return`<span class="idb"><span class="idg" style="background:${g};color:${inkOn(g)}"><b>${esc(gradeLabel(p.grade))}</b><small>${esc(shortKind(p.type))}</small></span><span class="idh">${p.type==="Kilter Board"?catIcon("Kilter Board")+`<small>${p.angle?esc(p.angle)+"°":"Board"}</small>`:holdBlob(p.hold)+`<small>${esc(p.hold||"None")}</small>`}</span><span class="idm" title="${esc(p.area||"")}">${wallThumb(p)}</span></span>`;
+  return`<span class="idb"><span class="idg" style="background:${g};color:${inkOn(g)}"><b>${esc(gradeLabel(p.grade))}</b><small>${esc(shortKind(p.type))}</small></span><span class="idh">${p.type==="Kilter Board"?catIcon("Kilter Board")+`<small>${p.angle?esc(p.angle)+"°":"Board"}</small>`:holdBlob(p.hold)+`<small>${esc(p.hold||"None")}</small>`}</span><span class="idm" title="${esc(p.area||"")}">${spot?wallSpot(p):wallThumb(p)}</span></span>`;
 }
 const projWallText=p=>(p.area||"Wall not set")+(p.anchor?" · #"+p.anchor:"");
 /* Twins: another project (open or sent, not reset) that looks like the same route: same category, grade and wall,
@@ -1198,7 +1218,7 @@ function renderProject(){
   const w=WHO,mine=projInfo(p).climbs.filter(c=>c.climber===w).sort((a,b)=>b.when-a.when);
   const tries=mine.filter(c=>c.result!=="Sent").reduce((a,c)=>a+(c.tries||1),0);
   const sessions=new Set(mine.map(c=>dayKey(c.when))).size,lastC=mine[0];
-  const third=lastC&&lastC.result==="Rested"?[String(lastC.rests||1),"rests last time"]:[lastC?relDay(dayKey(lastC.when)):"—","last tried"];
+  const third=lastC&&lastC.result==="Rested"?[String(lastC.rests||1),(lastC.rests>1?"times":"time")+" weighted last time"]:[lastC?relDay(dayKey(lastC.when)):"—","last tried"];
   const sent=p.sentBy.includes(w);
   const st=p.status==="Reset"?"Route reset":sent?`Sent by ${w}`:p.status==="Sent"?"Sent":`Open · since ${fmtShort(dayKey(p.added||Date.now()))}`;
   const h=holdHex(p.hold),t=themeFor(w);
@@ -1263,11 +1283,12 @@ const HUB_MAP={
      Labels sit on the left-hand side of the direction of travel (side:-1 = right-hand side).
      Speed climb is 71-74. 75-82 and 92-98 hang on the overhead bridge (not a wall; counted as Pit).
      106 to 107 crosses the gap with no anchors. 76-82 and 92-98 are spaced evenly across the bridge.
+     Upper 1-43 follows the outside line (Upper Entrance, then up the Upper wall's outer face to the top corner by the Pit; Gary, 2026-11-20).
      Upper Back 44-58 runs right to left along the back wall's front face, ending at the left of the Upper Back auto belay. */
   anchorRuns:[
     {side:-1,pts:[[71,374,278],[74,374,397],[null,374,404],[75,388,425],[null,388,477],[76,404,477],[82,585,477],[null,595,477],[87,595,278]]},
     {pts:[[88,355,690],[null,355,564],[91,372,547],[null,388,530],[92,404,530],[null,558,530],[98,627,608],[null,627,668],[null,613,709],[102,621,751],[null,613,837],[null,613,908],[null,623,967],[106,606,1002],[null,593,1029],[107,593,1111],[null,609,1135],[109,609,1198]]},
-    {pts:[[1,617,1197],[null,705,1087],[null,705,380],[43,602,277]]},
+    {pts:[[1,613,1206],[null,713,1207],[null,769,1150],[null,769,970],[null,820,920],[null,820,838],[null,774,793],[null,774,531],[null,872,433],[null,872,335],[null,807,270],[43,600,270]]},
     {side:-1,pts:[[44,805,66],[null,775,97],[null,720,97],[null,690,68],[null,582,68],[null,540,107],[null,503,107],[null,492,67],[null,478,67],[58,368,67]]}
   ],
   /* Which wall an anchor number belongs to when the Lists tab doesn't say */
@@ -1486,56 +1507,190 @@ function zonePanel(z,P){
     ${ps.length?`<div class="wprojs">${ps.map(p=>{const tries=Object.values(projInfo(p).tries).reduce((a,b)=>a+b,0);
       return`<button class="wrow" data-act="openProj" data-id="${p.id}">${holdDot(p.hold,"sm")}${tagHTML(p.type,p.grade,"sm")}<span class="t">${esc(projName(p))}${p.anchor?" · #"+esc(p.anchor):""}</span><span class="hsm">${tries} ${tries===1?"try":"tries"}</span></button>`;}).join("")}</div>`:`<p class="hint" style="margin:0">None here right now.</p>`}`}
     <div class="foot"><button class="btn primary wide" data-act="logHere" data-z="${z.id}">Log a climb here</button><button class="btn" data-act="wallHist" aria-expanded="${wallHist}">Wall history</button></div>
-    ${!wallHist?"":people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rested</th>`:""}<th scope="col">Didn't finish</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
+    ${!wallHist?"":people.length?`<table class="ctable"><thead><tr><th scope="col">All time</th><th scope="col">Climbs</th><th scope="col">Sent</th>${rope?`<th scope="col">Rope weighted</th>`:""}<th scope="col">Didn't finish</th><th scope="col">Hardest</th></tr></thead><tbody>${people.map(w=>{const a=cs.filter(c=>c.climber===w);return`<tr><td><b>${esc(w)}</b></td><td>${a.length}</td><td>${cnt(a,"Sent")}</td>${rope?`<td>${cnt(a,"Rested")}</td>`:""}<td>${cnt(a,"Fell")}</td><td>${esc(hardest(a)||"—")}</td></tr>`;}).join("")}</tbody></table>`:`<p class="hint">No climbs logged on this wall yet.</p>`}
     ${z.any?"":`<button class="btn" data-act="zoneReset" data-z="${z.id}" ${ps.length?`data-confirm="Tap again: move ${ps.length} to Reset"`:"disabled"}>This wall was reset</button>`}
   </section>`;
 }
 
-/* Progress */
+/* Progress: one range at a time — Month (as before), Year, All time or Custom (From / To).
+   Month and short custom ranges chart each session; longer ranges chart per week (up to ~6 months) or per month,
+   and add Grade progress: the hardest send in each week / month, a dashed best-so-far line and a ★ on each new best. */
+const PR_RANGES=[["month","Month"],["year","Year"],["all","All time"],["custom","Custom"]];
+const PR_PRESETS=[["d30","Last 30 days"],["m3","Last 3 months"],["m6","Last 6 months"],["ty","This year"],["ly","Last year"]];
+const CAL_ICON=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>`;
+const addDays=(k,n)=>{const d=keyDate(k);d.setDate(d.getDate()+n);return dayKey(d.getTime());};
+const addMonths=(k,n)=>{const d=keyDate(k);const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return dayKey(d.getTime());};
+const daysBetween=(a,b)=>Math.round((keyDate(b)-keyDate(a))/864e5)+1;
+const monKey=k=>{const d=keyDate(k);d.setDate(d.getDate()-((d.getDay()+6)%7));return dayKey(d.getTime());};
+const monthName=(ym,o)=>keyDate(ym+"-01").toLocaleDateString([],Object.assign({month:"long"},o||{}));
+function presetRange(p){
+  const t=todayKey(),y=+t.slice(0,4);
+  if(p==="d30")return{from:addDays(t,-29),to:t};
+  if(p==="m3")return{from:addDays(addMonths(t,-3),1),to:t};
+  if(p==="m6")return{from:addDays(addMonths(t,-6),1),to:t};
+  if(p==="ty")return{from:y+"-01-01",to:t};
+  if(p==="ly")return{from:(y-1)+"-01-01",to:(y-1)+"-12-31"};
+  return{from:addDays(t,-29),to:t};
+}
+let pRange=LS.get("prange","month"),pYear=+todayKey().slice(0,4),pgType=LS.get("pgtype","Bouldering");
+let pFrom=LS.get("pfrom",""),pTo=LS.get("pto","");
+if(!PR_RANGES.some(r=>r[0]===pRange))pRange="month";
+if(pRange==="custom"&&!(pFrom&&pTo))pRange="month";
+const fmtRange=(a,b)=>{const t=todayKey().slice(0,4),o={month:"short",day:"numeric"},yo=Object.assign({year:"numeric"},o);
+  const one=(k,yr)=>keyDate(k).toLocaleDateString([],yr?yo:o);const yr=a.slice(0,4)!==t||b.slice(0,4)!==t;
+  return a===b?one(a,yr):one(a,yr)+" – "+one(b,yr);};
+// The range being shown: from / to day keys, labels, and how the charts group it
+function progRange(pWho){
+  const t=todayKey();
+  if(pRange==="year"){const y=String(pYear);return{kind:"year",from:y+"-01-01",to:y+"-12-31",label:y,unit:"year",star:y===t.slice(0,4)?"this year":"in "+y,grain:"month"};}
+  if(pRange==="all"){
+    const ks=S.climbs.filter(c=>atGym(c)&&(pWho==="*"||c.climber===pWho)).map(c=>dayKey(c.when)).sort();
+    const from=ks[0]||t;return{kind:"all",from,to:t,label:"All time",unit:"time",star:"",grain:"month",sub:"Since "+keyDate(from).toLocaleDateString([],{month:"short",year:"numeric"})};}
+  if(pRange==="custom"){const n=daysBetween(pFrom,pTo);
+    return{kind:"custom",from:pFrom,to:pTo,label:fmtRange(pFrom,pTo),unit:"range",star:"in this range",grain:n<=31?"session":n<=190?"week":"month",sub:n+(n===1?" day":" days")};}
+  const thisMonth=t.slice(0,7);
+  return{kind:"month",from:pMonth+"-01",to:pMonth+"-31",label:keyDate(pMonth+"-01").toLocaleDateString([],{month:"long",year:pMonth.slice(0,4)===thisMonth.slice(0,4)?undefined:"numeric"}),unit:"month",star:"this month",grain:"session"};
+}
+// Week or month buckets covering the range, oldest first
+function progBuckets(R){
+  const out=[];
+  if(R.grain==="month"){let k=R.from.slice(0,7)+"-01";const end=(R.to<todayKey()?R.to:todayKey()).slice(0,7);
+    while(k.slice(0,7)<=end){out.push({k:k.slice(0,7),lab:keyDate(k).toLocaleDateString([],{month:"narrow"}),full:monthName(k.slice(0,7),{year:"numeric"}),yr:k.slice(0,4)});k=addMonths(k,1);}
+    if(new Set(out.map(b=>b.yr)).size>1)for(const b of out)if(b.k.endsWith("-01"))b.lab="’"+b.yr.slice(2);}
+  else if(R.grain==="week"){let k=monKey(R.from);const end=R.to<todayKey()?R.to:todayKey();
+    while(k<=end){out.push({k,lab:String(keyDate(k).getDate()),full:"Week of "+fmtShort(k),yr:k.slice(0,4),mo:k.slice(0,7)});k=addDays(k,7);}}
+  return out;
+}
+const bucketOf=(R,dk)=>R.grain==="month"?dk.slice(0,7):monKey(dk);
+function rangeSeg(){
+  return`<div class="seg prseg" role="group" aria-label="Range">${PR_RANGES.map(([k,l])=>`<button data-act="prange" data-v="${k}" aria-pressed="${pRange===k}">${l}</button>`).join("")}</div>`;
+}
+function rangeStep(R){
+  const t=todayKey();
+  if(R.kind==="month")return`<div class="monthrow"><div class="month"><button class="iconbtn" data-act="month" data-d="-1" aria-label="Previous month">${ICON.left}</button><span>${esc(R.label)}</span><button class="iconbtn" data-act="month" data-d="1" aria-label="Next month" ${pMonth>=t.slice(0,7)?"disabled":""}>${ICON.right}</button></div></div>`;
+  if(R.kind==="year")return`<div class="monthrow"><div class="month"><button class="iconbtn" data-act="pyear" data-d="-1" aria-label="Previous year">${ICON.left}</button><span>${esc(R.label)}</span><button class="iconbtn" data-act="pyear" data-d="1" aria-label="Next year" ${String(pYear)>=t.slice(0,4)?"disabled":""}>${ICON.right}</button></div></div>`;
+  if(R.kind==="all")return`<div class="monthrow"><div class="prt"><b>All time</b><small>${esc(R.sub)}</small></div></div>`;
+  return`<div class="monthrow"><button class="prpick" data-act="pcustom" aria-label="Change the date range">${CAL_ICON}<span class="prt"><b>${esc(R.label)}</b><small>${esc(R.sub)} · tap to change</small></span></button></div>`;
+}
 function renderProgress(){
   $("#title").textContent="Progress";
-  const cs=climbers(),pWho=cur();
-  const inMonth=S.climbs.filter(c=>atGym(c)&&dayKey(c.when).slice(0,7)===pMonth);
-  const data=pWho==="*"?inMonth:inMonth.filter(c=>c.climber===pWho);
+  const cs=climbers(),pWho=cur(),R=progRange(pWho);
+  const inRange=S.climbs.filter(c=>{if(!atGym(c))return false;const k=dayKey(c.when);return k>=R.from&&k<=R.to;});
+  const data=pWho==="*"?inRange:inRange.filter(c=>c.climber===pWho);
   const days=[...new Set(data.map(c=>dayKey(c.when)))].sort();
   const sent=data.filter(c=>c.result==="Sent").length,rested=data.filter(c=>c.result==="Rested").length,fell=data.length-sent-rested;
-  const thisMonth=todayKey().slice(0,7);
-  const mLabel=keyDate(pMonth+"-01").toLocaleDateString([],{month:"long",year:pMonth.slice(0,4)===thisMonth.slice(0,4)?undefined:"numeric"});
   const per=days.map(k=>{const d=data.filter(c=>dayKey(c.when)===k);const s=d.filter(c=>c.result==="Sent").length,r=d.filter(c=>c.result==="Rested").length;return{k,s,r,f:d.length-s-r,t:d.length,top:hardest(d)};});
-  const max=Math.max(1,...per.map(x=>x.t));const H=140;
-  let html=`
-    ${whoSeg()}
-    <div class="monthrow">
-      <div class="month"><button class="iconbtn" data-act="month" data-d="-1" aria-label="Previous month">${ICON.left}</button><span>${esc(mLabel)}</span><button class="iconbtn" data-act="month" data-d="1" aria-label="Next month" ${pMonth>=thisMonth?"disabled":""}>${ICON.right}</button></div>
-    </div>`;
-  if(!data.length){$("#view").innerHTML=html+`<div class="empty"><strong>No climbs in ${esc(mLabel)}</strong>Log a session and it shows up here.</div>`+sheetLink();return;}
+  let html=`${whoSeg()}${rangeSeg()}${rangeStep(R)}`;
+  if(!data.length){$("#view").innerHTML=html+`<div class="empty"><strong>No climbs ${R.kind==="all"?"yet":"in "+esc(R.label)}</strong>Log a session and it shows up here.</div>`+sheetLink();return;}
   if(pWho==="*"&&cs.length>1){
-    html+=`<div class="panel"><table class="ctable"><thead><tr><th scope="col">${esc(mLabel)}</th><th scope="col">Sessions</th><th scope="col">Climbs</th><th scope="col">Sent</th><th scope="col">Hardest</th></tr></thead><tbody>${cs.map(w=>{const d=inMonth.filter(c=>c.climber===w);const s=d.filter(c=>c.result==="Sent").length;return`<tr><td><b>${esc(w)}</b></td><td>${new Set(d.map(c=>dayKey(c.when))).size}</td><td>${d.length}</td><td>${d.length?Math.round(s/d.length*100)+"%":"—"}</td><td>${esc(hardest(d)||"—")}</td></tr>`;}).join("")}</tbody></table></div>`;
+    html+=`<div class="panel"><table class="ctable"><thead><tr><th scope="col">${esc(R.label)}</th><th scope="col">Sessions</th><th scope="col">Climbs</th><th scope="col">Sent</th><th scope="col">Hardest</th></tr></thead><tbody>${cs.map(w=>{const d=inRange.filter(c=>c.climber===w);const s=d.filter(c=>c.result==="Sent").length;return`<tr><td><b>${esc(w)}</b></td><td>${new Set(d.map(c=>dayKey(c.when))).size}</td><td>${d.length}</td><td>${d.length?Math.round(s/d.length*100)+"%":"—"}</td><td>${esc(hardest(d)||"—")}</td></tr>`;}).join("")}</tbody></table></div>`;
   }else{
     html+=`<div class="kpis">
       <div class="kpi"><b>${days.length}</b><span>${days.length===1?"session":"sessions"}</span></div>
-      <div class="kpi"><b>${data.length}</b><span>climbs · ${sent} sent, ${rested?rested+" rested, ":""}${fell} didn't finish</span></div>
+      <div class="kpi"><b>${data.length}</b><span>climbs · ${sent} sent, ${rested?rested+" rope weighted, ":""}${fell} didn't finish</span></div>
       <div class="kpi"><b>${Math.round(sent/data.length*100)}%</b><span>send rate</span></div>
       <div class="kpi"><b class="small">${esc(hardest(data)||"—")}</b><span>hardest sends</span></div>
     </div>`;
   }
-  html+=progressMap(data,pWho,mLabel);
-  html+=`<section class="panel"><div class="phead2"><h2>Climbs per session</h2><div class="legend"><span><i style="background:var(--chart-sent,var(--sent))"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rested</span>`:""}<span><i style="background:var(--fell-bar)"></i>Didn't finish</span></div></div>
-    <div class="chart" role="img" aria-label="${esc("Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "))}">${per.map(x=>`<div class="bar"><span class="v">${x.t}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.r?`<i style="height:${Math.round(x.r/max*H)}px;background:var(--rest-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--chart-sent,var(--sent))"></i>`:""}</span><span class="d">${keyDate(x.k).getDate()}</span></div>`).join("")}</div></section>`;
+  const B=progBuckets(R);
+  if(R.grain!=="session")html+=gradeProgress(data,R,B,pWho);
+  html+=progressMap(data,pWho,R);
+  const leg=`<div class="legend"><span><i style="background:var(--chart-sent,var(--sent))"></i>Sent</span>${rested?`<span><i style="background:var(--rest-bar)"></i>Rope weighted</span>`:""}<span><i style="background:var(--fell-bar)"></i>Didn't finish</span></div>`;
+  const barsHTML=(cols,title,aria)=>{const max=Math.max(1,...cols.map(x=>x.t)),H=140,n=cols.length,tight=R.grain!=="session"&&n>8;
+    return`<section class="panel"><div class="phead2"><h2>${title}</h2>${leg}</div>
+    <div class="chart${tight?" tight":""}"${tight?` style="--bw:${n>20?9:n>12?11:16}px;gap:${n>12?3:5}px"`:""} role="img" aria-label="${esc(aria)}">${cols.map(x=>`<div class="bar"${x.full?` title="${esc(x.full)}"`:""}><span class="v">${tight&&n>16?"":x.t||""}</span><span class="stack">${x.f?`<i style="height:${Math.round(x.f/max*H)}px;background:var(--fell-bar)"></i>`:""}${x.r?`<i style="height:${Math.round(x.r/max*H)}px;background:var(--rest-bar)"></i>`:""}${x.s?`<i style="height:${Math.round(x.s/max*H)}px;background:var(--chart-sent,var(--sent))"></i>`:""}</span><span class="d">${esc(x.lab)}</span></div>`).join("")}</div></section>`;};
+  if(R.grain==="session"){
+    html+=barsHTML(per.map(x=>Object.assign({lab:String(keyDate(x.k).getDate()),full:fmtShort(x.k)},x)),"Climbs per session","Climbs per session: "+per.map(x=>fmtShort(x.k)+", "+x.t+" ("+x.s+" sent)").join("; "));
+  }else{
+    const cols=B.map(b=>{const d=data.filter(c=>bucketOf(R,dayKey(c.when))===b.k);const s=d.filter(c=>c.result==="Sent").length,r=d.filter(c=>c.result==="Rested").length;return Object.assign({},b,{s,r,f:d.length-s-r,t:d.length});});
+    const word=R.grain==="month"?"month":"week";
+    html+=barsHTML(cols,"Climbs per "+word,"Climbs per "+word+": "+cols.filter(x=>x.t).map(x=>x.full+", "+x.t+" ("+x.s+" sent)").join("; "));
+  }
   // sends by grade, per type
   let gb="";const bmax=Math.max(1,...TYPES.flatMap(t=>gradeCounts(t.k,data).map(r=>r.s)));
   for(const t of TYPES){const rows=gradeCounts(t.k,data);if(!rows.length)continue;
-    gb+=`<div class="typeh">${t.k}</div>`+rows.map(r=>{const col=gradeColour(t.k,r.g)||"var(--ink)";return`<div class="gbar">${tagHTML(t.k,r.g,"sm")}<span class="track"><i style="width:${Math.round(r.s/bmax*100)}%;background:${col}"></i></span><span class="n"><b>${r.s}</b> sent${r.r?` · ${r.r} rest`:""}${r.f?` · ${r.f}✕`:""}</span></div>`;}).join("");}
+    gb+=`<div class="typeh">${t.k}</div>`+rows.map(r=>{const col=gradeColour(t.k,r.g)||"var(--ink)";return`<div class="gbar">${tagHTML(t.k,r.g,"sm")}<span class="track"><i style="width:${Math.round(r.s/bmax*100)}%;background:${col}"></i></span><span class="n"><b>${r.s}</b> sent${r.r?` · ${r.r} weighted`:""}${r.f?` · ${r.f}✕`:""}</span></div>`;}).join("");}
   html+=`<section class="panel"><h2>Sends by grade</h2><div class="gbars">${gb}</div></section>`;
-  html+=`<section><h2 class="sech">Sessions</h2><div class="slist">${per.slice().reverse().map(x=>`<button class="srow" data-act="openDay" data-k="${x.k}"><span class="dd"><small>${esc(fmtDow(x.k))}</small><b>${keyDate(x.k).getDate()}</b></span><span class="tx"><b>${x.t} ${x.t===1?"climb":"climbs"} · ${x.s} sent</b><span>${x.top?"Top "+esc(x.top):"No sends yet"}</span></span>${ICON.right}</button>`).join("")}</div></section>`+sheetLink();
+  // the list at the bottom: sessions, months (a year or a long custom range) or years (all time); each opens that range
+  const sumLine=d=>{const s=d.filter(c=>c.result==="Sent").length,n=new Set(d.map(c=>dayKey(c.when))).size;return`${n} ${n===1?"session":"sessions"} · ${d.length} ${d.length===1?"climb":"climbs"} · ${s} sent`;};
+  if(R.kind==="all"){
+    const ys=[...new Set(data.map(c=>dayKey(c.when).slice(0,4)))].sort().reverse();
+    html+=`<section><h2 class="sech">Years</h2><div class="slist">${ys.map(y=>{const d=data.filter(c=>dayKey(c.when).startsWith(y));const top=hardest(d);return`<button class="srow" data-act="openYear" data-y="${y}"><span class="dd"><small>Year</small><b>${y}</b></span><span class="tx"><b>${sumLine(d)}</b><span>${top?"Top "+esc(top):"No sends yet"}</span></span>${ICON.right}</button>`;}).join("")}</div></section>`;
+  }else if(R.grain==="month"){
+    const ms=[...new Set(data.map(c=>dayKey(c.when).slice(0,7)))].sort().reverse();
+    html+=`<section><h2 class="sech">Months</h2><div class="slist">${ms.map(m=>{const d=data.filter(c=>dayKey(c.when).startsWith(m));const top=hardest(d);return`<button class="srow" data-act="openMonth" data-m="${m}"><span class="dd"><small>${m.slice(0,4)}</small><b>${esc(keyDate(m+"-01").toLocaleDateString([],{month:"short"}))}</b></span><span class="tx"><b>${sumLine(d)}</b><span>${top?"Top "+esc(top):"No sends yet"}</span></span>${ICON.right}</button>`;}).join("")}</div></section>`;
+  }else{
+    html+=`<section><h2 class="sech">Sessions</h2><div class="slist">${per.slice().reverse().map(x=>`<button class="srow" data-act="openDay" data-k="${x.k}"><span class="dd"><small>${esc(fmtDow(x.k))}</small><b>${keyDate(x.k).getDate()}</b></span><span class="tx"><b>${x.t} ${x.t===1?"climb":"climbs"} · ${x.s} sent</b><span>${R.kind==="month"?"":esc(fmtShort(x.k))+" · "}${x.top?"Top "+esc(x.top):"No sends yet"}</span></span>${ICON.right}</button>`).join("")}</div></section>`;
+  }
+  html+=sheetLink();
   $("#view").innerHTML=html;
+  const ch=$("#view .chart.tight");if(ch)ch.scrollLeft=ch.scrollWidth;
 }
-/* Progress map: walls shaded by sends this month, a tag with the hardest send on each wall,
-   and a gold star when that beats everything sent on the wall before this month. Tap a wall for its line. */
+/* Grade progress: hardest send per week / month for one category (chips when there's more than one).
+   One person: a line in their colour, a dashed best-so-far line (starting from their best before the range) and ★ on each new best.
+   Both: a line per person, no stars. */
+function gradeProgress(data,R,B,pWho){
+  if(B.length<2)return"";
+  const types=TYPES.filter(t=>t.k!=="Kilter Board"||data.some(c=>c.type===t.k)).filter(t=>data.some(c=>c.type===t.k&&c.result==="Sent")&&gradeRows(t.k).length);
+  if(!types.length)return"";
+  const type=types.some(t=>t.k===pgType)?pgType:types[0].k;
+  const order=gradeRows(type).map(r=>r.value);
+  const people=pWho==="*"?climbers().filter(w=>data.some(c=>c.climber===w&&c.type===type&&c.result==="Sent")):[pWho];
+  const series=people.map(w=>{
+    const mine=data.filter(c=>c.climber===w&&c.type===type&&c.result==="Sent");
+    const pts=B.map(b=>{let i=-1;for(const c of mine)if(bucketOf(R,dayKey(c.when))===b.k)i=Math.max(i,gradeIdx(type,c.grade));return i;});
+    let prior=-1;for(const c of S.climbs)if(atGym(c)&&c.climber===w&&c.type===type&&c.result==="Sent"&&dayKey(c.when)<R.from)prior=Math.max(prior,gradeIdx(type,c.grade));
+    return{w,pts,prior,col:PCOL[themeFor(w)][0]};
+  });
+  const sent=series.flatMap(s=>s.pts).filter(i=>i>=0);if(!sent.length)return"";
+  const all=series.length===1&&series[0].prior>=0?sent.concat(series[0].prior):sent;
+  const lo=Math.max(0,Math.min(...all)-1),hi=Math.min(order.length-1,Math.max(...all)+1),rows=hi-lo+1,RH=24,top=14,W=320,L=50,Rt=312;
+  const yOf=i=>top+(hi-i)*RH,n=B.length,xOf=j=>n>1?L+(Rt-L)*j/(n-1):(L+Rt)/2,H=top+rows*RH+(R.grain==="month"&&new Set(B.map(b=>b.yr)).size>1?30:18);
+  let g="";
+  for(let i=lo;i<=hi;i++){const y=yOf(i),bg=gradeFill(type,order[i])||"#132235",fg=gradeFill(type,order[i])?inkOn(gradeFill(type,order[i])):"#ECEBFA";
+    g+=`<line x1="${L-4}" x2="${W-4}" y1="${y}" y2="${y}" stroke="#2C2752" stroke-width="1"/><rect x="2" y="${y-10}" width="42" height="20" rx="7" fill="${bg}" stroke="#000" stroke-width="1"/><text x="23" y="${y+4}" text-anchor="middle" font-family="Bricolage Grotesque, DM Sans, sans-serif" font-weight="700" font-size="11" fill="${fg}">${esc(gradeLabel(order[i]))}</text>`;}
+  const every=Math.ceil(n/13);
+  B.forEach((b,j)=>{if(j%every===0||j===n-1)g+=`<text x="${xOf(j).toFixed(1)}" y="${top+rows*RH+4}" text-anchor="middle" font-size="10.5" fill="#A3A0C8">${esc(b.lab)}</text>`;});
+  if(R.grain==="month"&&new Set(B.map(b=>b.yr)).size>1)for(const y of new Set(B.map(b=>b.yr))){const js=B.map((b,j)=>b.yr===y?j:-1).filter(j=>j>=0);g+=`<text x="${((xOf(js[0])+xOf(js[js.length-1]))/2).toFixed(1)}" y="${top+rows*RH+20}" text-anchor="middle" font-size="11" font-weight="600" fill="#ECEBFA">${y}</text>`;}
+  const one=series.length===1;
+  for(const s of series){
+    const P=s.pts.map((i,j)=>i>=0?[xOf(j),yOf(i),i,j]:null).filter(Boolean);
+    if(one){let best=s.prior;const step=[];const stars=[];
+      for(const [x,y,i] of P){if(i>best){if(best>=0)stars.push([x,y]);best=i;}step.push([x,yOf(Math.min(hi,Math.max(best,lo)))]);}
+      if(step.length>1)g+=`<path d="M${step.map(p=>p[0].toFixed(1)+","+p[1]).join(" L")}" fill="none" stroke="#A193FA" stroke-width="2" stroke-dasharray="4 4" opacity=".85"/>`;
+      s.stars=stars;}
+    if(P.length>1)g+=`<polyline points="${P.map(p=>p[0].toFixed(1)+","+p[1]).join(" ")}" fill="none" stroke="${s.col}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+    for(const [x,y,i] of P)g+=`<circle cx="${x.toFixed(1)}" cy="${y}" r="${n>16?4.5:6}" fill="${gradeFill(type,order[i])||s.col}" stroke="${one?"#ECEBFA":s.col}" stroke-width="2"/>`;
+    if(one)for(const [x,y] of s.stars)g+=`<text x="${x.toFixed(1)}" y="${y-10}" text-anchor="middle" font-size="13" fill="#FFD36E">★</text>`;
+  }
+  const s0=series[0],lastI=s0.pts.filter(i=>i>=0).pop();
+  const aria=`Hardest ${type.toLowerCase()} send per ${R.grain}${one&&lastI!=null?", latest "+gradeLabel(order[lastI]):""}`;
+  return`<section class="panel"><div class="phead2"><h2>Grade progress</h2>${types.length>1?`<div class="chips" role="group" aria-label="Category">${types.map(t=>`<button class="chip" data-act="pgType" data-v="${t.k}" aria-pressed="${t.k===type}">${t.k==="Bouldering"?"Boulder":t.k}</button>`).join("")}</div>`:`<span class="hsm">${esc(type)}</span>`}</div>
+    <p class="hint" style="margin:-6px 0 0">Hardest send each ${R.grain}</p>
+    <svg class="gpchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${g}</svg>
+    <div class="legend">${one?`<span><i style="background:${s0.col}"></i>Hardest that ${R.grain}</span><span><i style="background:none;border:2px dashed #A193FA;width:6px;height:6px"></i>Best so far</span><span><b style="color:#FFD36E;font-weight:400">★</b> New best</span>`:series.map(s=>`<span><i style="background:${s.col}"></i>${esc(s.w)}</span>`).join("")}</div></section>`;
+}
+function openCustom(){
+  const r=pFrom&&pTo?{from:pFrom,to:pTo}:presetRange("m3");
+  openSheet({type:"prange",d:{from:r.from,to:r.to,preset:pFrom&&pTo?"":"m3"}});
+}
+function prangeSheet(){
+  const d=sheet.d,t=todayKey();let a=d.from,b=d.to;if(a>b)[a,b]=[b,a];
+  const n=daysBetween(a,b),w=cur();
+  const ses=new Set(S.climbs.filter(c=>atGym(c)&&(w==="*"||c.climber===w)).map(c=>dayKey(c.when)).filter(k=>k>=a&&k<=b)).size;
+  const grain=n<=31?"session":n<=190?"week":"month";
+  return head("Custom range")+`<div class="stack">
+    <div><span class="flabel">Quick picks</span><div class="pills" role="group" aria-label="Quick picks">${PR_PRESETS.map(([k,l])=>`<button class="chip" data-act="prPreset" data-v="${k}" aria-pressed="${d.preset===k}">${l}</button>`).join("")}</div></div>
+    <div class="prdates"><label class="field">From<input type="date" id="prFrom" value="${a}" max="${t}"></label><label class="field">To<input type="date" id="prTo" value="${b}" max="${t}"></label></div>
+    <p class="hint" style="margin:0">${n} ${n===1?"day":"days"} · ${ses} ${ses===1?"session":"sessions"}. Charts go by ${grain} for this range.</p>
+    <div class="foot"><button class="btn" data-act="close">Cancel</button><button class="btn primary wide" data-act="prApply">Show this range</button></div></div>`;
+}
+/* Progress map: walls shaded by sends in the range, a tag with the hardest send on each wall,
+   and a gold star when that beats everything sent on the wall before the range starts. Tap a wall for its line. */
 let progSel="";
-function progressMap(data,pWho,mLabel){
+function progressMap(data,pWho,R){
   const M=gymMap();if(!M)return"";
-  const who=pWho==="*"?null:pWho,start=pMonth+"-01";
+  const who=pWho==="*"?null:pWho,start=R.from;
   const before=S.climbs.filter(c=>atGym(c)&&c.result==="Sent"&&dayKey(c.when)<start&&(!who||c.climber===who));
   const o={act:"progWall",noLabels:true,noNums:true,heat:{},heatMax:1,heatRGB:pWho==="*"?"161,147,250":meRGB(pWho),marks:[],sel:progSel};
   const info={};let total=0,walls=0;
@@ -1550,11 +1705,11 @@ function progressMap(data,pWho,mLabel){
   }
   if(!Object.keys(info).length)return"";
   const sel=info[progSel];
-  const line=sel?`<div class="pline"><b>${esc(sel.z.area)} · ${esc(mLabel)}</b><span class="hsm">${sel.n} ${sel.n===1?"send":"sends"}${sel.top?` · hardest ${esc(gradeLabel(sel.top))}${sel.nb?" (new best!)":""}`:""}${sel.rest?` · ${sel.rest} rested`:""}${sel.fell?` · ${sel.fell} didn't finish`:""}</span></div>`
-    :`<p class="hint">Tap a wall for its month.</p>`;
+  const line=sel?`<div class="pline"><b>${esc(sel.z.area)} · ${esc(R.label)}</b><span class="hsm">${sel.n} ${sel.n===1?"send":"sends"}${sel.top?` · hardest ${esc(gradeLabel(sel.top))}${sel.nb?" (new best!)":""}`:""}${sel.rest?` · ${sel.rest} rope weighted`:""}${sel.fell?` · ${sel.fell} didn't finish`:""}</span></div>`
+    :`<p class="hint">Tap a wall for its ${R.kind==="all"?"totals":R.unit}.</p>`;
   return`<section class="panel"><div class="phead2"><h2>Where you sent</h2><span class="hsm">${total} ${total===1?"send":"sends"} · ${walls} ${walls===1?"wall":"walls"}</span></div>
     <div class="bigmap">${mapSVG(o)}</div>
-    <div class="mleg"><span><i class="lg"></i>Fewer → more sends</span><span><i class="lt" style="background:#F08A24"></i>Hardest send there</span><span><i class="ls">★</i>New best this month</span></div>${line}</section>`;
+    <div class="mleg"><span><i class="lg"></i>Fewer → more sends</span><span><i class="lt" style="background:#F08A24"></i>Hardest send there</span>${R.star?`<span><i class="ls">★</i>New best ${R.star}</span>`:""}</div>${line}</section>`;
 }
 function gradeCounts(type,data){
   const d=data.filter(c=>c.type===type);if(!d.length)return[];
@@ -1579,6 +1734,7 @@ function renderSheet(){
   else if(sheet.type==="day")b.innerHTML=daySheet(sheet.k);
   else if(sheet.type==="share")b.innerHTML=shareSheet();
   else if(sheet.type==="gym")b.innerHTML=gymSheet();
+  else if(sheet.type==="prange")b.innerHTML=prangeSheet();
   else if(sheet.type==="merge"){const h=mergeSheet();if(h==null){closeSheet();return;}b.innerHTML=h;}
   replayTap();
 }
@@ -1654,7 +1810,7 @@ function climbSheet(){
   if(!(ms.length&&inList))d._mShown=false;
   const who=climbers();
   const vids=d.videos;
-  const place={Fell:"What stopped you?",Rested:"Where did you rest?",Sent:"Anything to remember?"}[d.result];
+  const place={Fell:"What stopped you?",Rested:"Where did you weight the rope?",Sent:"Anything to remember?"}[d.result];
   const rWas=d._rShown;d._rShown=d.result==="Rested";const newVid=d._vids!=null&&vids.length>d._vids;d._vids=vids.length;
   const dayTxt=d.day===todayKey()?"Today":d.day===shiftDay(todayKey(),-1)?"Yesterday":fmtShort(d.day);
   const rows=areaRows(d.type),GM=gymMap(),hasMap=!!GM&&GM.zones.some(z=>z.type===d.type);
@@ -1673,7 +1829,7 @@ function climbSheet(){
       <input name="problem" value="${esc(d.problem)}" placeholder="Problem name (optional)" aria-label="Problem name" class="lnote">`
       :`<div class="wallbox">${hasMap?`<div class="minimap wm" data-type="${esc(d.type)}" aria-label="Tap a wall to choose where">${miniSVG(d.type,d.area,d.anchor,true)}</div>`:""}<div class="wr"${hasMap?"":` style="grid-column:1/-1"`}><span class="flabel" style="margin:0">Wall</span>${wallPills}${typeOf(d.type).anchor?`<label class="anc">Anchor #<input id="fAnchor" name="anchor" inputmode="numeric" value="${esc(d.anchor||"")}" placeholder="—"></label>`:""}</div></div>
       <fieldset><legend class="flabel">Hold colour</legend>${holdField(d.hold).replace(/^<fieldset><legend class="flabel">Hold colour<\/legend>/,"").replace(/<\/fieldset>$/,"")}</fieldset>`}
-    <div class="lrow">${step("tries","Tries",d.tries,"try")}${d.result==="Rested"?step("rests","Rests",d.rests,"rest").replace('class="stepc"',`class="stepc${rWas?"":" enter"}"`):""}<button type="button" class="vbtn" data-act="cvAdd"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>${vids.length?"+ Video":"Video"}</button></div>
+    <div class="lrow">${step("tries","Tries",d.tries,"try")}${d.result==="Rested"?step("rests","Weighted",d.rests,"time").replace('class="stepc"',`class="stepc${rWas?"":" enter"}"`):""}<button type="button" class="vbtn" data-act="cvAdd"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg>${vids.length?"+ Video":"Video"}</button></div>
     ${vids.length?`<div class="vlist">${vids.map((u,i)=>`<div class="vrow${newVid&&i===vids.length-1?" enter":""}">${/^https?:\/\//i.test(u)?`<a class="vtile" href="${esc(u)}" target="_blank" rel="noopener" aria-label="Open the video"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></a>`:""}<input name="video" type="url" inputmode="url" value="${esc(u)}" placeholder="Paste a share link from Google Photos" aria-label="Video link ${i+1}"><button type="button" class="x" data-act="cvDel" data-i="${i}" aria-label="Remove this link">×</button></div>`).join("")}</div>`:""}
     ${ms.length&&inList?matchList(d,ms):linked?`<div class="plink">${holdDot(linked.hold,"sm")}<span class="t"><b>${esc(projName(linked))} ${esc(gradeLabel(linked.grade))} project</b><small>${d.result==="Sent"?"Marks it sent for "+esc(d.climber):"Counts as a try on it"}</small></span><button type="button" class="btn small" data-act="cf" data-f="link" data-v="">Change</button></div>`:""}
     ${!linked&&!kil&&d.result!=="Sent"?`<label class="check"><input type="checkbox" name="addProj" ${d.addProj?"checked":""}>${d.result==="Fell"?"Add to Projects to come back to":"Add to Projects to send it clean"}</label>`:""}
@@ -1883,8 +2039,8 @@ function daySheet(k){
   let body="";
   for(const w of cs){const mine=list.filter(c=>c.climber===w);const s=mine.filter(c=>c.result==="Sent").length;
     body+=`<h3 class="sech">${esc(w)} · ${mine.length} climbs · ${s} sent</h3>`+mine.map(c=>{const det=[c.hold?c.hold+" holds":"",c.area,c.anchor?"Anchor "+c.anchor:"",c.note?"“"+c.note+"”":""].filter(Boolean).join(" · ");
-      return`<div class="crow">${resIcon(c.result)}${tagHTML(c.type,c.grade,"sm")}<button class="t" data-act="openClimb" data-id="${c.id}" style="appearance:none;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:inherit"><b style="display:flex;align-items:center;gap:6px">${catIcon(c.type)}<span class="res ${c.result==="Sent"?"s":c.result==="Rested"?"r":"f"}">${c.result}${c.result==="Rested"&&c.rests?" ×"+c.rests:""}</span> · ${esc(c.type)}</b>
-<span>${esc(det||"Tap to add details")}</span></button><button class="x" data-act="delClimb" data-id="${c.id}" data-confirm="Delete?" aria-label="Delete this climb">×</button></div>`;}).join("");}
+      return`<div class="crow">${resIcon(c.result)}${tagHTML(c.type,c.grade,"sm")}<button class="t" data-act="openClimb" data-id="${c.id}" style="appearance:none;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:inherit"><b style="display:flex;align-items:center;gap:6px">${catIcon(c.type)}<span class="res ${c.result==="Sent"?"s":c.result==="Rested"?"r":"f"}">${resLabel(c.result)}${c.result==="Rested"&&c.rests>1?" ×"+c.rests:""}</span> · ${esc(c.type)}</b>
+<span>${esc(det||"Tap to add details")}</span></button>${spotBadge(c)}<button class="x" data-act="delClimb" data-id="${c.id}" data-confirm="Delete?" aria-label="Delete this climb">×</button></div>`;}).join("");}
   return head(esc(fmtLong(k)),esc(GYM))+`<div class="stack">${body||`<div class="empty">No climbs on this day.</div>`}
     <button class="btn primary" data-act="logOnDay" data-k="${k}">${k===todayKey()?"Log more today":"Log more for this day"}</button></div>`;
 }
@@ -1909,7 +2065,7 @@ function toast(msg,acts){
 const CHEER={"sent": [["Wow! You did it!", "Bloody good show!"], ["Cor blimey!", "You sent it. Someone put the kettle on."], ["Absolutely spiffing!", "The wall never stood a chance."], ["Smashing!", "Topped out like a proper gent. Biscuit earned."], ["Get in!", "Ring the bells, hang the bunting, fetch the scones."], ["Jolly well done!", "Your forearms deserve a knighthood."], ["Crikey, that was tidy!", "Textbook stuff. Take a bow."], ["Bob's your uncle!", "Up, done, sorted. Marvellous."], ["Champion!", "Even the pigeons on the roof are clapping."], ["Ruddy brilliant!", "Tell your mum. Tell the whole street."], ["Blinding!", "Climbed it like you owned the freehold."], ["Well I never!", "Sent, and not a single swear word. Probably."], ["Top drawer!", "That deserves a full English. With extra beans."], ["Lovely jubbly!", "The holds were putty in your hands."], ["Bang on!", "Dead tidy, that. Proper climber, you are."], ["Hats off!", "The King would like a word. To say well done."], ["Oi oi!", "Look who's gone and sent it. Cheeky."], ["Stonking effort!", "Your chalk bag is beaming with pride."], ["Cracking climb!", "Gromit would be ever so impressed."], ["Brilliant, simply brilliant!", "Even the route setter is a bit jealous."], ["Huzzah!", "A send fit for a royal wedding."], ["Mint!", "Sorted quicker than a queue at Greggs."], ["Spot on!", "Have a cuppa. You've more than earned it."], ["Belting!", "That was smoother than a pint of best bitter."], ["Wizard!", "Absolutely wizard, old chap. Wizard."], ["Ace!", "Clean as a whistle. Clean as a Sunday roast plate."], ["Splendid!", "Somebody fetch the Pimm's."], ["Phwoar, look at that!", "Up it like a squirrel up a drainpipe."], ["Gold star!", "A big shiny one. You've earned it."], ["Well chuffed!", "And so you should be. Top marks."]], "rested": [["Not bad at all!", "A little sit-down never hurt anyone."], ["Very civilised!", "A spot of tea halfway up. Respectable."], ["Not too shabby!", "Bit of a breather, bit of a send."], ["Got there in the end!", "Like the 8:15 from Paddington. Late, but it arrived."], ["Rather good, old bean!", "Next time, skip the tea break."], ["Not half bad!", "The rope did a bit of the lifting, mind."], ["Steady on!", "That's progress. Very British of you."], ["Respectable effort!", "Hung about like washing on a line, but you finished."], ["Decent, that!", "Took the scenic route, but you got to the top."], ["Close, but no biscuit.", "Well, half a biscuit. A rich tea, perhaps."], ["Fair play!", "A rest is just a picnic with extra steps."], ["Good-ish!", "Like a Victoria sponge with a soggy bottom. Still lovely."], ["Nearly clean!", "Paul Hollywood would give it a handshake. Almost."], ["Not shabby at all!", "You hung there like a well-loved hanging basket."], ["Admirable!", "Every great Brit needs a sit down now and then."], ["That'll do, pig.", "That'll do. Next time, no hanging about."], ["Not bad, not bad!", "The rope's sending you a thank-you card."], ["Pretty decent!", "Rested more than a pensioner on a bench, but you topped it."], ["Respectable!", "Half marks for style, full marks for stubbornness."], ["Nice one!", "A breather here and there. Proper sensible."]], "dnf": [["Oh dear.", "Chin up, stiff upper lip! Next time."], ["Bad luck, old sport.", "The wall's a cheeky blighter today."], ["Bit of a damp squib.", "Have a biscuit. Have two."], ["Not today, love.", "Put the kettle on and give it another go."], ["Gone a bit pear-shaped.", "Happens to the best of us. Mostly to you, today."], ["Blimey, the wall won.", "Best of three? Rematch next session."], ["Gutted!", "Still, not the end of the world. Probably."], ["Keep calm and chalk up.", "You'll have it next time, champ."], ["Off you pop.", "Have a rest. The wall's not going anywhere."], ["Well, that's a shame.", "The holds were clearly made of butter."], ["Oh, bother.", "Shake it off. Shake your arms off, actually."], ["Bit of a pickle, that.", "Not to worry. Rome wasn't sent in a day."], ["Sod's law.", "It was going so well, too."], ["Close, but no cigar.", "Not even a cigarillo. Next time!"], ["Rotten luck!", "Must have been the weather. It's always the weather."], ["Cheer up, chuck.", "Even Wallace needed a few goes."], ["Better luck next time!", "The wall said 'not today, sunshine'."], ["Whoopsie daisy.", "Gravity: one. You: zero. For now."], ["Ah, nuts.", "Tea, biscuits, and a cheeky revenge plan."], ["Righto, regroup.", "Like a proper rainy Tuesday. It'll pass."], ["Blast!", "That route owes you an apology."], ["Not quite, old chum.", "Even the Queen had off days. Probably."], ["Oh, crumbs.", "Plenty more crumbs where that came from. Try again!"], ["Bit wobbly, that.", "Wobblier than a jelly at a kids' party."], ["Pants!", "Absolute pants. Next go will be smashing, though."], ["Hard cheese.", "Mature cheddar, mind. Builds character."], ["Not your day.", "Not to worry. There's always next Thursday."], ["Ooh, so close.", "Closer than a London bus to the kerb."], ["Down you come!", "That was a scenic descent, if nothing else."], ["Well, bugger.", "Dust yourself off and have another crack."]], "proj": [["PROJECT SENT!", "Absolutely bloody marvellous. Fetch the bunting!"], ["Finally!", "All those tries, and look at you now. Smashing!"], ["Hip hip hooray!", "That project's been well and truly sorted."], ["You legend!", "Write it in the history books. In your nicest handwriting."], ["It's done! It's DONE!", "Somebody call the BBC. And your nan."], ["Glory be!", "Weeks of faffing about, and you've only gone and sent it."], ["Bloomin' marvellous!", "That project didn't know what hit it."], ["Victory!", "Crack open the good biscuits. The chocolate ones."], ["Absolute scenes!", "Pubs across the nation are raising a pint."], ["Get in there!", "From projecting to perfecting. Champion."], ["Sorted, at long last!", "The wall has formally surrendered."], ["Ta-da!", "One project down. Knighthood pending."]]};
 const CHEER_ART={"sent": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><rect class=\"conf\" x=\"10\" y=\"4\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"47\" y=\"17\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"84\" y=\"10\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"21\" y=\"23\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"58\" y=\"16\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.40s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"95\" y=\"9\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:1.65s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"32\" y=\"22\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.90s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"69\" y=\"15\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:2.15s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"106\" y=\"8\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.40s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"43\" y=\"21\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:1.65s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"80\" y=\"14\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.90s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"17\" y=\"7\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:2.15s;animation-delay:0.18s\"/><g class=\"bob\"><path d=\"M60 14 L72 42 L103 45 L79 65 L86 96 L60 80 L34 96 L41 65 L17 45 L48 42 Z\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><circle cx=\"51\" cy=\"58\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"58\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"65\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"65\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M54 64 Q60 71 66 64\" fill=\"#E8607A\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/></g></svg>", "proj": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><rect class=\"conf\" x=\"10\" y=\"4\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"47\" y=\"17\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"84\" y=\"10\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"21\" y=\"23\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"58\" y=\"16\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.40s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"95\" y=\"9\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:1.65s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"32\" y=\"22\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.90s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"69\" y=\"15\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:2.15s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"106\" y=\"8\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.40s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"43\" y=\"21\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:1.65s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"80\" y=\"14\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#C4B8F5\" style=\"animation-duration:1.90s;animation-delay:0.00s\"/><rect class=\"conf\" x=\"17\" y=\"7\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#FF9B85\" style=\"animation-duration:2.15s;animation-delay:0.18s\"/><rect class=\"conf\" x=\"54\" y=\"20\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F5C84B\" style=\"animation-duration:1.40s;animation-delay:0.36s\"/><rect class=\"conf\" x=\"91\" y=\"13\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#3DC2EC\" style=\"animation-duration:1.65s;animation-delay:0.54s\"/><rect class=\"conf\" x=\"28\" y=\"6\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#F7A1C4\" style=\"animation-duration:1.90s;animation-delay:0.72s\"/><rect class=\"conf\" x=\"65\" y=\"19\" width=\"7\" height=\"11\" rx=\"2\" fill=\"#8FE3C8\" style=\"animation-duration:2.15s;animation-delay:0.00s\"/><g class=\"bob\"><path d=\"M38 28h44v22a22 22 0 0 1-44 0z\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><path d=\"M38 34h-10a12 12 0 0 0 12 16M82 34h10a12 12 0 0 1-12 16\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"3.2\"/><rect x=\"54\" y=\"72\" width=\"12\" height=\"12\" fill=\"#F5C84B\" stroke=\"#1E2235\" stroke-width=\"3\"/><rect x=\"42\" y=\"84\" width=\"36\" height=\"10\" rx=\"3\" fill=\"#3DC2EC\" stroke=\"#1E2235\" stroke-width=\"3\"/><circle cx=\"51\" cy=\"44\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"44\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"51\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"51\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M54 50 Q60 57 66 50\" fill=\"#E8607A\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/></g></svg>", "rested": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><g fill=\"none\" stroke=\"#C9D8E8\" stroke-width=\"3.4\" stroke-linecap=\"round\"><path class=\"steam\" d=\"M46 34 q-6 -8 0 -16\"/><path class=\"steam\" style=\"animation-delay:.5s\" d=\"M60 32 q-6 -8 0 -16\"/><path class=\"steam\" style=\"animation-delay:1s\" d=\"M74 34 q-6 -8 0 -16\"/></g><g class=\"bob\"><ellipse cx=\"60\" cy=\"96\" rx=\"40\" ry=\"8\" fill=\"#5B45D6\" stroke=\"#1E2235\" stroke-width=\"3\"/><path d=\"M28 44h64v20a32 32 0 0 1-64 0z\" fill=\"#fff\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><path d=\"M92 52h6a10 10 0 0 1 0 20h-8\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"3.2\"/><rect x=\"28\" y=\"44\" width=\"64\" height=\"7\" fill=\"#C4B8F5\" stroke=\"#1E2235\" stroke-width=\"3\"/><circle cx=\"51\" cy=\"66\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"66\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"73\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"73\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><path d=\"M55 73 Q60 77 65 73\" fill=\"none\" stroke=\"#1E2235\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></g></svg>", "dnf": "<svg class=\"art\" viewBox=\"0 0 120 120\" aria-hidden=\"true\"><g fill=\"#7FB6F0\" stroke=\"#1E2235\" stroke-width=\"2.4\"><path class=\"drop\" d=\"M40 84 q-5 8 0 12 q5 -4 0 -12z\"/><path class=\"drop\" style=\"animation-delay:.45s\" d=\"M62 86 q-5 8 0 12 q5 -4 0 -12z\"/><path class=\"drop\" style=\"animation-delay:.9s\" d=\"M82 82 q-5 8 0 12 q5 -4 0 -12z\"/></g><g class=\"wob\"><path d=\"M30 78a20 20 0 0 1 2-38 26 26 0 0 1 50-6 20 20 0 0 1 10 44z\" fill=\"#DCE6F2\" stroke=\"#1E2235\" stroke-width=\"3.2\" stroke-linejoin=\"round\"/><circle cx=\"51\" cy=\"56\" r=\"3.2\" fill=\"#1E2235\"/><circle cx=\"69\" cy=\"56\" r=\"3.2\" fill=\"#1E2235\"/><ellipse cx=\"45\" cy=\"63\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"75\" cy=\"63\" rx=\"4\" ry=\"2.4\" fill=\"#F4A6B5\"/><ellipse cx=\"60\" cy=\"65\" rx=\"3.2\" ry=\"3.8\" fill=\"#1E2235\"/></g></svg>"};
 const CHEER_STYLE={sent:{cb:"var(--me)",cbg:"var(--me-soft)",cfg:"var(--me)",tag:"SENT"},proj:{cb:"#F5C84B",cbg:"#3A2F0E",cfg:"#F5C84B",tag:"PROJECT SENT"},
-  rested:{cb:"#8C7CF0",cbg:"#2A2260",cfg:"#C9C0FF",tag:"SENT WITH RESTS"},dnf:{cb:"#CDBFFB",cbg:"#2E2847",cfg:"#CDBFFB",tag:"DIDN'T FINISH"}};
+  rested:{cb:"#8C7CF0",cbg:"#2A2260",cfg:"#C9C0FF",tag:"ROPE WEIGHTED"},dnf:{cb:"#CDBFFB",cbg:"#2E2847",cfg:"#CDBFFB",tag:"DIDN'T FINISH"}};
 const cheerKind=(res,proj)=>res==="Sent"?(proj?"proj":"sent"):res==="Rested"?"rested":"dnf";
 function cheerLine(k){
   const L=CHEER[k];let deck;try{deck=JSON.parse(LS.get("deck."+k,"[]"));}catch(e){deck=[];}
@@ -1984,6 +2140,14 @@ document.addEventListener("click",e=>{
     case"reopen":if(P){store.update("projects",P.id,{status:"Open"});toast("Back in your projects");}break;
     case"delProj":if(P){for(const c of S.climbs.filter(c=>c.project===P.id))store.update("climbs",c.id,{project:""});for(const n of S.notes.filter(n=>n.project===P.id))store.del("notes",n.id);store.del("projects",P.id);if(sheet)closeSheet();if(tab==="proj")setTab("projects");toast("Project deleted (your logged climbs stay)");}break;
     case"month":{const d=keyDate(pMonth+"-01");d.setMonth(d.getMonth()+ +t.dataset.d);pMonth=dayKey(d.getTime()).slice(0,7);render();break;}
+    case"prange":{const v=t.dataset.v;if(v==="custom"){openCustom();break;}if(v===pRange)break;pRange=v;LS.set("prange",v);progSel="";render();animView("restack");break;}
+    case"pyear":pYear+= +t.dataset.d;progSel="";render();break;
+    case"pcustom":openCustom();break;
+    case"prPreset":if(sheet&&sheet.type==="prange"){Object.assign(sheet.d,presetRange(t.dataset.v),{preset:t.dataset.v});renderSheet();}break;
+    case"prApply":if(sheet&&sheet.type==="prange"){let a=($("#prFrom")||{}).value||sheet.d.from,b=($("#prTo")||{}).value||sheet.d.to;if(a>b)[a,b]=[b,a];pFrom=a;pTo=b;LS.set("pfrom",a);LS.set("pto",b);pRange="custom";LS.set("prange","custom");progSel="";closeSheet();render();animView("restack");}break;
+    case"pgType":pgType=t.dataset.v;LS.set("pgtype",pgType);render();break;
+    case"openMonth":pMonth=t.dataset.m;pRange="month";LS.set("prange","month");progSel="";render();animView("restack");window.scrollTo(0,0);break;
+    case"openYear":pYear=+t.dataset.y;pRange="year";LS.set("prange","year");progSel="";render();animView("restack");window.scrollTo(0,0);break;
     case"mapStep":mapStep(+t.dataset.d);break;
     case"mapZoom":mapZoom=Math.max(1,Math.min(3,mapZoom+ +t.dataset.d));LS.set("mapz",mapZoom);render();break;
     case"mapSel":{mapSel=mapSel===t.dataset.z?"":t.dataset.z;LS.set("mapsel",mapSel);const box=$("#mapbox"),sx=box?box.scrollLeft:0,sy=box?box.scrollTop:0;render();const nb=$("#mapbox");if(nb){nb.scrollLeft=sx;nb.scrollTop=sy;}const h=$("#zoneTitle");if(h)h.scrollIntoView({behavior:"smooth",block:"nearest"});break;}
@@ -1996,7 +2160,7 @@ document.addEventListener("click",e=>{
     case"setGym":GYM=t.dataset.v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+GYM);break;
   }
 });
-document.addEventListener("click",e=>{if((e.target.id==="dayInput"||e.target.id==="fDay")&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
+document.addEventListener("click",e=>{if((e.target.id==="dayInput"||e.target.id==="fDay"||e.target.id==="prFrom"||e.target.id==="prTo")&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
 document.addEventListener("input",e=>{
   // Typing an anchor number picks the wall it belongs to and pins roughly where it is on the map
   if(e.target.id==="fAnchor"){const n=parseInt(e.target.value,10);const form=e.target.form;if(!form)return;
@@ -2010,6 +2174,7 @@ document.addEventListener("change",e=>{
   // wall, hold colour or anchor changed: redraw so the project matches (or the duplicate warning) follow
   if(["area","hold","anchor"].includes(e.target.name)&&sheet&&sheet.d){if(sheet.type==="climb"){readForm();renderSheet();}else if(sheet.type==="project"){readProjForm();renderSheet();}}
   if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){DAY=v;render();}return;}
+  if((e.target.id==="prFrom"||e.target.id==="prTo")&&sheet&&sheet.type==="prange"){const v=e.target.value;if(v){sheet.d[e.target.id==="prFrom"?"from":"to"]=v;sheet.d.preset="";renderSheet();}return;}
   if(e.target.name==="link"&&sheet&&sheet.d){readForm();linkProject(e.target.value);renderSheet();}
   if(e.target.name==="keep"&&sheet&&sheet.type==="merge")sheet.keep=e.target.value;
   if((e.target.name==="day"||e.target.name==="addProj")&&sheet&&sheet.type==="climb"&&sheet.d){readForm();renderSheet();}

@@ -33,6 +33,11 @@ body,.top{transition:background-color .25s ease}
 #view.slide-r{animation:slideR .42s cubic-bezier(.2,.9,.3,1)}
 @keyframes slideL{from{transform:translateX(56px);opacity:.3}}
 @keyframes slideR{from{transform:translateX(-56px);opacity:.3}}
+#view.day-l :is(.datepick>span,.wseg small,.backfill,.hstats,.dhead,.pctl,.pcards),#view.day-l>.hint{animation:dayL .38s cubic-bezier(.2,.9,.3,1)}
+#view.day-r :is(.datepick>span,.wseg small,.backfill,.hstats,.dhead,.pctl,.pcards),#view.day-r>.hint{animation:dayR .38s cubic-bezier(.2,.9,.3,1)}
+#view:is(.day-l,.day-r) .hmap svg{animation:cbFade .38s ease-out}
+@keyframes dayL{from{transform:translateX(22px);opacity:0}}
+@keyframes dayR{from{transform:translateX(-22px);opacity:0}}
 /* person switcher: a big button per climber with their kawaii avatar; the picked one is filled in their colour (--pc) */
 .wseg{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px}
 .wseg button{appearance:none;display:flex;align-items:center;gap:10px;height:60px;padding:0 12px;border-radius:18px;border:2px solid var(--line);background:var(--surface);color:var(--ink);text-align:left;cursor:pointer;min-width:0;font:inherit;transition:background-color .15s,border-color .15s}
@@ -74,7 +79,7 @@ body,.top{transition:background-color .25s ease}
 :root[data-dark] .mapbox{background:#000}
 :root[data-dark] .zone.sel polygon{fill:rgba(255,196,77,.42);stroke:#FFC44D}
 :root[data-dark] .sync.on::before{background:#3DC2EC}
-@media (prefers-reduced-motion:reduce){#view.slide-l,#view.slide-r{animation:none}body,.top{transition:none}}
+@media (prefers-reduced-motion:reduce){#view.slide-l,#view.slide-r,#view.day-l *,#view.day-r *,#view.day-l>.hint,#view.day-r>.hint{animation:none!important}body,.top{transition:none}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{min-height:100%}
@@ -970,7 +975,7 @@ function setTab(t){hideToast();if(t==="map")mapLand();const from=tab;tab=t;LS.se
   animView(t==="proj"?"slide-l":from==="proj"&&t==="projects"?"slide-r":from!==t?"tabin":"");}
 // one-off view animations for things you tap (never for background syncs)
 let animT=0;
-function animView(cls){if(REDUCED||!cls)return;const v=$("#view");v.classList.remove("slide-l","slide-r","tabin","restack");void v.offsetWidth;v.classList.add(cls);clearTimeout(animT);animT=setTimeout(()=>v.classList.remove(cls),1300);}
+function animView(cls){if(REDUCED||!cls)return;const v=$("#view");v.classList.remove("slide-l","slide-r","tabin","restack","day-l","day-r");void v.offsetWidth;v.classList.add(cls);clearTimeout(animT);animT=setTimeout(()=>v.classList.remove(cls),1300);}
 function render(msg){
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===(tab==="proj"?"projects":tab))));
   $("#gymBtn").innerHTML=esc(GYM||"Climb Buddy")+(ready?" "+ICON.down:"");
@@ -2111,9 +2116,9 @@ document.addEventListener("click",e=>{
     case"projWall":{const z=t.dataset.z;projSel=!z||projSel===z?"":z;render();animView("restack");if(projSel){const c=$("#pcards");if(c)c.scrollIntoView({behavior:"smooth",block:"nearest"});}break;}
     case"progWall":{const z=t.dataset.z;progSel=progSel===z?"":z;render();break;}
     case"wallHist":wallHist=!wallHist;render();break;
-    case"prevDay":DAY=shiftDay(DAY,-1);render();animView("slide-r");break;
-    case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();animView("slide-l");break;
-    case"goToday":DAY=todayKey();render();animView("slide-l");break;
+    case"prevDay":DAY=shiftDay(DAY,-1);render();animView("day-r");break;
+    case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();animView("day-l");break;
+    case"goToday":DAY=todayKey();render();animView("day-l");break;
     case"openDay":openSheet({type:"day",k:t.dataset.k});break;
     case"openClimb":{const c=S.climbs.find(x=>x.id===id);if(c)editClimb(c);break;}
     case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
@@ -2169,15 +2174,23 @@ document.addEventListener("input",e=>{
     const r=a?[...form.querySelectorAll('input[name=area][type=radio]')].find(i=>eqi(i.value,a)):null;if(r)r.checked=true;
     syncMini();}
 });
+// The button being tapped right now. Leaving a text field fires "change" as the tap starts; redrawing the sheet then
+// would replace that button and swallow the tap (Save needed two taps), so the redraw waits until the tap is done.
+let downBtn=null,downAt=0;
+document.addEventListener("pointerdown",e=>{downBtn=e.target.closest&&e.target.closest("button");downAt=Date.now();},true);
+function redrawAfterTap(fn){
+  if(downBtn&&downBtn.isConnected&&Date.now()-downAt<1500){const s=sheet;const b=downBtn;setTimeout(()=>{if(sheet&&sheet===s&&$("#sheetBody")&&!(b&&b.dataset.armed==="1"))fn();},450);}
+  else fn();
+}
 document.addEventListener("change",e=>{
   if(e.target.name==="area"){syncMini();}
   // wall, hold colour or anchor changed: redraw so the project matches (or the duplicate warning) follow
-  if(["area","hold","anchor"].includes(e.target.name)&&sheet&&sheet.d){if(sheet.type==="climb"){readForm();renderSheet();}else if(sheet.type==="project"){readProjForm();renderSheet();}}
-  if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){DAY=v;render();}return;}
+  if(["area","hold","anchor"].includes(e.target.name)&&sheet&&sheet.d){if(sheet.type==="climb"){readForm();redrawAfterTap(()=>{readForm();renderSheet();});}else if(sheet.type==="project"){readProjForm();redrawAfterTap(()=>{readProjForm();renderSheet();});}}
+  if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){const dir=v>DAY?"day-l":"day-r";DAY=v;render();animView(dir);}return;}
   if((e.target.id==="prFrom"||e.target.id==="prTo")&&sheet&&sheet.type==="prange"){const v=e.target.value;if(v){sheet.d[e.target.id==="prFrom"?"from":"to"]=v;sheet.d.preset="";renderSheet();}return;}
   if(e.target.name==="link"&&sheet&&sheet.d){readForm();linkProject(e.target.value);renderSheet();}
   if(e.target.name==="keep"&&sheet&&sheet.type==="merge")sheet.keep=e.target.value;
-  if((e.target.name==="day"||e.target.name==="addProj")&&sheet&&sheet.type==="climb"&&sheet.d){readForm();renderSheet();}
+  if((e.target.name==="day"||e.target.name==="addProj")&&sheet&&sheet.type==="climb"&&sheet.d){readForm();redrawAfterTap(()=>{readForm();renderSheet();});}
 });
 document.addEventListener("submit",e=>{
   const id=e.target.id;e.preventDefault();

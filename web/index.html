@@ -469,7 +469,13 @@ legend{padding:0}
 .logbtn{appearance:none;flex:none;display:flex;align-items:center;gap:6px;height:46px;padding:0 9px 0 7px;border-radius:14px;border:0;background:var(--me);color:var(--me-ink);cursor:pointer}
 .logbtn .plus{width:30px;height:30px;border-radius:50%;background:var(--me-ink);color:var(--me);display:flex;align-items:center;justify-content:center;font:800 22px/1 var(--f-body)}
 .logbtn .ics{display:flex;gap:1px}.logbtn .cicon{width:21px;height:21px}
-.dhead{display:flex;align-items:baseline;gap:8px;margin-top:6px}.dhead h2{margin:0;font:800 19px var(--f-body)}.dhead small{font-size:12px;color:var(--muted)}
+.dhead{display:flex;align-items:baseline;gap:8px;margin-top:6px}.dhead .selbtn{margin-left:auto;align-self:center}
+.selrow{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:-6px}
+.cc3.pick .tick{flex:none;width:26px;height:26px;margin:0 4px 0 2px;border-radius:8px;border:2px solid var(--line2);display:grid;place-items:center;color:#08202C;transition:background .2s,border-color .2s}
+.cc3.pick.on{border-color:var(--me);background:color-mix(in srgb,var(--me) 14%,var(--surface))}.cc3.pick.on .tick{background:var(--me);border-color:var(--me)}
+.selbar{position:fixed;left:12px;right:12px;bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px) + 12px);z-index:7;max-width:620px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 16px;border-radius:18px;background:var(--surface2,var(--surface));border:1px solid var(--line2);box-shadow:0 10px 30px rgba(0,0,0,.45);}.selbar.enter{animation:selUp .4s cubic-bezier(.2,.9,.3,1)}@keyframes selUp{from{transform:translateY(40px);opacity:0}}
+.selbar b{flex:1}.selbar .btn{display:inline-flex;align-items:center;gap:8px}.selbar .btn svg{width:18px;height:18px}
+.mvpicks{display:flex;flex-wrap:wrap;gap:8px}.dhead h2{margin:0;font:800 19px var(--f-body)}.dhead small{font-size:12px;color:var(--muted)}
 .cc3{display:flex;align-items:center;border-radius:14px;border:1px solid var(--line);border-left:5px solid var(--rc,var(--line));background:var(--surface);overflow:hidden}
 .cc3 .pmain{appearance:none;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 4px 6px 6px;flex:1;min-width:0;min-height:58px}
 .cc3 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-left:4px}
@@ -484,7 +490,7 @@ legend{padding:0}
 .lwho{display:flex;padding:2px;border-radius:999px;border:1px solid var(--line2);flex:none}
 .lwho button{appearance:none;height:32px;padding:0 9px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:800 12.5px var(--f-body);cursor:pointer}
 .lwho button[aria-pressed="true"]{background:var(--pc);color:#08202C}
-.dchip{position:relative;flex:none;display:inline-flex;align-items:center;height:36px;padding:0 10px;border-radius:999px;border:1px solid var(--line2);font:700 12.5px var(--f-body);white-space:nowrap}
+.dchip{position:relative;flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 12px;border-radius:999px;border:2px solid var(--me,var(--accent));background:var(--surface2,var(--surface));font:700 13px var(--f-body);white-space:nowrap}.dchip svg{width:16px;height:16px;color:var(--me,var(--accent))}.dchip .dv{color:var(--muted)}
 .dchip input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:0;padding:0;border:0;cursor:pointer}
 .lsheet .close{width:36px;height:36px}
 .lsheet form{gap:12px}
@@ -941,7 +947,7 @@ function animateSwitch(target,dir,from,commit){
   };
   switchAnim=requestAnimationFrame(step);
 }
-function tapWho(v){
+function tapWho(v){endSelect();
   if(v===cur())return;
   const o=whoOpts(),dir=o.indexOf(v)>o.indexOf(cur())?1:-1;
   animateSwitch(v,dir,0,true);
@@ -971,7 +977,7 @@ const myNotes=(p,w)=>S.notes.filter(n=>n.project===p.id&&n.climber===w).sort((a,
 function projWhere(p){return[p.type,p.area,p.anchor?"Anchor "+p.anchor:""].filter(Boolean).join(" · ");}
 
 /* ---------- render ---------- */
-function setTab(t){hideToast();if(t==="map")mapLand();const from=tab;tab=t;LS.set("tab",t);render();window.scrollTo(0,0);
+function setTab(t){hideToast();endSelect();if(t==="map")mapLand();const from=tab;tab=t;LS.set("tab",t);render();window.scrollTo(0,0);
   animView(t==="proj"?"slide-l":from==="proj"&&t==="projects"?"slide-r":from!==t?"tabin":"");}
 // one-off view animations for things you tap (never for background syncs)
 let animT=0;
@@ -1004,6 +1010,9 @@ function onData(){if(auth!=="ok"||!ready)return;render();if(sheet&&sheet.type===
 /* Session */
 /* Climb home: date, a map card beside the day's stats (tap a wall to log there), four category tiles, then the day's climbs */
 let homeSel=LS.get("homesel",""),homeAll=false;
+// Select mode on the Climb tab: tick climbs, then move them to another day together
+let selMode=false,selEnter=false;const selIds=new Set();
+function endSelect(){selMode=false;selIds.clear();}
 const shortType=t=>t==="Bouldering"?"Boulder":t;
 const videoLinks=c=>String(c.video||"").split(/\s+/).filter(u=>/^https?:\/\//i.test(u));
 const homeWall=()=>gymMap()&&homeSel?zoneById(homeSel)||null:null;
@@ -1040,7 +1049,7 @@ function renderSession(){
     groups=Object.values(m).map(it=>{const c=it[0],r=rk(c);return{items:it.sort(byR),title:gradeLabel(c.grade),sub:shortKind(c.type==="Auto belay"||c.type==="Top rope"?"Rope":c.type)+" · "+it.length,sw:gradeFill(c.type,c.grade),k:grp(c.type)*1000+(dayHard?-r:r)};}).sort((a,b)=>a.k-b.k);
   }else if(daySort==="Type"){
     groups=TYPES.map(t=>t.k).map(t=>{const it=vis.filter(c=>c.type===t).sort(byG);return{items:it,title:shortKind(t),sub:it.length+(it.length===1?" climb":" climbs")};}).filter(g=>g.items.length);
-  }else{const it=vis.slice().sort(byR);groups=[{items:homeAll?it:it.slice(0,8),more:it.length>8&&!homeAll?it.length:0}];}
+  }else{const it=vis.slice().sort(byR);groups=[{items:homeAll||selMode?it:it.slice(0,8),more:it.length>8&&!homeAll&&!selMode?it.length:0}];}
   const kinds=[["All","All"],["Bouldering","Boulder"],["Top rope","Top rope"],["Auto belay","Auto"],["Kilter Board","Kilter"]].filter(([k])=>k==="All"||mine.some(c=>c.type===k));
   const dctl=mine.length?`<div class="pctl">
     ${kinds.length>2?`<div class="row"><span class="lb">Show</span><div class="chips" role="group" aria-label="Show">${kinds.map(([k,l])=>`<button class="chip" data-act="dayf" data-v="${k}" aria-pressed="${dayFilter===k}">${l} <span class="n">${mine.filter(c=>k==="All"||c.type===k).length}</span></button>`).join("")}</div></div>`:""}
@@ -1058,12 +1067,21 @@ function renderSession(){
     <section class="card hcard"><div class="hrow">${map}${stats}</div>
       ${M?`<div class="hfoot"><span class="hsm">${sel?`<b>${esc(sel.area)}</b> picked · tap it again to clear`:"Tap a wall to log there"}</span><button class="btn small" data-tab="map">Full map ⤢</button></div>`:""}</section>
     <div class="logrow"><span class="t"><b>${sel?"Log a climb at "+esc(sel.area):"Log a climb"}</b><small>${sel?esc(shortKind(sel.type))+" · picked on the map":esc(gymTypes().map(t=>t.k==="Bouldering"?"boulder":t.k==="Kilter Board"?"Kilter":t.k.toLowerCase()).join(", ").replace(/, ([^,]*)$/," or $1").replace(/^./,c=>c.toUpperCase()))}</small></span><button class="logbtn" data-act="logNew" aria-label="Log a climb"><span class="plus" aria-hidden="true">+</span><span class="ics" aria-hidden="true">${gymTypes().map(t=>catIcon(t.k)).join("")}</span></button></div>
-    <div class="dhead"><h2>${isToday?"Today's climbs":"Climbs that day"}</h2>${mine.length?`<small>${mine.length} · tap one to fix it</small>`:""}</div>
+    <div class="dhead"><h2>${isToday?"Today's climbs":"Climbs that day"}</h2>${mine.length?`${selMode?"":`<small>${mine.length} · tap one to fix it</small>`}<button class="chip selbtn" data-act="selMode" aria-pressed="${selMode}">${selMode?"Done":"Select"}</button>`:""}</div>
+    ${selMode&&mine.length?`<div class="selrow"><span>${selIds.size} of ${mine.length} picked</span><button class="chip" data-act="selAll">${selIds.size===mine.length?"Clear":"Select all "+mine.length}</button></div>`:""}
     ${dctl}
-    ${mine.length?`<div class="pcards">${groups.map(g=>(g.title?`<div class="pgh">${g.sw?`<i style="background:${g.sw}"></i>`:""}<b>${esc(g.title)}</b><small>${esc(g.sub)}</small><span class="ln"></span></div>`:"")+g.items.map(climbCard).join("")+(g.more?`<button class="btn dashed" data-act="homeAll">Show all ${g.more}</button>`:"")).join("")}</div>`:`<p class="hint">Nothing logged ${isToday?"yet today":"on this day"}. Tap <b>+</b> to log your first climb.</p>`}
-    ${sheetLink()}`;
+    ${mine.length?`<div class="pcards">${groups.map(g=>(g.title?`<div class="pgh">${g.sw?`<i style="background:${g.sw}"></i>`:""}<b>${esc(g.title)}</b><small>${esc(g.sub)}</small><span class="ln"></span></div>`:"")+g.items.map(selMode?selCard:climbCard).join("")+(g.more?`<button class="btn dashed" data-act="homeAll">Show all ${g.more}</button>`:"")).join("")}</div>`:`<p class="hint">Nothing logged ${isToday?"yet today":"on this day"}. Tap <b>+</b> to log your first climb.</p>`}
+    ${sheetLink()}
+    ${selMode?`<div class="selbar${selEnter?" enter":""}" role="region" aria-label="Picked climbs"><b>${selIds.size?selIds.size+" picked":"Pick climbs"}</b><button class="btn primary" data-act="moveSel" ${selIds.size?"":"disabled"}>${CAL_ICON}Move to another day</button></div>`:""}`;
 }
 // One climb as a card: result edge + icon, grade · holds · wall badges, where, then time, tries, rests and note; play tile for a video
+function selCard(c){
+  const kil=c.type==="Kilter Board",on=selIds.has(c.id);
+  const title=kil?[c.problem?"“"+c.problem+"”":"Kilter Board",c.angle?c.angle+"°":""].filter(Boolean).join(" · "):projWallText(c);
+  const det=[resLabel(c.result),c.tries>1?c.tries+" tries":"",c.note||""].filter(Boolean).join(" · ");
+  const rc=c.result==="Sent"?"var(--me)":c.result==="Rested"?"#5B45D6":"#CDBFFB";
+  return`<div class="cc3 pick${on?" on":""}" style="--rc:${rc}"><button class="pmain" data-act="selClimb" data-id="${c.id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on?`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`:""}</span>${idBadges(c,true)}<span class="tx"><b>${resIcon(c.result)}<span>${esc(title)}</span></b><small>${esc(det)}</small></span></button></div>`;
+}
 function climbCard(c){
   const kil=c.type==="Kilter Board";
   const title=kil?[c.problem?"“"+c.problem+"”":"Kilter Board",c.angle?c.angle+"°":""].filter(Boolean).join(" · "):projWallText(c);
@@ -1679,6 +1697,28 @@ function openCustom(){
   const r=pFrom&&pTo?{from:pFrom,to:pTo}:presetRange("m3");
   openSheet({type:"prange",d:{from:r.from,to:r.to,preset:pFrom&&pTo?"":"m3"}});
 }
+function moveSheet(){
+  const d=sheet.d,t=todayKey(),n=selIds.size;
+  const recent=[...new Set(S.climbs.filter(c=>atGym(c)&&c.climber===WHO).map(c=>dayKey(c.when)))].filter(k=>k!==DAY&&k<=t).sort().reverse().slice(0,3);
+  const picks=[...new Set([DAY!==t?t:"",shiftDay(t,-1)!==DAY?shiftDay(t,-1):"",...recent].filter(Boolean))].slice(0,4);
+  const nice=k=>k===t?"Today":k===shiftDay(t,-1)?"Yesterday":fmtShort(k);
+  return head(`Move ${n} ${n===1?"climb":"climbs"}`)+`<div class="stack">
+    <p class="hint" style="margin:-6px 0 0">From ${esc(keyDate(DAY).toLocaleDateString([],{weekday:"long",month:"short",day:"numeric"}))}. Their order and times stay the same.</p>
+    <div class="mvpicks" role="group" aria-label="Quick picks">${picks.map(k=>`<button class="chip" data-act="mvPick" data-v="${k}" aria-pressed="${d.day===k}">${esc(nice(k))}</button>`).join("")}</div>
+    <label class="field">New date<input type="date" id="mvDay" value="${d.day}" max="${t}"></label>
+    <div class="foot"><button class="btn" data-act="close">Cancel</button><button class="btn primary wide" data-act="mvApply" ${d.day&&d.day!==DAY?"":"disabled"}>Move to ${esc(d.day?nice(d.day):"…")}</button></div>
+  </div>`;
+}
+// Move the picked climbs to another day, keeping each one's time of day (so their order holds); one Undo puts them back
+function moveClimbs(day){
+  const moved=[];
+  for(const id of selIds){const c=S.climbs.find(x=>x.id===id);if(!c)continue;
+    const from=dayKey(c.when),off=c.when-keyDate(from).getTime();moved.push({id,when:c.when});
+    store.update("climbs",id,{when:keyDate(day).getTime()+off});}
+  const n=moved.length,to=day===todayKey()?"today":fmtShort(day);
+  endSelect();closeSheet();render();
+  toast(`Moved ${n} ${n===1?"climb":"climbs"} to ${to}`,[{label:"Undo",fn:()=>{for(const m of moved)store.update("climbs",m.id,{when:m.when});}},{label:"Go there",fn:()=>{DAY=day;render();animView(day>DAY?"day-l":"day-r");}}]);
+}
 function prangeSheet(){
   const d=sheet.d,t=todayKey();let a=d.from,b=d.to;if(a>b)[a,b]=[b,a];
   const n=daysBetween(a,b),w=cur();
@@ -1740,6 +1780,7 @@ function renderSheet(){
   else if(sheet.type==="share")b.innerHTML=shareSheet();
   else if(sheet.type==="gym")b.innerHTML=gymSheet();
   else if(sheet.type==="prange")b.innerHTML=prangeSheet();
+  else if(sheet.type==="move")b.innerHTML=moveSheet();
   else if(sheet.type==="merge"){const h=mergeSheet();if(h==null){closeSheet();return;}b.innerHTML=h;}
   replayTap();
 }
@@ -1769,7 +1810,7 @@ function editClimb(c){
 function readForm(){
   const f=$("#climbForm");if(!f||!sheet||!sheet.d)return;
   const d=sheet.d,fd=new FormData(f);
-  for(const k of["area","anchor","hold","note","day","angle","problem","link"])if(f.querySelector(`[name="${k}"]`))d[k]=String(fd.get(k)||"").trim();
+  for(const k of["area","anchor","hold","note","day","angle","problem","link"])if(f.elements.namedItem(k))d[k]=String(fd.get(k)||"").trim();
   d.videos=fd.getAll("video").map(v=>String(v).trim());
   if(f.querySelector('[name="addProj"]'))d.addProj=!!fd.get("addProj");
 }
@@ -1824,7 +1865,7 @@ function climbSheet(){
   const step=(f,label,val,what)=>`<div class="stepc" role="group" aria-label="${label}"><span>${label}</span><button type="button" data-act="cf" data-f="${f}" data-d="-1" aria-label="One fewer ${what}">−</button><output>${val}</output><button type="button" data-act="cf" data-f="${f}" data-d="1" aria-label="One more ${what}">+</button></div>`;
   return`<div class="sheet-h"><h2 id="sheetTitle">${isNew?"Log a climb":"Edit climb"}</h2>
     ${who.length>1?`<div class="lwho" role="group" aria-label="Who climbed it">${who.map(w=>`<button type="button" data-act="cf" data-f="climber" data-v="${esc(w)}" aria-pressed="${w===d.climber}" style="--pc:${PCOL[themeFor(w)][0]}">${esc(w)}</button>`).join("")}</div>`:""}
-    <label class="dchip">${esc(dayTxt)} ⌄<input id="fDay" name="day" type="date" value="${d.day}" max="${todayKey()}" aria-label="Date"></label>
+    <label class="dchip">${CAL_ICON}<span>${esc(dayTxt)}</span><span class="dv">⌄</span><input id="fDay" name="day" form="climbForm" type="date" value="${d.day}" max="${todayKey()}" aria-label="Date of this climb (tap to change)"></label>
     <button class="close" data-act="close" aria-label="Close">×</button></div>
   <form id="climbForm" autocomplete="off">
     <div class="ccat" role="group" aria-label="What you climbed"${gymTypes().length<4?` style="grid-template-columns:repeat(${gymTypes().length},minmax(0,1fr))"`:""}>${gymTypes().map(t=>`<button type="button" class="cbtn" data-act="cf" data-f="type" data-v="${t.k}" aria-pressed="${t.k===d.type}">${catIcon(t.k)}${t.k==="Kilter Board"?"Kilter":esc(shortType(t.k))}</button>`).join("")}</div>
@@ -1883,7 +1924,7 @@ function saveClimb(){
     area:kil?"":d.area,anchor:kil||!rope?"":d.anchor,hold:d.hold,tries:Math.max(1,+d.tries||1),rests:d.result==="Rested"?Math.max(1,+d.rests||1):"",
     note:d.note,video:d.videos.filter(u=>u).join("\n"),angle:kil?d.angle:"",problem:kil?d.problem:"",project:d.link||""};
   if(!old)data.when=whenFor(d.day&&d.day<=todayKey()?d.day:DAY);
-  else if(d.day&&d.day!==dayKey(old.when)&&d.day<=todayKey())data.when=whenFor(d.day);
+  else if(d.day&&d.day!==dayKey(old.when)&&d.day<=todayKey())data.when=keyDate(d.day).getTime()+(old.when-keyDate(dayKey(old.when)).getTime()); // keeps its time of day
   // projects: a linked one gets the send or a try; a new fall can start one
   let proj=null;const p=d.link?S.projects.find(x=>x.id===d.link):null;
   if(p){
@@ -1897,7 +1938,7 @@ function saveClimb(){
   const lbl=gradeLabel(d.grade);
   const msg=p&&d.result==="Sent"?`Saved ${lbl}: project sent!`:p?`Saved ${lbl} to your project`:proj?`Saved ${lbl} to Projects`:`Saved ${lbl}`;
   TYPE=d.type;LS.set("type",TYPE);
-  if(old){const prev=Object.assign({},old);store.update("climbs",old.id,data);closeSheet();toast(msg,undoSave(old,prev,false,Object.keys(data),proj));}
+  if(old){const prev=Object.assign({},old);store.update("climbs",old.id,data);closeSheet();toast(data.when?msg+" · moved to "+(d.day===todayKey()?"today":fmtShort(d.day)):msg,undoSave(old,prev,false,Object.keys(data),proj));}
   else{const id=store.add("climbs",Object.assign({gym:GYM},data));closeSheet();
     const where=kil?["Kilter",data.angle?data.angle+"°":""].filter(Boolean).join(" "):[data.area,data.anchor?"#"+data.anchor:""].filter(Boolean).join(" ");
     showCheer(cheerKind(d.result,p&&d.result==="Sent"),[lbl,where,d.climber!==WHO?d.climber:"",proj&&proj.created?"added to Projects":p?"project":""].filter(Boolean).join(" · "),undoSave({id},null,true,[],proj)[0].fn);}
@@ -2112,13 +2153,19 @@ document.addEventListener("click",e=>{
     case"cvDel":if(sheet&&sheet.d){readForm();sheet.d.videos.splice(+t.dataset.i,1);renderSheet();}break;
     case"homeWall":{const z=t.dataset.z;homeSel=!z||homeSel===z?"":z;LS.set("homesel",homeSel);render();break;}
     case"homeAll":homeAll=true;render();animView("restack");break;
+    case"selMode":if(selMode)endSelect();else{selMode=true;selEnter=true;}render();selEnter=false;break;
+    case"selClimb":{const id=t.dataset.id;if(selIds.has(id))selIds.delete(id);else selIds.add(id);render();break;}
+    case"selAll":{const all=dayClimbs(DAY,WHO);if(selIds.size===all.length)selIds.clear();else all.forEach(c=>selIds.add(c.id));render();break;}
+    case"moveSel":if(selIds.size){const y=shiftDay(todayKey(),-1);openSheet({type:"move",d:{day:DAY!==y?y:""}});}break;
+    case"mvPick":if(sheet&&sheet.type==="move"){sheet.d.day=t.dataset.v;renderSheet();}break;
+    case"mvApply":if(sheet&&sheet.type==="move"){const v=($("#mvDay")||{}).value||sheet.d.day;if(v&&v<=todayKey()&&v!==DAY&&selIds.size)moveClimbs(v);}break;
     case"logHere":{const z=zoneById(t.dataset.z);if(!z)break;homeSel=z.id;LS.set("homesel",homeSel);setTab("session");newClimb(z.type,z.area);break;}
     case"projWall":{const z=t.dataset.z;projSel=!z||projSel===z?"":z;render();animView("restack");if(projSel){const c=$("#pcards");if(c)c.scrollIntoView({behavior:"smooth",block:"nearest"});}break;}
     case"progWall":{const z=t.dataset.z;progSel=progSel===z?"":z;render();break;}
     case"wallHist":wallHist=!wallHist;render();break;
-    case"prevDay":DAY=shiftDay(DAY,-1);render();animView("day-r");break;
-    case"nextDay":if(DAY<todayKey())DAY=shiftDay(DAY,1);render();animView("day-l");break;
-    case"goToday":DAY=todayKey();render();animView("day-l");break;
+    case"prevDay":endSelect();DAY=shiftDay(DAY,-1);render();animView("day-r");break;
+    case"nextDay":endSelect();if(DAY<todayKey())DAY=shiftDay(DAY,1);render();animView("day-l");break;
+    case"goToday":endSelect();DAY=todayKey();render();animView("day-l");break;
     case"openDay":openSheet({type:"day",k:t.dataset.k});break;
     case"openClimb":{const c=S.climbs.find(x=>x.id===id);if(c)editClimb(c);break;}
     case"logOnDay":DAY=t.dataset.k;closeSheet();setTab("session");break;
@@ -2165,7 +2212,7 @@ document.addEventListener("click",e=>{
     case"setGym":GYM=t.dataset.v;LS.set("gym",GYM);closeSheet();render();toast("Now at "+GYM);break;
   }
 });
-document.addEventListener("click",e=>{if((e.target.id==="dayInput"||e.target.id==="fDay"||e.target.id==="prFrom"||e.target.id==="prTo")&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
+document.addEventListener("click",e=>{if((e.target.id==="dayInput"||e.target.id==="fDay"||e.target.id==="prFrom"||e.target.id==="prTo"||e.target.id==="mvDay")&&e.target.showPicker){try{e.target.showPicker();}catch(_){}}});
 document.addEventListener("input",e=>{
   // Typing an anchor number picks the wall it belongs to and pins roughly where it is on the map
   if(e.target.id==="fAnchor"){const n=parseInt(e.target.value,10);const form=e.target.form;if(!form)return;
@@ -2186,7 +2233,8 @@ document.addEventListener("change",e=>{
   if(e.target.name==="area"){syncMini();}
   // wall, hold colour or anchor changed: redraw so the project matches (or the duplicate warning) follow
   if(["area","hold","anchor"].includes(e.target.name)&&sheet&&sheet.d){if(sheet.type==="climb"){readForm();redrawAfterTap(()=>{readForm();renderSheet();});}else if(sheet.type==="project"){readProjForm();redrawAfterTap(()=>{readProjForm();renderSheet();});}}
-  if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){const dir=v>DAY?"day-l":"day-r";DAY=v;render();animView(dir);}return;}
+  if(e.target.id==="dayInput"){const v=e.target.value;if(v&&v<=todayKey()){const dir=v>DAY?"day-l":"day-r";endSelect();DAY=v;render();animView(dir);}return;}
+  if(e.target.id==="mvDay"&&sheet&&sheet.type==="move"){if(e.target.value){sheet.d.day=e.target.value;renderSheet();}return;}
   if((e.target.id==="prFrom"||e.target.id==="prTo")&&sheet&&sheet.type==="prange"){const v=e.target.value;if(v){sheet.d[e.target.id==="prFrom"?"from":"to"]=v;sheet.d.preset="";renderSheet();}return;}
   if(e.target.name==="link"&&sheet&&sheet.d){readForm();linkProject(e.target.value);renderSheet();}
   if(e.target.name==="keep"&&sheet&&sheet.type==="merge")sheet.keep=e.target.value;
